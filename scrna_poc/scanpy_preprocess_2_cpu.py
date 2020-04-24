@@ -1,31 +1,34 @@
 # Import requirements
 import scanpy as sc
 from timeit import default_timer as timer
-import sys
+import argparse
 import os
 
-# Inputs
-in_file = sys.argv[1] # .h5ad file containing normalized count matrix, produced by scanpy_preprocess_1.py
-out_dir = sys.argv[2] # Output directory
-min_disp = float(sys.argv[3]) # Threshold to select highly variable genes. Lower threshold = more genes selected. Recommended 0.5. If 0, all genes used.
+# Parse args
+
+parser = argparse.ArgumentParser(description='Create scaled HVG matrix.')
+parser.add_argument('--input', type=str, help='Input normalized count matrix in .h5ad format')
+parser.add_argument('--out_dir', type=str, help='output directory')
+parser.add_argument('--out_prefix', type=str, help='output file prefix')
+parser.add_argument('--min_disp', type=float, help='Select HVGs with greater than this threshold', default=0.5)
+args = parser.parse_args()
 
 # Read normalized count matrix
-adata = sc.read(in_file)
+adata = sc.read(args.input)
 
-if min_disp > 0:
-
-    # Filter matrix to only variable genes
+# Filter matrix to only variable genes
+if args.min_disp > 0:
     start = timer()
-    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=min_disp)
-    
+    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=10, min_disp=args.min_disp)
+    # Retain the ACE2 gene for eventual visualization
+    adata.var.highly_variable['ACE2']=True
     n_genes = sum(adata.var.highly_variable)
     print("Selected " + str(n_genes) + " genes.")
     adata = adata[:, adata.var.highly_variable]
-    
     end = timer()
     print("identifying HVG time: " + str(end - start))
 
-# Regress out effects of total counts per cell and the percentage expressed. of mitochondrial genes 
+# Regress out effects of total counts per cell and the percentage of mitochondrial genes expressed. 
 start = timer()
 sc.pp.regress_out(adata, ['n_counts', 'percent_mito'])
 end = timer()
@@ -39,7 +42,7 @@ print("scaling filtered data time: " + str(end - start))
 
 # Save output
 start = timer()
-out_file = os.path.join(out_dir, "scanpy_scaled_" + str(n_genes) + ".h5ad")
+out_file = os.path.join(args.out_dir, args.out_prefix + "_scanpy_scaled_" + str(n_genes) + ".h5ad")
 adata.write(out_file)
 end = timer()
 print("write time: " + str(end - start))
