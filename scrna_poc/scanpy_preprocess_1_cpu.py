@@ -6,7 +6,8 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser(description='Filter and normalize scRNA-seq count matrix')
-parser.add_argument('--csv', type=str, help='Input count matrix in CSV format')
+parser.add_argument('--input', type=str, help='Input count matrix')
+parser.add_argument('--delim', type=str, help='Delimiter', default=",")
 parser.add_argument('--out_dir', type=str, help='output directory')
 parser.add_argument('--out_prefix', type=str, help='output file prefix')
 parser.add_argument('--min_genes', type=int, help='drop cells with fewer than this number of genes', default=200)
@@ -16,7 +17,7 @@ args = parser.parse_args()
 
 # Load data
 start = timer()
-adata = sc.read_csv(args.csv)
+adata = sc.read_csv(filename=args.input, delimiter=args.delim)
 adata = adata.T
 end = timer()
 print("CSV loading time: " + str(end - start))
