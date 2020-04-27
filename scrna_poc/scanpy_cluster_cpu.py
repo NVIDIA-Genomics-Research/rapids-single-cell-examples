@@ -46,6 +46,7 @@ start = timer()
 sc.tl.louvain(adata, resolution=args.resolution)
 end = timer()
 print("Louvain clustering time: " + str(end - start))
+print(adata.obs.louvain.value_counts())
 
 # Save
 start = timer()
