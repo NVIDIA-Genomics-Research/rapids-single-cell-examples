@@ -42,7 +42,7 @@ print("scaling filtered data time: " + str(end - start))
 
 # Save output
 start = timer()
-out_file = os.path.join(args.out_dir, args.out_prefix + "_scanpy_scaled_" + str(n_genes) + ".h5ad")
+out_file = os.path.join(args.out_dir, args.out_prefix + "_scanpy_scaled.h5ad")
 adata.write(out_file)
 end = timer()
 print("write time: " + str(end - start))
