@@ -4,6 +4,7 @@ import scanpy as sc
 from timeit import default_timer as timer
 import argparse
 import os
+from sklearn.cluster import KMeans
 
 # Load data
 start = timer()
@@ -18,17 +19,13 @@ start = timer()
 
 ## Filter cells with extreme number of genes
 sc.pp.filter_cells(adata, min_genes=200)
-print(adata)
-
 sc.pp.filter_cells(adata, max_genes=8000)
-print(adata)
 
 ## Filter cells with high MT reads
 mito_genes = adata.var_names.str.startswith('MT-')
 adata.obs['percent_mito'] = np.sum(adata[:, mito_genes].X, axis=1) / np.sum(adata.X, axis=1)
 adata.obs['n_counts'] = adata.X.sum(axis=1)
 adata = adata[adata.obs.percent_mito < 0.5, :]
-print(adata)
 
 ## Remove zero columns
 adata = adata[:,adata.X.sum(axis=0) > 0]
@@ -50,7 +47,7 @@ print("log transform time: " + str(end - start))
 
 # Save preprocessed count matrix
 start = timer()
-adata.write("organoid_scanpy_normalized_counts.h5ad")
+adata.write("organoid_original_matrix_scanpy_normalized_counts.h5ad")
 end = timer()
 print("write normalized matrix time: " + str(end - start))
 
@@ -78,7 +75,7 @@ print("scaling filtered data time: " + str(end - start))
 
 # Save output
 start = timer()
-adata.write("organoid_scanpy_scaled.h5ad")
+adata.write("organoid_original_matrix_5000_genes_scanpy_scaled.h5ad")
 end = timer()
 print("write scaled and filtered matrix time: " + str(end - start))
 
@@ -118,11 +115,10 @@ start = timer()
 sc.tl.louvain(adata, resolution=0.5)
 end = timer()
 print("Louvain clustering time: " + str(end - start))
-print(adata.obs.louvain.value_counts())
 
 # Save
 start = timer()
-adata.write("organoid_scanpy_clustered.h5ad")
+adata.write("organoid_original_matrix_5000_genes_scanpy_clustered.h5ad")
 end = timer()
 print("write clustered annData time: " + str(end - start))
 
