@@ -87,9 +87,20 @@ print("PCA time: " + str(end - start))
 
 # t-SNE
 start = timer()
-sc.tl.tsne(adata, n_pcs=20)
+sc.tl.tsne(adata, n_pcs=20, n_jobs=4)
 end = timer()
 print("t-SNE time: " + str(end - start))
+
+# K-means on t-SNE
+start = timer()
+kmeans = KMeans(n_clusters=13, random_state=0).fit(adata.obsm['X_tsne'])
+adata.obs['kmeans_tsne'] = kmeans.labels_.astype(str)
+end = timer()
+print("k-means time: " + str(end - start))
+
+# Plot
+sc.pl.tsne(adata, save='_organoid_kmeans.png', color=["kmeans_tsne"])
+sc.pl.tsne(adata, save='_organoid_ace2.png', color=["ACE2"], color_map="Blues")
 
 # KNN graph
 start = timer()
@@ -103,7 +114,7 @@ sc.tl.umap(adata, min_dist=0.3, spread=0.6)
 end = timer()
 print("UMAP time: " + str(end - start))
 
-# K-means
+# K-means on UMAP
 start = timer()
 kmeans = KMeans(n_clusters=13, random_state=0).fit(adata.obsm['X_umap'])
 adata.obs['kmeans'] = kmeans.labels_.astype(str)
@@ -112,7 +123,7 @@ print("k-means time: " + str(end - start))
 
 # Louvain clustering
 start = timer()
-sc.tl.louvain(adata, resolution=0.5)
+sc.tl.louvain(adata, resolution=0.4)
 end = timer()
 print("Louvain clustering time: " + str(end - start))
 
@@ -125,9 +136,7 @@ print("write clustered annData time: " + str(end - start))
 # Plot
 sc.pl.umap(adata, save='_organoid_kmeans.png', color=["kmeans"])
 sc.pl.umap(adata, save='_organoid_louvain.png', color=["louvain"])
-sc.pl.umap(adata, save='_organoid_ace2.png', color=["ACE2"], color_map="jet")
-sc.pl.tsne(adata, save='_organoid_kmeans.png', color=["kmeans"])
-sc.pl.tsne(adata, save='_organoid_louvain.png', color=["louvain"])
-sc.pl.tsne(adata, save='_organoid_ace2.png', color=["ACE2"], color_map="jet")
+sc.pl.umap(adata, save='_organoid_ace2.png', color=["ACE2"], color_map="Blues")
+
 
 
