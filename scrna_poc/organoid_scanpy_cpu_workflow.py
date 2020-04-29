@@ -11,10 +11,9 @@ adata = sc.read_csv(filename='/covid-omics/scrna_demo/data/organoid/original_mat
 adata = adata.T
 end = timer()
 print("Count matrix loading time: " + str(end - start))
-print(adata)
+adata
 
 # Filtering cells in the matrix
-
 start = timer()
 
 ## Filter cells with extreme number of genes
@@ -51,8 +50,7 @@ print("log transform time: " + str(end - start))
 
 # Save preprocessed count matrix
 start = timer()
-out_file = os.path.join("organoid_scanpy_normalized_counts.h5ad")
-adata.write(out_file)
+adata.write("organoid_scanpy_normalized_counts.h5ad")
 end = timer()
 print("write normalized matrix time: " + str(end - start))
 
@@ -80,8 +78,7 @@ print("scaling filtered data time: " + str(end - start))
 
 # Save output
 start = timer()
-out_file = os.path.join("organoid_scanpy_scaled.h5ad")
-adata.write(out_file)
+adata.write("organoid_scanpy_scaled.h5ad")
 end = timer()
 print("write scaled and filtered matrix time: " + str(end - start))
 
