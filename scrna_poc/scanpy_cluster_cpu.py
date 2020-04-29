@@ -15,6 +15,8 @@ parser.add_argument('--neighbors', type=int, help='Number of neighbors for KNN',
 parser.add_argument('--resolution', type=float, help='Number of neighbors for KNN', default=0.5)
 parser.add_argument('--spread', type=float, help='Spread for UMAP', default=1.0)
 parser.add_argument('--min_dist', type=float, help='Minimum distance for UMAP', default=0.5)
+parser.add_argument('--lr', type=int, help='t-SNE learning rate', default=1000)
+parser.add_argument('--k', type=int, help='k-means clusters', default=13)
 args = parser.parse_args()
 
 # Load data
@@ -29,6 +31,12 @@ sc.tl.pca(adata, n_comps=args.ncomps)
 end = timer()
 print("PCA time: " + str(end - start))
 
+# t-SNE
+start = timer()
+sc.tl.tsne(adata, n_pcs=args.ncomps, learning_rate=args.lr)
+end = timer()
+print("t-SNE time: " + str(end - start))
+
 # KNN graph
 start = timer()
 sc.pp.neighbors(adata, n_pcs=args.ncomps_knn, n_neighbors=args.neighbors)
@@ -40,6 +48,13 @@ start = timer()
 sc.tl.umap(adata, min_dist=args.min_dist, spread=args.spread)
 end = timer()
 print("UMAP time: " + str(end - start))
+
+# K-means
+start = timer()
+kmeans = KMeans(n_clusters=args.k, random_state=0).fit(adata.obsm['X_umap'])
+adata.obs['kmeans'] = kmeans.labels_.astype(str)
+end = timer()
+print("k-means time: " + str(end - start))
 
 # Louvain clustering
 start = timer()
@@ -54,5 +69,10 @@ out_file = os.path.join(args.out_dir, args.out_prefix + "_scanpy_clustered.h5ad"
 adata.write(out_file)
 end = timer()
 print("write time: " + str(end - start))
+
+# Plot
+sc.pl.umap(adata, save=args.out_prefix + '_kmeans.png', color=["kmeans"])
+sc.pl.umap(adata, save=args.out_prefix + '_louvain.png', color=["louvain"])
+sc.pl.umap(adata, save=args.out_prefix + '_ace2.png', color=["ACE2"], color_map="jet")
 
 

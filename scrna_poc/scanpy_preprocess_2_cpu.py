@@ -19,11 +19,10 @@ adata = sc.read(args.input)
 # Filter matrix to only variable genes
 if args.min_disp > 0:
     start = timer()
-    sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=10, min_disp=args.min_disp)
-    # Retain the ACE2 gene for eventual visualization
+    sc.pp.highly_variable_genes(adata, n_top_genes=hvg, flavor="cell_ranger")
+    # Retain the ACE2 and TMPRSS2 genes for eventual visualization
     adata.var.highly_variable['ACE2']=True
-    n_genes = sum(adata.var.highly_variable)
-    print("Selected " + str(n_genes) + " genes.")
+    adata.var.highly_variable['TMPRSS2']=True
     adata = adata[:, adata.var.highly_variable]
     end = timer()
     print("identifying HVG time: " + str(end - start))
