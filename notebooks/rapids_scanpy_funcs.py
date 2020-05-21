@@ -160,11 +160,6 @@ def rank_genes_groups(
     **kwds,
 ):
 
-#     adata = adata.copy() if copy else adata
-    
-    ### Converts groups (cluster labels) to strings
-#     _utils.sanitize_anndata(adata)
-    
     #### Wherever we see "adata.obs[groupby], we should just replace w/ the groups"
 
     import time
