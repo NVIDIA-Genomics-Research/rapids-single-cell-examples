@@ -1,4 +1,4 @@
-# GPU-Accelerated Single-Cell Genomics Analysis using [RAPIDS](https://www.rapids.ai)
+# GPU-Accelerated Single-Cell Genomics Analysis with [RAPIDS](https://www.rapids.ai)
 
 This repository contains example notebooks demonstrating how to use RAPIDS for GPU-accelerated analysis of single-cell sequencing data.
 
