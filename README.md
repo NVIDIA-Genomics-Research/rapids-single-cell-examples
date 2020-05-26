@@ -4,10 +4,10 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 ## Installation 
 
-All dependencies for this example can be installed with conda.
+All dependencies for this example can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. If installing for a system running a CUDA10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`
 
 ```bash
-conda env create --name rapidgenomics -f conda/rapidgenomics.yml
+conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
 conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
