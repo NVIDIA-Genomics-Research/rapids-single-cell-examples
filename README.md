@@ -14,4 +14,13 @@ Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPID
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/hlca_lung_cpu_analysis.ipynb).
 
+## Installation 
 
+All dependencies for this example can be installed with conda. 
+
+```bash
+conda env create --name rapidgenomics -f conda/rapidgenomics.yml
+conda activate rapidgenomics
+jupyter lab
+
+```
