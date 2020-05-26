@@ -1,4 +1,4 @@
-# Single cell genomics analysis examples accelerated with RAPIDS
+# GPU-Accelerated Single-Cell Genomics Analysis using RAPIDS
 
 This repository contains example notebooks demonstrating how to use RAPIDS for GPU-accelerated analysis of single-cell sequencing data.
 
