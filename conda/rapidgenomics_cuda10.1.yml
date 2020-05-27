@@ -12,6 +12,7 @@ dependencies:
   - dask-cudf
   - cuml
   - cugraph
+  - numba=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
@@ -19,6 +20,7 @@ dependencies:
   - louvain
   - cupy=7
   - scanpy
+  - umap-learn
   - ipykernel
   - jupyterlab
   - pip
