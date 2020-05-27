@@ -1,5 +1,5 @@
 channels:
-  - rapidsai-nightly
+  - rapidsai
   - nvidia
   - conda-forge
   - bioconda
@@ -11,10 +11,12 @@ dependencies:
   - dask-cuda
   - dask-cudf
   - cuml
+  - cugraph
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
   - scikit-learn
+  - louvain
   - cupy=7
   - scanpy
   - ipykernel
