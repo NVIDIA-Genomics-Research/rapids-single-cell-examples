@@ -12,23 +12,27 @@ conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
 
-## Running the Notebooks
-
-After installing the necessary dependencies, you can just run `jupyter lab`
+After installing the necessary dependencies, you can just run `jupyter lab`.
 
 ## Human Lung Cell Atlas Example
 
 We present an example using RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering visualization and gene ranking. 
 
-### Dataset
+### Example Dataset
 
-The dataset is based on [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2) and can be downloaded following the instructions at https://github.com/krasnowlab/HLCA.
+The dataset is based on [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2). If you wish to run the notebook using the same data, use the following command to download the count matrix for this dataset and store it in the `data` folder:
 
-To run the examples, you will need to convert the dataset to a sparse `h5ad` format using [this notebook](notebooks/csv_to_h5ad.ipynb)
+```bash
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x_UMIs.sparse.h5ad
+```
 
-### Example
+### Example Code
 
 Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPIDS analysis of this dataset.
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/hlca_lung_cpu_analysis.ipynb).
+
+### Adapting to another dataset
+
+For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb)
 
