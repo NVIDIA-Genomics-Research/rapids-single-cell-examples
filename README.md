@@ -34,5 +34,19 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Adapting to another dataset
 
-For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb)
+For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
 
+### Acceleration
+
+All runtimes are given in seconds.
+
+| Step                         | CPU runtime (16 core AMD EPYC 7571) | GPU runtime (Tesla V100 32 GB) | Acceleration |
+|------------------------------|-------------------------------------|--------------------------------|--------------|
+| Preprocessing                | 324.35                              | 68.49                          | 4.7x         |
+| PCA                          | 16.2                                | 1.59                           | 10.2x        |
+| t-SNE                        | 166                                 | 1.95                           | 85.1x        |
+| k-means (single iteration)   | 7.3                                 | 0.11                           | 66.4x        |
+| KNN                          | 23                                  | 5.18                           | 4.4x         |
+| UMAP                         | 78                                  | 0.98                           | 80x          |
+| Louvain clustering           | 13.6                                | 0.25                           | 54.4x        |
+| Differential Gene Expression | 45.1                                | 18.9                           | 2.4x         |
