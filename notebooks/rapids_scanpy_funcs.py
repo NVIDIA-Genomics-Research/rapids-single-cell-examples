@@ -24,32 +24,25 @@ from cuml.linear_model import LinearRegression
 def scale(normalized, max_value=10):
     mean = normalized.mean(axis=0)
     stddev = cp.sqrt(normalized.var(axis=0))
+    
     normalized -= mean
-    normalized /= stddev
+    normalized *= 1/stddev
     
     normalized[normalized>10] = 10
     
     return normalized
 
 
-def _regress_out_chunk(data_chunk, regressors):
+def _regress_out_chunk(X, y):
     """
     Performs a data_cunk.shape[1] number of local linear regressions,
     replacing the data in the original chunk w/ the regressed result. 
     """
-    
     output = []
+    lr = LinearRegression(fit_intercept=False)
+    lr.fit(X, y, convert_dtype=True)
+    return y.reshape(y.shape[0],) - lr.predict(X).reshape(y.shape[0])
     
-    for col in range(data_chunk.shape[1]):
-        y = data_chunk[:,col]
-        X = regressors
-        lr = LinearRegression(fit_intercept=False)
-        lr.fit(X, y, convert_dtype=True)
-        mu = lr.predict(X)
-        
-        data_chunk[:, col] = y - mu
-
-    return data_chunk
 
 
 def normalize_total(filtered_cells, target_sum):
@@ -61,20 +54,21 @@ def normalize_total(filtered_cells, target_sum):
     return normalized
 
 
-def regress_out(normalized, n_counts, percent_mito):
+def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
     regressors = cp.ones((n_counts.shape[0]*3)).reshape((n_counts.shape[0], 3), order="F")
 
     regressors[:, 1] = n_counts
     regressors[:, 2] = percent_mito
     
-    df_regressors = cudf.DataFrame.from_gpu_matrix(regressors)
+    for i in range(normalized.shape[1]):
+        if verbose and i % 500 == 0:
+            print("Regressed %s out of %s" %(i, normalized.shape[1]))
+        X = regressors
+        y = normalized[:,i]
+        _regress_out_chunk(X, y)
     
-    da_normalized = da.from_array(normalized, chunks=(-1, 1000), asarray=False)
-    da_normalized = da_normalized.map_blocks(lambda cols: _regress_out_chunk(cols, df_regressors), 
-                                             dtype=cp.float32)
-
-    return da_normalized.compute()
+    return normalized
 
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000):
@@ -247,7 +241,7 @@ def rank_genes_groups(
         partial_indices = cp.argsort(scores[partition])[::-1]
         global_indices = reference_indices[partition][partial_indices]
         rankings_gene_scores.append(scores[global_indices].get())  ## Shouldn't need to take this off device
-        rankings_gene_names.append(var_names[global_indices])
+        rankings_gene_names.append(var_names[global_indices].to_pandas())
         if len(groups_order) <= 2:
             break
 
@@ -255,9 +249,8 @@ def rank_genes_groups(
     if (len(groups) == 2):
         groups_order_save = [g for g in groups_order if g != reference]
     
-    print("GPU Ranking took: " + str(time.time() - start))
+    print("Ranking took (GPU): " + str(time.time() - start))
     
-
     start = time.time()
     
     scores = np.rec.fromarrays(
@@ -270,6 +263,7 @@ def rank_genes_groups(
         dtype=[(rn, 'U50') for rn in groups_order_save],
     )
     
-    print("Created np.rec.fromarrays in: " + str(time.time() - start))
+    print("Preparing output np.rec.fromarrays took (CPU): " + str(time.time() - start))
+    print("Note: This operation will be accelerated in a future version")
     
     return scores, names, original_reference
