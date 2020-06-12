@@ -28,7 +28,7 @@ wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us
 
 ### Example Code
 
-Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPIDS analysis of this dataset.
+Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPIDS analysis of this dataset. Please note that in order for the commands in the notebook to run, the file [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) needs to be in the same folder as the notebook.
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/hlca_lung_cpu_analysis.ipynb).
 
@@ -39,6 +39,7 @@ For our examples, we stored the count matrix in a sparse `.h5ad` format. To conv
 ### Acceleration
 
 All runtimes are given in seconds.
+Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
 
 | Step                         | CPU runtime (16 core AMD EPYC 7571) | GPU runtime (Tesla V100 32 GB) | Acceleration |
 |------------------------------|-------------------------------------|--------------------------------|--------------|
