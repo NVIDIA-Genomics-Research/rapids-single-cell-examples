@@ -25,7 +25,27 @@ import math
 import dask.array as da
 
 from cuml.linear_model import LinearRegression
+from cuml.decomposition import PCA
 
+def pca(adata, n_components=50, train_ratio=0.25, n_batches=50):
+    import math
+    train_size = math.ceil(adata.X.shape[0] * train_ratio)
+    pca = PCA(n_components=n_components).fit(adata.X[:train_size])
+    
+    embeddings = cp.zeros((adata.X.shape[0], n_components))
+    batch_size = int(embeddings.shape[0] / n_batches)
+    for batch in range(n_batches):
+        start_idx = batch * batch_size
+        end_idx = start_idx + batch_size
+
+        if(adata.X.shape[0] - end_idx < batch_size):
+            end_idx = adata.X.shape[0]
+
+        embeddings[start_idx:end_idx,:] = cp.asarray(pca.transform(adata.X[start_idx:end_idx]))
+        
+    adata.obsm["X_pca"] = embeddings.get()
+    
+    return adata
 
 def scale(normalized, max_value=10):
     mean = normalized.mean(axis=0)
@@ -52,12 +72,12 @@ def _regress_out_chunk(X, y):
 
 
 def normalize_total(filtered_cells, target_sum):
-    sums = np.array(target_sum / filtered_cells.sum(axis=1)).ravel()
-
-    normalized = filtered_cells.multiply(sums[:, np.newaxis]) # Done on host for now
-    normalized = cp.sparse.csr_matrix(normalized)
     
-    return normalized
+    local_cells_host = filtered_cells.get()
+    sums = np.array((target_sum * (filtered_cells.sum(axis=1)**-1)).get()).ravel()
+
+    normalized = local_cells_host.multiply(sums[:, np.newaxis]) # Done on host for now
+    return cp.sparse.csr_matrix(normalized)
 
 
 def regress_out(normalized, n_counts, percent_mito, verbose=False):
@@ -101,7 +121,7 @@ def _filter_cells(sparse_gpu_array, min_genes, max_genes):
 
 def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
     thr = np.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
-    filtered_genes = sparse_gpu_array[:,thr]
+    filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:,thr])
     genes_idx = genes_idx[np.where(thr)[0]]
     
     return filtered_genes, genes_idx.reset_index(drop=True)
