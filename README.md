@@ -34,7 +34,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Adapting to another dataset
 
-For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
+For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/convert_to_h5ad.ipynb).
 
 ### Acceleration
 
