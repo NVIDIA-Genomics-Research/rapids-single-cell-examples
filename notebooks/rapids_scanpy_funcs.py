@@ -48,15 +48,15 @@ def pca(adata, n_components=50, train_ratio=0.25, n_batches=50):
     return adata
 
 def scale(normalized, max_value=10):
+
     mean = normalized.mean(axis=0)
-    stddev = cp.sqrt(normalized.var(axis=0))
-    
     normalized -= mean
-    normalized *= 1/stddev
+    del mean
+    stddev = cp.sqrt(normalized.var(axis=0))
+    normalized /= stddev
+    del stddev
     
-    normalized[normalized>10] = 10
-    
-    return normalized
+    return normalized.clip(a_max=max_value)
 
 
 def _regress_out_chunk(X, y):
@@ -64,10 +64,11 @@ def _regress_out_chunk(X, y):
     Performs a data_cunk.shape[1] number of local linear regressions,
     replacing the data in the original chunk w/ the regressed result. 
     """
-    output = []
+    y_d = y.todense()
+    
     lr = LinearRegression(fit_intercept=False)
-    lr.fit(X, y, convert_dtype=True)
-    return y.reshape(y.shape[0],) - lr.predict(X).reshape(y.shape[0])
+    lr.fit(X, y_d, convert_dtype=True)
+    return y_d.reshape(y_d.shape[0],) - lr.predict(X).reshape(y_d.shape[0])
     
 
 
@@ -119,13 +120,13 @@ def normalize_total(filtered_cells, target_sum):
     return filtered_cells
 
 
-def sum_major(csr_arr):
+def sum_major(csr_arr, square=False):
     sums = cp.zeros(csr_arr.shape[0], dtype=csr_arr.dtype)
     
     sum_major_kernel = cp.RawKernel(r'''
     extern "C" __global__
     void sum_major_kernel(const int *indptr, const float *data, 
-                    float *out, int nrows) {
+                    float *out, int nrows, bool square) {
         int row = blockDim.x * blockIdx.x + threadIdx.x;
         
         float sum = 0.0;
@@ -133,7 +134,10 @@ def sum_major(csr_arr):
         int stop_idx = indptr[row+1];
 
         for(int i = start_idx; i < stop_idx; i++)
-            sum += data[i];
+            float val = data[i];
+            if(square)
+                val = val * val;
+            sum += val;
         out[row] = sum;
     }
     ''', 'mul_kernel')
@@ -142,7 +146,8 @@ def sum_major(csr_arr):
                (csr_arr.indptr,
                csr_arr.data,
                sums,
-               filtered_cells.shape[0]))
+               filtered_cells.shape[0],
+               square))
 
     
 
@@ -153,14 +158,16 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     regressors[:, 1] = n_counts
     regressors[:, 2] = percent_mito
     
+    outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
+    
     for i in range(normalized.shape[1]):
         if verbose and i % 500 == 0:
             print("Regressed %s out of %s" %(i, normalized.shape[1]))
         X = regressors
         y = normalized[:,i]
-        _regress_out_chunk(X, y)
+        outputs[:,i] = _regress_out_chunk(X, y)
     
-    return normalized
+    return outputs
 
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000):
