@@ -73,12 +73,78 @@ def _regress_out_chunk(X, y):
 
 def normalize_total(filtered_cells, target_sum):
     
-    local_cells_host = filtered_cells.get()
-    sums = np.array((target_sum * (filtered_cells.sum(axis=1)**-1)).get()).ravel()
 
-    normalized = local_cells_host.multiply(sums[:, np.newaxis]) # Done on host for now
-    return cp.sparse.csr_matrix(normalized)
+    mul_kernel = cp.RawKernel(r'''
+    extern "C" __global__
+    void mul_kernel(const int *indptr, float *data, 
+                    int nrows, int tsum) {
+        int row = blockDim.x * blockIdx.x + threadIdx.x;
+        
+        if(row >= nrows) {
+            return;
+        }
+        
+        
+        float scale = 0.0;
+        int start_idx = indptr[row];
+        int stop_idx = indptr[row+1];
 
+        for(int i = start_idx; i < stop_idx; i++)
+            scale += data[i];
+            
+        if(row % 100000 == 0)
+            printf("scale: %f, row=%d, target_sum=%f\n", scale, row, tsum);
+
+        if(scale > 0.0) {
+        
+            scale = tsum / scale;
+            for(int i = start_idx; i < stop_idx; i++)
+                data[i] *= scale;
+        }
+    }
+    ''', 'mul_kernel')
+    
+    print("Target_sum="  + str(target_sum) + ", dtype=" + str(type(target_sum)))
+    
+    mul_kernel((math.ceil(filtered_cells.shape[0] / 32.0),), (32,), 
+               (filtered_cells.indptr,
+               filtered_cells.data,
+               filtered_cells.shape[0],
+               int(target_sum)))
+    
+    cp.cuda.Stream.null.synchronize()
+    
+    print("Finished kernel")
+
+    return filtered_cells
+
+
+def sum_major(csr_arr):
+    sums = cp.zeros(csr_arr.shape[0], dtype=csr_arr.dtype)
+    
+    sum_major_kernel = cp.RawKernel(r'''
+    extern "C" __global__
+    void sum_major_kernel(const int *indptr, const float *data, 
+                    float *out, int nrows) {
+        int row = blockDim.x * blockIdx.x + threadIdx.x;
+        
+        float sum = 0.0;
+        int start_idx = indptr[row];
+        int stop_idx = indptr[row+1];
+
+        for(int i = start_idx; i < stop_idx; i++)
+            sum += data[i];
+        out[row] = sum;
+    }
+    ''', 'mul_kernel')
+    
+    sum_major_kernel((math.ceil(csr_arr.shape[0] / 32.0),), (32,), 
+               (csr_arr.indptr,
+               csr_arr.data,
+               sums,
+               filtered_cells.shape[0]))
+
+    
 
 def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
