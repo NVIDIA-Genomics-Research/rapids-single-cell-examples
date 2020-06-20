@@ -81,10 +81,8 @@ def normalize_total(filtered_cells, target_sum):
                     int nrows, int tsum) {
         int row = blockDim.x * blockIdx.x + threadIdx.x;
         
-        if(row >= nrows) {
+        if(row >= nrows)
             return;
-        }
-        
         
         float scale = 0.0;
         int start_idx = indptr[row];
@@ -92,12 +90,8 @@ def normalize_total(filtered_cells, target_sum):
 
         for(int i = start_idx; i < stop_idx; i++)
             scale += data[i];
-            
-        if(row % 100000 == 0)
-            printf("scale: %f, row=%d, target_sum=%f\n", scale, row, tsum);
 
         if(scale > 0.0) {
-        
             scale = tsum / scale;
             for(int i = start_idx; i < stop_idx; i++)
                 data[i] *= scale;
