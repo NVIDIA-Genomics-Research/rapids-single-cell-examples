@@ -16,7 +16,7 @@ After installing the necessary dependencies, you can just run `jupyter lab`.
 
 ## Example 1: Human Lung Cell Atlas (Single-cell RNA-seq)
 
-<img align="left" width="120" height="100" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
 
 We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering visualization and gene ranking. 
 
