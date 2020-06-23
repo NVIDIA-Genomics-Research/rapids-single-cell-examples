@@ -52,7 +52,7 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 
 ## Example 2: 1 Million Mouse Brain Cells from 10X Genomics (Single-cell RNA-seq)
 
-<img align="left" width="120" height="100" src="images/1M_brain.png", raw=True>
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering visualization.
 
