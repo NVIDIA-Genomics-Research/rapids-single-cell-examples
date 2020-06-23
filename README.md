@@ -61,7 +61,7 @@ We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-s
 The dataset was made publicly available by 10X Genomics. Use the following command to download the count matrix for this dataset and store it in the `data` folder:
 
 ```bash
-wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_neurons_10X.sparse.gz.h5ad
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad
 ```
 
 ### Example Code
