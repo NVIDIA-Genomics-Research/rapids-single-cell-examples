@@ -25,27 +25,6 @@ import math
 import dask.array as da
 
 from cuml.linear_model import LinearRegression
-from cuml.decomposition import PCA
-
-def pca(adata, n_components=50, train_ratio=0.25, n_batches=50):
-    import math
-    train_size = math.ceil(adata.X.shape[0] * train_ratio)
-    pca = PCA(n_components=n_components).fit(adata.X[:train_size])
-    
-    embeddings = cp.zeros((adata.X.shape[0], n_components))
-    batch_size = int(embeddings.shape[0] / n_batches)
-    for batch in range(n_batches):
-        start_idx = batch * batch_size
-        end_idx = start_idx + batch_size
-
-        if(adata.X.shape[0] - end_idx < batch_size):
-            end_idx = adata.X.shape[0]
-
-        embeddings[start_idx:end_idx,:] = cp.asarray(pca.transform(adata.X[start_idx:end_idx]))
-        
-    adata.obsm["X_pca"] = embeddings.get()
-    
-    return adata
 
 def scale(normalized, max_value=10):
 
@@ -166,7 +145,6 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000):
     n_batches = math.ceil(sparse_gpu_array.shape[0] / rows_per_batch)
-    print("Running %d batches" % n_batches)
     filtered_list = []
     for batch in range(n_batches):
         batch_size = rows_per_batch
