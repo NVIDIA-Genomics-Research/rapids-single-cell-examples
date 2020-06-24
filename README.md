@@ -14,6 +14,19 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
 
+## Configuration
+
+
+Unified Virtual Memory (UVM) can be used to oversubscribe your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of memory GPU memory being oversubscribed. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following
+```
+import cupy as cp
+import rmm
+rmm.reinitialize(managed_memory=True)
+cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+```
+
+RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter. 
+
 ## Example 1: Single-cell RNA-seq of 70,000 cells from the Human Lung Cell Atlas
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
@@ -55,6 +68,8 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
+
+This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this workflow should work on any GPU w/ the Pascal architecture or newer, you will want to make sure there is enough main memory available.
 
 ### Example Dataset
 
