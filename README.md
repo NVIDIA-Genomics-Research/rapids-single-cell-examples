@@ -14,11 +14,24 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
 
+## Configuration
+
+
+Unified Virtual Memory (UVM) can be used to [oversubscribe](https://developer.nvidia.com/blog/beyond-gpu-memory-limits-unified-memory-pascal/) your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of oversubscription. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following:
+```
+import cupy as cp
+import rmm
+rmm.reinitialize(managed_memory=True)
+cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+```
+
+RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter. 
+
 ## Example 1: Single-cell RNA-seq of 70,000 cells from the Human Lung Cell Atlas
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
 
-We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering visualization and gene ranking. 
+We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking. 
 
 ### Example Dataset
 
@@ -54,7 +67,9 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
 
-We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering visualization.
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
+
+This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available.
 
 ### Example Dataset
 
@@ -66,7 +81,8 @@ wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us
 
 ### Example Code
 
-Follow this [Jupyter notebook](notebooks/1M_neurons_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the file [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) needs to be in the same folder as the notebook.
+Follow this [Jupyter notebook](notebooks/1M_neurons_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook.
+This notebook runs completely in under 15 minutes on a Tesla V100 GPU with 32 GB memory.
 
 ## Adapting these examples to another dataset
 

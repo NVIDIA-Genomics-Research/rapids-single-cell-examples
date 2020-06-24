@@ -84,10 +84,6 @@ def normalize_total(filtered_cells, target_sum):
                filtered_cells.shape[0],
                int(target_sum)))
     
-    cp.cuda.Stream.null.synchronize()
-    
-    print("Finished kernel")
-
     return filtered_cells
 
 
