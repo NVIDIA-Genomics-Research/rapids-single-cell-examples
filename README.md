@@ -66,7 +66,8 @@ wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us
 
 ### Example Code
 
-Follow this [Jupyter notebook](notebooks/1M_neurons_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the file [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) needs to be in the same folder as the notebook.
+Follow this [Jupyter notebook](notebooks/1M_neurons_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook.
+This notebook runs completely in under 15 minutes on a Tesla V100 GPU with 32 GB memory.
 
 ## Adapting these examples to another dataset
 
