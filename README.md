@@ -18,7 +18,7 @@ After installing the necessary dependencies, you can just run `jupyter lab`.
 
 
 Unified Virtual Memory (UVM) can be used to [oversubscribe](https://developer.nvidia.com/blog/beyond-gpu-memory-limits-unified-memory-pascal/) your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of oversubscription. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following:
-```
+```python
 import cupy as cp
 import rmm
 rmm.reinitialize(managed_memory=True)
