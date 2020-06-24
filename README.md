@@ -18,7 +18,7 @@ After installing the necessary dependencies, you can just run `jupyter lab`.
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
 
-We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering visualization and gene ranking. 
+We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking. 
 
 ### Example Dataset
 
@@ -54,7 +54,7 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
 
-We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering visualization.
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
 
 ### Example Dataset
 
