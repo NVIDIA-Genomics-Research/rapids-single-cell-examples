@@ -78,8 +78,6 @@ def normalize_total(filtered_cells, target_sum):
     }
     ''', 'mul_kernel')
     
-    print("Target_sum="  + str(target_sum) + ", dtype=" + str(type(target_sum)))
-    
     mul_kernel((math.ceil(filtered_cells.shape[0] / 32.0),), (32,), 
                (filtered_cells.indptr,
                filtered_cells.data,
