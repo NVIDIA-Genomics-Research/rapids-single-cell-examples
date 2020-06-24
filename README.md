@@ -17,7 +17,7 @@ After installing the necessary dependencies, you can just run `jupyter lab`.
 ## Configuration
 
 
-Unified Virtual Memory (UVM) can be used to oversubscribe your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of memory GPU memory being oversubscribed. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following
+Unified Virtual Memory (UVM) can be used to [oversubscribe](https://developer.nvidia.com/blog/beyond-gpu-memory-limits-unified-memory-pascal/) your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of oversubscription. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following:
 ```
 import cupy as cp
 import rmm
@@ -69,7 +69,7 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
 
-This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this workflow should work on any GPU w/ the Pascal architecture or newer, you will want to make sure there is enough main memory available.
+This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available.
 
 ### Example Dataset
 
