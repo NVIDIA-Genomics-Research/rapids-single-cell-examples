@@ -26,17 +26,16 @@ import dask.array as da
 
 from cuml.linear_model import LinearRegression
 
-
 def scale(normalized, max_value=10):
+
     mean = normalized.mean(axis=0)
-    stddev = cp.sqrt(normalized.var(axis=0))
-    
     normalized -= mean
-    normalized *= 1/stddev
+    del mean
+    stddev = cp.sqrt(normalized.var(axis=0))
+    normalized /= stddev
+    del stddev
     
-    normalized[normalized>10] = 10
-    
-    return normalized
+    return normalized.clip(a_max=max_value)
 
 
 def _regress_out_chunk(X, y):
@@ -44,21 +43,86 @@ def _regress_out_chunk(X, y):
     Performs a data_cunk.shape[1] number of local linear regressions,
     replacing the data in the original chunk w/ the regressed result. 
     """
-    output = []
+    y_d = y.todense()
+    
     lr = LinearRegression(fit_intercept=False)
-    lr.fit(X, y, convert_dtype=True)
-    return y.reshape(y.shape[0],) - lr.predict(X).reshape(y.shape[0])
+    lr.fit(X, y_d, convert_dtype=True)
+    return y_d.reshape(y_d.shape[0],) - lr.predict(X).reshape(y_d.shape[0])
     
 
 
 def normalize_total(filtered_cells, target_sum):
-    sums = np.array(target_sum / filtered_cells.sum(axis=1)).ravel()
-
-    normalized = filtered_cells.multiply(sums[:, np.newaxis]) # Done on host for now
-    normalized = cp.sparse.csr_matrix(normalized)
     
-    return normalized
 
+    mul_kernel = cp.RawKernel(r'''
+    extern "C" __global__
+    void mul_kernel(const int *indptr, float *data, 
+                    int nrows, int tsum) {
+        int row = blockDim.x * blockIdx.x + threadIdx.x;
+        
+        if(row >= nrows)
+            return;
+        
+        float scale = 0.0;
+        int start_idx = indptr[row];
+        int stop_idx = indptr[row+1];
+
+        for(int i = start_idx; i < stop_idx; i++)
+            scale += data[i];
+
+        if(scale > 0.0) {
+            scale = tsum / scale;
+            for(int i = start_idx; i < stop_idx; i++)
+                data[i] *= scale;
+        }
+    }
+    ''', 'mul_kernel')
+    
+    print("Target_sum="  + str(target_sum) + ", dtype=" + str(type(target_sum)))
+    
+    mul_kernel((math.ceil(filtered_cells.shape[0] / 32.0),), (32,), 
+               (filtered_cells.indptr,
+               filtered_cells.data,
+               filtered_cells.shape[0],
+               int(target_sum)))
+    
+    cp.cuda.Stream.null.synchronize()
+    
+    print("Finished kernel")
+
+    return filtered_cells
+
+
+def sum_major(csr_arr, square=False):
+    sums = cp.zeros(csr_arr.shape[0], dtype=csr_arr.dtype)
+    
+    sum_major_kernel = cp.RawKernel(r'''
+    extern "C" __global__
+    void sum_major_kernel(const int *indptr, const float *data, 
+                    float *out, int nrows, bool square) {
+        int row = blockDim.x * blockIdx.x + threadIdx.x;
+        
+        float sum = 0.0;
+        int start_idx = indptr[row];
+        int stop_idx = indptr[row+1];
+
+        for(int i = start_idx; i < stop_idx; i++)
+            float val = data[i];
+            if(square)
+                val = val * val;
+            sum += val;
+        out[row] = sum;
+    }
+    ''', 'mul_kernel')
+    
+    sum_major_kernel((math.ceil(csr_arr.shape[0] / 32.0),), (32,), 
+               (csr_arr.indptr,
+               csr_arr.data,
+               sums,
+               filtered_cells.shape[0],
+               square))
+
+    
 
 def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
@@ -67,19 +131,20 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     regressors[:, 1] = n_counts
     regressors[:, 2] = percent_mito
     
+    outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
+    
     for i in range(normalized.shape[1]):
         if verbose and i % 500 == 0:
             print("Regressed %s out of %s" %(i, normalized.shape[1]))
         X = regressors
         y = normalized[:,i]
-        _regress_out_chunk(X, y)
+        outputs[:,i] = _regress_out_chunk(X, y)
     
-    return normalized
+    return outputs
 
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000):
     n_batches = math.ceil(sparse_gpu_array.shape[0] / rows_per_batch)
-    print("Running %d batches" % n_batches)
     filtered_list = []
     for batch in range(n_batches):
         batch_size = rows_per_batch
@@ -101,7 +166,7 @@ def _filter_cells(sparse_gpu_array, min_genes, max_genes):
 
 def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
     thr = np.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
-    filtered_genes = sparse_gpu_array[:,thr]
+    filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:,thr])
     genes_idx = genes_idx[np.where(thr)[0]]
     
     return filtered_genes, genes_idx.reset_index(drop=True)
