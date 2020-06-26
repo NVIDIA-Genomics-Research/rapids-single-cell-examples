@@ -4,7 +4,7 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 ## Installation 
 
-All dependencies for this example can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. If installing for a system running a CUDA10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`
+All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. If installing for a system running a CUDA10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`
 
 ```bash
 conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
@@ -14,13 +14,28 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
 
-## Human Lung Cell Atlas Example
+## Configuration
 
-We present an example using RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering visualization and gene ranking. 
+
+Unified Virtual Memory (UVM) can be used to [oversubscribe](https://developer.nvidia.com/blog/beyond-gpu-memory-limits-unified-memory-pascal/) your GPU memory so that chunks of data will be automatically offloaded to main memory when necessary. This is a great way to explore data without having to worry about out of memory errors, but it does degrade performance in proportion to the amount of oversubscription. UVM is enabled by default in these examples and can be enabled/disabled in any RAPIDS workflow with the following:
+```python
+import cupy as cp
+import rmm
+rmm.reinitialize(managed_memory=True)
+cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
+```
+
+RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter. 
+
+## Example 1: Single-cell RNA-seq of 70,000 cells from the Human Lung Cell Atlas
+
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
+
+We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking. 
 
 ### Example Dataset
 
-The dataset is based on [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2). If you wish to run the notebook using the same data, use the following command to download the count matrix for this dataset and store it in the `data` folder:
+The dataset is from [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2). If you wish to run the example notebook using the same data, use the following command to download the count matrix for this dataset and store it in the `data` folder:
 
 ```bash
 wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x_UMIs.sparse.h5ad
@@ -28,13 +43,9 @@ wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us
 
 ### Example Code
 
-Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPIDS analysis of this dataset. Please note that in order for the commands in the notebook to run, the file [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) needs to be in the same folder as the notebook.
+Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the file [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) needs to be in the same folder as the notebook.
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/hlca_lung_cpu_analysis.ipynb).
-
-### Adapting to another dataset
-
-For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
 
 ### Acceleration
 
@@ -51,3 +62,28 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 | UMAP                         | 78                                  | 0.98                           | 80x          |
 | Louvain clustering           | 13.6                                | 0.25                           | 54.4x        |
 | Differential Gene Expression | 45.1                                | 18.9                           | 2.4x         |
+
+## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
+
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
+
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
+
+This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available.
+
+### Example Dataset
+
+The dataset was made publicly available by 10X Genomics. Use the following command to download the count matrix for this dataset and store it in the `data` folder:
+
+```bash
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad
+```
+
+### Example Code
+
+Follow this [Jupyter notebook](notebooks/1M_neurons_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook.
+This notebook runs completely in under 15 minutes on a Tesla V100 GPU with 32 GB memory.
+
+## Adapting these examples to another dataset
+
+For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).

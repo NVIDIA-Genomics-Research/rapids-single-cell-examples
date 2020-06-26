@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-import cuml
 import cupy as cp
 import cudf
 
@@ -22,64 +21,196 @@ import numpy as np
 import scipy
 import math
 
-import dask.array as da
-
 from cuml.linear_model import LinearRegression
 
 
 def scale(normalized, max_value=10):
+    """
+    Scales matrix to unit variance and clips values
+
+    Parameters
+    ----------
+
+    normalized : cupy.ndarray or numpy.ndarray of shape (n_cells, n_genes)
+                 Matrix to scale
+    max_value : int
+                After scaling matrix to unit variance,
+                values will be clipped to this number
+                of std deviations.
+
+    Return
+    ------
+
+    normalized : cupy.ndarray of shape (n_cells, n_genes)
+        Dense normalized matrix
+    """
+
+    normalized = cp.asarray(normalized)
     mean = normalized.mean(axis=0)
-    stddev = cp.sqrt(normalized.var(axis=0))
-    
     normalized -= mean
-    normalized *= 1/stddev
+    del mean
+    stddev = cp.sqrt(normalized.var(axis=0))
+    normalized /= stddev
+    del stddev
     
-    normalized[normalized>10] = 10
-    
-    return normalized
+    return normalized.clip(a_max=max_value)
 
 
 def _regress_out_chunk(X, y):
     """
     Performs a data_cunk.shape[1] number of local linear regressions,
-    replacing the data in the original chunk w/ the regressed result. 
+    replacing the data in the original chunk w/ the regressed result.
+
+    Parameters
+    ----------
+
+    X : cupy.ndarray of shape (n_cells, 3)
+        Matrix of regressors
+
+    y : cupy.sparse.spmatrix of shape (n_cells,)
+        Sparse matrix containing a single column of the cellxgene matrix
+
+    Returns
+    -------
+
+    dense_mat : cupy.ndarray of shape (n_cells,)
+        Adjusted column
     """
-    output = []
-    lr = LinearRegression(fit_intercept=False)
-    lr.fit(X, y, convert_dtype=True)
-    return y.reshape(y.shape[0],) - lr.predict(X).reshape(y.shape[0])
+    y_d = y.todense()
+    
+    lr = LinearRegression(fit_intercept=False, output_type="cupy")
+    lr.fit(X, y_d, convert_dtype=True)
+    return y_d.reshape(y_d.shape[0],) - lr.predict(X).reshape(y_d.shape[0])
     
 
+def normalize_total(csr_arr, target_sum):
+    """
+    Normalizes rows in matrix so they sum to `target_sum`
 
-def normalize_total(filtered_cells, target_sum):
-    sums = np.array(target_sum / filtered_cells.sum(axis=1)).ravel()
+    Parameters
+    ----------
 
-    normalized = filtered_cells.multiply(sums[:, np.newaxis]) # Done on host for now
-    normalized = cp.sparse.csr_matrix(normalized)
+    csr_arr : cupy.sparse.csr_matrix of shape (n_cells, n_genes)
+        Matrix to normalize
+
+    target_sum : int
+        Each row will be normalized to sum to this value
+
+    Returns
+    -------
+
+    csr_arr : cupy.sparse.csr_arr of shape (n_cells, n_genes)
+        Normalized sparse matrix
+    """
     
-    return normalized
+    mul_kernel = cp.RawKernel(r'''
+    extern "C" __global__
+    void mul_kernel(const int *indptr, float *data, 
+                    int nrows, int tsum) {
+        int row = blockDim.x * blockIdx.x + threadIdx.x;
+        
+        if(row >= nrows)
+            return;
+        
+        float scale = 0.0;
+        int start_idx = indptr[row];
+        int stop_idx = indptr[row+1];
+
+        for(int i = start_idx; i < stop_idx; i++)
+            scale += data[i];
+
+        if(scale > 0.0) {
+            scale = tsum / scale;
+            for(int i = start_idx; i < stop_idx; i++)
+                data[i] *= scale;
+        }
+    }
+    ''', 'mul_kernel')
+    
+    mul_kernel((math.ceil(csr_arr.shape[0] / 32.0),), (32,),
+               (csr_arr.indptr,
+                csr_arr.data,
+                csr_arr.shape[0],
+               int(target_sum)))
+    
+    return csr_arr
 
 
 def regress_out(normalized, n_counts, percent_mito, verbose=False):
-    
+
+    """
+    Use linear regression to adjust for the effects of unwanted noise
+    and variation.
+
+    Parameters
+    ----------
+
+    normalized : cupy.sparse.csc_matrix of shape (n_cells, n_genes)
+        The matrix to adjust. The adjustment will be performed over
+        the columns.
+
+    n_counts : cupy.ndarray of shape (n_cells,)
+        Number of genes for each cell
+
+    percent_mito : cupy.ndarray of shape (n_cells,)
+        Percentage of genes that each cell needs to adjust for
+
+    verbose : bool
+        Print debugging information
+
+    Returns
+    -------
+
+    outputs : cupy.ndarray
+        Adjusted matrix
+    """
+
     regressors = cp.ones((n_counts.shape[0]*3)).reshape((n_counts.shape[0], 3), order="F")
 
     regressors[:, 1] = n_counts
     regressors[:, 2] = percent_mito
+    
+    outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
     
     for i in range(normalized.shape[1]):
         if verbose and i % 500 == 0:
             print("Regressed %s out of %s" %(i, normalized.shape[1]))
         X = regressors
         y = normalized[:,i]
-        _regress_out_chunk(X, y)
+        outputs[:, i] = _regress_out_chunk(X, y)
     
-    return normalized
+    return outputs
 
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000):
+    """
+    Filter cells that have genes greater than a max number of genes or less than
+    a minimum number of genes.
+
+    Parameters
+    ----------
+
+    sparse_gpu_array : cupy.sparse.csr_matrix of shape (n_cells, n_genes)
+        CSR matrix to filter
+
+    min_genes : int
+        Lower bound on number of genes to keep
+
+    max_genes : int
+        Upper bound on number of genes to keep
+
+    rows_per_batch : int
+        Batch size to use for filtering. This can be adjusted for performance
+        to trade-off memory use.
+
+    Returns
+    -------
+
+    filtered : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
+        Matrix on host with filtered cells
+    """
+
     n_batches = math.ceil(sparse_gpu_array.shape[0] / rows_per_batch)
-    print("Running %d batches" % n_batches)
     filtered_list = []
     for batch in range(n_batches):
         batch_size = rows_per_batch
@@ -100,17 +231,29 @@ def _filter_cells(sparse_gpu_array, min_genes, max_genes):
 
 
 def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
+    """
+    Filters out genes that contain less than a specified number of cells
+
+    Parameters
+    ----------
+
+    sparse_gpu_array : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
+        CSR Matrix to filter
+
+    genes_idx : cudf.Series or pandas.Series of size (n_genes,)
+        Current index of genes. These must map to the indices in sparse_gpu_array
+
+    min_cells : int
+        Genes containing a number of cells below this value will be filtered
+    """
     thr = np.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
-    filtered_genes = sparse_gpu_array[:,thr]
+    filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:, thr])
     genes_idx = genes_idx[np.where(thr)[0]]
     
     return filtered_genes, genes_idx.reset_index(drop=True)
 
 
 def select_groups(labels, groups_order_subset='all'):
-    """Get subset of groups in adata.obs[key].
-    """
-    
     adata_obs_key = labels
     groups_order = labels.cat.categories
     groups_masks = cp.zeros(
@@ -149,16 +292,40 @@ def select_groups(labels, groups_order_subset='all'):
 
 def rank_genes_groups(
     X,
-    labels, # louvain results
+    labels,  # louvain results
     var_names,
-    groupby =  str,
-    groups = None,
-    reference = 'rest',
-    n_genes = 100,
-    key_added = None,
-    layer = None,
+    groups=None,
+    reference='rest',
+    n_genes=100,
     **kwds,
 ):
+
+    """
+    Rank genes for characterizing groups.
+
+    Parameters
+    ----------
+
+    X : cupy.ndarray of shape (n_cells, n_genes)
+        The cellxgene matrix to rank genes
+
+    labels : cudf.Series of size (n_cells,)
+        Observations groupings to consider
+
+    var_names : cudf.Series of size (n_genes,)
+        Names of genes in X
+
+    groups : Iterable[str] (default: 'all')
+        Subset of groups, e.g. ['g1', 'g2', 'g3'], to which comparison
+        shall be restricted, or 'all' (default), for all groups.
+
+    reference : str (default: 'rest')
+        If 'rest', compare each group to the union of the rest of the group.
+        If a group identifier, compare with respect to this group.
+
+    n_genes : int (default: 100)
+        The number of genes that appear in the returned tables.
+    """
 
     #### Wherever we see "adata.obs[groupby], we should just replace w/ the groups"
 
@@ -210,14 +377,6 @@ def rank_genes_groups(
 
     rankings_gene_scores = []
     rankings_gene_names = []
-    rankings_gene_logfoldchanges = []
-    rankings_gene_pvals = []
-    rankings_gene_pvals_adj = []
-
-#     if 'log1p' in adata.uns_keys() and adata.uns['log1p']['base'] is not None:
-#         expm1_func = lambda x: np.expm1(x * np.log(adata.uns['log1p']['base']))
-#     else:
-#         expm1_func = np.expm1
 
     # Perform LogReg
         
