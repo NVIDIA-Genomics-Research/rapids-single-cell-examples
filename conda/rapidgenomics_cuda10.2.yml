@@ -23,6 +23,15 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
+  - plotly=4.5
+  - dash=1.8
+  - datashader=0.10
+  - dash-daq=0.3.2
+  - dash-html-components
+  - gunicorn=20.0
+  - requests>=2.22.*
+  - pyproj
+  - dash-bootstrap-components
   - pip
   - pip:
       - jupyter-server-proxy
