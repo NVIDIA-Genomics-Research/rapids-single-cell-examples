@@ -98,7 +98,7 @@ Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa1
 | k-means (single iteration)   | 84                                  | 1.37                           | 61.3x        |
 | KNN                          | 733                                 | 45.1                           | 16.3x        |
 | UMAP                         | 1537                                | 21.1                           | 72.8x        |
-| Louvain clustering           | 650                                 | 2.5                            | 269x         |
+| Louvain clustering           | 650                                 | 2.5                            | 260x         |
 
 
 ## Adapting these examples to another dataset
