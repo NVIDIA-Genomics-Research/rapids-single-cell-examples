@@ -88,6 +88,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 ### Acceleration
 
 All runtimes are given in seconds.
+Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa13`.
 
 | Step                         | CPU runtime <br>(2x20 core Intel Xeon E5-2698 v4) | GPU runtime (Tesla V100 32 GB) | Acceleration |
 |------------------------------|-------------------------------------|--------------------------------|--------------|
