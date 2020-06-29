@@ -62,7 +62,7 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 | UMAP                         | 78                                  | 0.98                           | 80x          |
 | Louvain clustering           | 13.6                                | 0.25                           | 54.4x        |
 | Differential Gene Expression | 45.1                                | 18.9                           | 2.4x         |
-| End-to-end notebook run      | 1548.5                              | 118.7                          | 13x          |
+| End-to-end notebook run<br>(steps above + data load and additional processing)      | 1548.5                              | 118.7                          | 13x          |
 
 
 ## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
@@ -101,7 +101,7 @@ Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa1
 | KNN                          | 733                                 | 45.1                           | 16.3x        |
 | UMAP                         | 1537                                | 21.1                           | 72.8x        |
 | Louvain clustering           | 650                                 | 2.5                            | 260x         |
-| End-to-end notebook run      | 15399.4                             | 655.3                          | 23.5x        |
+| End-to-end notebook run<br>(steps above + data load and additional processing)      | 15399.4                             | 655.3                          | 23.5x        |
 
 
 ## Adapting these examples to another dataset
