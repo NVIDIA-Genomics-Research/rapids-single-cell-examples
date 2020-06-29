@@ -85,6 +85,21 @@ Follow this [Jupyter notebook](notebooks/1M_brain_gpu_analysis_uvm.ipynb) for RA
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/1M_brain_cpu_analysis.ipynb).
 
+### Acceleration
+
+All runtimes are given in seconds.
+
+| Step                         | CPU runtime <br>(2x20 core Intel Xeon E5-2698 v4) | GPU runtime (Tesla V100 32 GB) | Acceleration |
+|------------------------------|-------------------------------------|--------------------------------|--------------|
+| Preprocessing                | 5446                                | 244.7                          | 22.3x        |
+| PCA                          | 38.2                                | 27.9                           | 1.4x         |
+| t-SNE                        | 4303                                | 42.4                           | 101.5x       |
+| k-means (single iteration)   | 84                                  | 1.37                           | 61.3x        |
+| KNN                          | 733                                 | 45.1                           | 16.3x        |
+| UMAP                         | 1537                                | 21.1                           | 72.8x        |
+| Louvain clustering           | 650                                 | 2.5                            | 269x         |
+
+
 ## Adapting these examples to another dataset
 
 For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
