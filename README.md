@@ -105,7 +105,7 @@ Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa1
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells
 
-<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
 
 We demonstrate how to use RAPIDS, Scanpy and Plotly Dash to create an interactive dashboard where we visualize a single-cell RNA-sequencing dataset. Within the interactive dashboard, we can cluster, visualize, and compare any selected groups of cells.
 
