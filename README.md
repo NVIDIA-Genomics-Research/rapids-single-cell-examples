@@ -103,6 +103,32 @@ Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa1
 | Louvain clustering           | 650                                 | 2.5                            | 260x         |
 | End-to-end notebook run<br>(steps above + data load and additional processing)      | 15399.4                             | 655.3                          | 23.5x        |
 
+## Example 3: GPU-based Interactive Visualization of 70,000 cells
+
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/visualization/images/dashboard.png?raw=true">
+
+We demonstrate how to use RAPIDS, Scanpy and Plotly Dash to create an interactive dashboard where we visualize a single-cell RNA-sequencing dataset. Within the interactive dashboard, we can cluster, visualize, and compare any selected groups of cells.
+
+### Installation
+
+Additional dependencies are needed for this example. Follow these instructions for conda installation:
+
+```bash
+conda env create --name rapidgenomics-viz -f conda/rapidgenomics_cuda10.2.viz.yml
+conda activate rapidgenomics-viz
+python -m ipykernel install --user --display-name "Python (rapidgenomics)"
+```
+
+After installing the necessary dependencies, you can just run `jupyter lab`.
+
+### Example Dataset
+
+The dataset used here is the same as in example 1.
+
+### Example Code
+
+Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ipynb) to create the interactive visualization. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [visualization.py](notebooks/visualization.py) need to be in the same folder as the notebook.
+
 
 ## Adapting these examples to another dataset
 
