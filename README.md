@@ -116,7 +116,7 @@ Additional dependencies are needed for this example. Follow these instructions f
 ```bash
 conda env create --name rapidgenomics-viz -f conda/rapidgenomics_cuda10.2.viz.yml
 conda activate rapidgenomics-viz
-python -m ipykernel install --user --display-name "Python (rapidgenomics)"
+python -m ipykernel install --user --display-name "Python (rapidgenomics-viz)"
 ```
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
