@@ -103,7 +103,7 @@ Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa1
 | Louvain clustering           | 650                                 | 2.5                            | 260x         |
 | End-to-end notebook run<br>(steps above + data load and additional processing)      | 15399.4                             | 655.3                          | 23.5x        |
 
-## Example 3: GPU-based Interactive Visualization of 70,000 cells
+## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
 
