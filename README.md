@@ -133,7 +133,31 @@ The dataset used here is the same as in example 1.
 
 Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ipynb) to create the interactive visualization. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [visualize.py](notebooks/visualize.py) need to be in the same folder as the notebook.
 
+## Example 4: Droplet single-cell ATAC-seq of 60K bone marrow cells from Lareau et al. 2019
+
+<img align="left" width="240" height="200" src="https://github.com/rmovva/rapids-single-cell-examples/blob/scatac_gpu/images/60k_bmmc_dsciATAC.png?raw=true">
+
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell ATAC-seq data from 60,495 cells with 25,000 peaks. We start with the peak-cell matrix from GEO, perform peak selection, normalization, dimensionality reduction, clustering, and visualization. We also visualize regulatory activity at marker genes and compute differential peaks. The notebook runs on a 16GB V100 GPU.
+
+### Example Dataset
+
+The dataset was made publicly available by Lareau et al., on GEO. We processed the dataset to include only cells in the 'Resting' condition and nonzero peaks. Use the following command to download (1) the processed peak-cell count matrix for this dataset (.h5ad), (2) the set of nonzero peak names (.npy), and (3) the cell metadata (.csv), and store them in the `data` folder:
+
+```bash
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad; \
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy; \
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
+```
+
+### Example Code
+
+Follow this [Jupyter notebook](notebooks/dsci_bmmc_60k_gpu.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook.
+
+We provide a second notebook with the CPU version of this analysis [here](notebooks/dsci_bmmc_60k_cpu.ipynb).
+
+### Acceleration
 
 ## Adapting these examples to another dataset
 
 For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
+
