@@ -229,7 +229,7 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
         filtered_list.append(_filter_cells(arr_batch, 
                                             min_genes=min_genes, 
                                             max_genes=max_genes, 
-                                            barcodes=barcodes_batch)))
+                                            barcodes=barcodes_batch))
 
     if barcodes is None:
         return scipy.sparse.vstack(filtered_list)

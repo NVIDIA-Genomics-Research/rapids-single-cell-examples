@@ -29,9 +29,9 @@ dependencies:
   - cupy=7.1
   - datashader=0.10
   - dash-daq=0.3.2
-  - dash_html_components
+  - dash-html-components
   - gunicorn=20.0
-  - requests=2.22.0+
+  - requests=2.22.0
   - pyproj
   - pip
   - pip:
