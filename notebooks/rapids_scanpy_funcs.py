@@ -224,6 +224,8 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
         start_idx = batch * batch_size
         stop_idx = min(batch * batch_size + batch_size, sparse_gpu_array.shape[0])
         arr_batch = sparse_gpu_array[start_idx:stop_idx]
+        if barcodes is not None:
+            barcodes_batch = barcodes[start_idx:stop_idx]
         filtered_list.append(_filter_cells(arr_batch, 
                                             min_genes=min_genes, 
                                             max_genes=max_genes, 
