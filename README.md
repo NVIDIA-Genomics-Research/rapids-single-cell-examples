@@ -52,7 +52,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 All runtimes are given in seconds.
 Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU| GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
 |------------------------------|-------------------------------------|---------------------------------|--------------|
 | Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
 | PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
@@ -96,17 +96,19 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 All runtimes are given in seconds.
 Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa13`.
 
-| Step                         | CPU runtime <br>(2x20 core Intel Xeon E5-2698 v4) | GPU runtime (Tesla V100 32 GB) | Acceleration |
-|------------------------------|-------------------------------------|--------------------------------|--------------|
-| Preprocessing                | 5446                                | 244.7                          | 22.3x        |
-| PCA                          | 38.2                                | 27.9                           | 1.4x         |
-| t-SNE                        | 4303                                | 42.4                           | 101.5x       |
-| k-means (single iteration)   | 84                                  | 1.37                           | 61.3x        |
-| KNN                          | 733                                 | 45.1                           | 16.3x        |
-| UMAP                         | 1537                                | 21.1                           | 72.8x        |
-| Louvain clustering           | 650                                 | 2.5                            | 260x         |
-| End-to-end notebook run<br>(steps above + data load and additional processing)      | 15399.4                             | 655.3                          | 23.5x        |
-
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU |
+|------------------------------|-------------------------------------|----------------------------|-------------------|
+| Preprocessing                | 4033                                | 331  (12.2x)               | 323  (12.5x)      |
+| PCA                          | 34                                  | 24.6  (1.4x)               | 20.6  (1.7x)      |
+| t-SNE                        | 5417                                | 164  (33x)                 | 41  (132.1x)      |
+| k-means (single iteration)   | 106                                 | 13.5  (7.9x)               | 2.1  (50.5x)      |
+| KNN                          | 585                                 | 110  (5.3x)                | 53.4  (11x)       |
+| UMAP                         | 1751                                | 98  (17.9x)                | 20.3  (86.3x)     |
+| Louvain clustering           | 597                                 | 5  (119x)                  | 2.5  (238.8x)     |
+| Re-analysis of subgroup      | 230                                 | 12.3  (18.7x)              | 10  (23x)
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
+| Price ($/hr)                 | 2.064                               | 0.526                      | 12.24             |
+| Total cost ($)               | 7.455                               | 0.018                      | 2.287             |   
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
