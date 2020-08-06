@@ -52,7 +52,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 All runtimes are given in seconds.
 Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU| GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU| GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
 |------------------------------|-------------------------------------|---------------------------------|--------------|
 | Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
 | PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
@@ -63,7 +63,7 @@ Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f9979204
 | Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
 | Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
 | Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (5.9x)
-| End-to-end notebook run<br>(steps above + data load and additional processing)      | 787                              | 122                          | 134          |
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 787                              | 122                          | 134          |
 | Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
 | Total cost ($)               | 0.451                               | 0.018                           | 0.114            |               
 
