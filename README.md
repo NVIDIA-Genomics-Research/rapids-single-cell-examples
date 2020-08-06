@@ -49,10 +49,9 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-All runtimes are given in seconds.
-Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  <br> (Acceleration) | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU  <br> (Acceleration) |
 |------------------------------|-------------------------------------|---------------------------------|--------------|
 | Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
 | PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
@@ -93,10 +92,9 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-All runtimes are given in seconds.
-Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa13`.
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
 | Preprocessing                | 4033                                | 331  (12.2x)               | 323  (12.5x)      |
 | PCA                          | 34                                  | 24.6  (1.4x)               | 20.6  (1.7x)      |
