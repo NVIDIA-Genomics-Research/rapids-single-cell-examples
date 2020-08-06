@@ -49,20 +49,23 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-All runtimes are given in seconds.
-Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
-| Step                         | CPU runtime (16 core AMD EPYC 7571) | GPU runtime (Tesla V100 32 GB) | Acceleration |
-|------------------------------|-------------------------------------|--------------------------------|--------------|
-| Preprocessing                | 324.35                              | 68.49                          | 4.7x         |
-| PCA                          | 16.2                                | 1.59                           | 10.2x        |
-| t-SNE                        | 166                                 | 1.95                           | 85.1x        |
-| k-means (single iteration)   | 7.3                                 | 0.11                           | 66.4x        |
-| KNN                          | 23                                  | 5.18                           | 4.4x         |
-| UMAP                         | 78                                  | 0.98                           | 80x          |
-| Louvain clustering           | 13.6                                | 0.25                           | 54.4x        |
-| Differential Gene Expression | 45.1                                | 18.9                           | 2.4x         |
-| End-to-end notebook run<br>(steps above + data load and additional processing)      | 1548.5                              | 118.7                          | 13x          |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  <br> (Acceleration) | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU  <br> (Acceleration) |
+|------------------------------|-------------------------------------|---------------------------------|--------------|
+| Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
+| PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
+| t-SNE                        | 208                                 | 2.8      (74.3x)                | 2.2  (94.5x)        |
+| k-means (single iteration)   | 31                                  | 0.5      (62x)                  | 0.4  (77.5x)        |
+| KNN                          | 25                                  | 4.9      (5.1x)                 | 6.1  (4.1x)         |
+| UMAP                         | 80                                  | 1.8      (44.4x)                | 1    (80x)          |
+| Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
+| Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
+| Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (7.9x)
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 787                              | 122                          | 134          |
+| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
+| Total cost ($)               | 0.451                               | 0.018                           | 0.114            |               
+
 
 
 ## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
@@ -89,20 +92,21 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-All runtimes are given in seconds.
-Benchmarking was performed at commit ID `0fbe0adda19da278d806603aef239831dd2faa13`.
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
-| Step                         | CPU runtime <br>(2x20 core Intel Xeon E5-2698 v4) | GPU runtime (Tesla V100 32 GB) | Acceleration |
-|------------------------------|-------------------------------------|--------------------------------|--------------|
-| Preprocessing                | 5446                                | 244.7                          | 22.3x        |
-| PCA                          | 38.2                                | 27.9                           | 1.4x         |
-| t-SNE                        | 4303                                | 42.4                           | 101.5x       |
-| k-means (single iteration)   | 84                                  | 1.37                           | 61.3x        |
-| KNN                          | 733                                 | 45.1                           | 16.3x        |
-| UMAP                         | 1537                                | 21.1                           | 72.8x        |
-| Louvain clustering           | 650                                 | 2.5                            | 260x         |
-| End-to-end notebook run<br>(steps above + data load and additional processing)      | 15399.4                             | 655.3                          | 23.5x        |
-
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
+|------------------------------|-------------------------------------|----------------------------|-------------------|
+| Preprocessing                | 4033                                | 331  (12.2x)               | 323  (12.5x)      |
+| PCA                          | 34                                  | 24.6  (1.4x)               | 20.6  (1.7x)      |
+| t-SNE                        | 5417                                | 164  (33x)                 | 41  (132.1x)      |
+| k-means (single iteration)   | 106                                 | 13.5  (7.9x)               | 2.1  (50.5x)      |
+| KNN                          | 585                                 | 110  (5.3x)                | 53.4  (11x)       |
+| UMAP                         | 1751                                | 98  (17.9x)                | 20.3  (86.3x)     |
+| Louvain clustering           | 597                                 | 5  (119x)                  | 2.5  (238.8x)     |
+| Re-analysis of subgroup      | 230                                 | 12.3  (18.7x)              | 10  (23x)
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
+| Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
+| Total cost ($)               | 7.455                               | 1.134                      | 2.287             |   
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
