@@ -61,7 +61,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | UMAP                         | 80                                  | 1.8      (44.4x)                | 1    (80x)          |
 | Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
 | Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
-| Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (5.9x)
+| Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (7.9x)
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 787                              | 122                          | 134          |
 | Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
 | Total cost ($)               | 0.451                               | 0.018                           | 0.114            |               
@@ -105,8 +105,8 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | Louvain clustering           | 597                                 | 5  (119x)                  | 2.5  (238.8x)     |
 | Re-analysis of subgroup      | 230                                 | 12.3  (18.7x)              | 10  (23x)
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
-| Price ($/hr)                 | 2.064                               | 0.526                      | 12.24             |
-| Total cost ($)               | 7.455                               | 0.018                      | 2.287             |   
+| Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
+| Total cost ($)               | 7.455                               | 1.134                      | 2.287             |   
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
