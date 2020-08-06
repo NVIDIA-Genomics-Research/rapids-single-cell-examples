@@ -52,17 +52,21 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 All runtimes are given in seconds.
 Benchmarking was performed on May 28, 2020 (commit ID `1f84796fbc255baf2f997920421bd300e0c30fc0`)
 
-| Step                         | CPU runtime (16 core AMD EPYC 7571) | GPU runtime (Tesla V100 32 GB) | Acceleration |
-|------------------------------|-------------------------------------|--------------------------------|--------------|
-| Preprocessing                | 324.35                              | 68.49                          | 4.7x         |
-| PCA                          | 16.2                                | 1.59                           | 10.2x        |
-| t-SNE                        | 166                                 | 1.95                           | 85.1x        |
-| k-means (single iteration)   | 7.3                                 | 0.11                           | 66.4x        |
-| KNN                          | 23                                  | 5.18                           | 4.4x         |
-| UMAP                         | 78                                  | 0.98                           | 80x          |
-| Louvain clustering           | 13.6                                | 0.25                           | 54.4x        |
-| Differential Gene Expression | 45.1                                | 18.9                           | 2.4x         |
-| End-to-end notebook run<br>(steps above + data load and additional processing)      | 1548.5                              | 118.7                          | 13x          |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU| GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU |
+|------------------------------|-------------------------------------|---------------------------------|--------------|
+| Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
+| PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
+| t-SNE                        | 208                                 | 2.8      (74.3x)                | 2.2  (94.5x)        |
+| k-means (single iteration)   | 31                                  | 0.5      (62x)                  | 0.4  (77.5x)        |
+| KNN                          | 25                                  | 4.9      (5.1x)                 | 6.1  (4.1x)         |
+| UMAP                         | 80                                  | 1.8      (44.4x)                | 1    (80x)          |
+| Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
+| Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
+| Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (5.9x)
+| End-to-end notebook run<br>(steps above + data load and additional processing)      | 787                              | 122                          | 134          |
+| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
+| Total cost ($)               | 0.451                               | 0.018                           | 0.114            |               
+
 
 
 ## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
