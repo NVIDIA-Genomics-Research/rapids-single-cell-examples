@@ -137,11 +137,11 @@ Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ip
 
 <img align="left" width="240" height="200" src="https://github.com/rmovva/rapids-single-cell-examples/blob/scatac_gpu/images/60k_bmmc_dsciATAC.png?raw=true">
 
-We demonstrate the use of RAPIDS to accelerate the analysis of single-cell ATAC-seq data from 60,495 cells with 25,000 peaks. We start with the peak-cell matrix from GEO, perform peak selection, normalization, dimensionality reduction, clustering, and visualization. We also visualize regulatory activity at marker genes and compute differential peaks. The notebook runs on a 16GB V100 GPU.
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell ATAC-seq data from 60,495 cells. We start with the peak-cell matrix, then perform peak selection, normalization, dimensionality reduction, clustering, and visualization. We also visualize regulatory activity at marker genes and compute differential peaks.
 
 ### Example Dataset
 
-The dataset was made publicly available by Lareau et al., on GEO. We processed the dataset to include only cells in the 'Resting' condition and nonzero peaks. Use the following command to download (1) the processed peak-cell count matrix for this dataset (.h5ad), (2) the set of nonzero peak names (.npy), and (3) the cell metadata (.csv), and store them in the `data` folder:
+The dataset was made publicly available by Lareau et al., on GEO. We processed the dataset to include only cells in the 'Resting' condition and peaks with nonzero coverage. Use the following command to download (1) the processed peak-cell count matrix for this dataset (.h5ad), (2) the set of nonzero peak names (.npy), and (3) the cell metadata (.csv), and store them in the `data` folder:
 
 ```bash
 wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad; \
