@@ -163,11 +163,11 @@ We report the runtime of these notebooks on various AWS instances below. All run
 
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
-| PCA                          | 160                                 | 129  (x)                   | 59.5  (x)         |
-| t-SNE                        | 237                                 | 3.4  (x)                   | 2.1  (x)          |
-| KNN                          | 32.6                                | 4.2  (x)                   | 5.0  (x)          |
-| UMAP                         | 60                                  | 1.6  (x)                   | 1.1  (x)          |
-| Louvain clustering           | 6.1                                 | 0.2  (x)                   | 0.2  (x)          |
+| PCA                          | 160                                 | 129  (1.2x)                | 59.5  (2.7x)      |
+| t-SNE                        | 237                                 | 3.4  (69.7x)               | 2.1  (112.8x)     |
+| KNN                          | 32.6                                | 4.2  (7.8x)                | 5.0  (6.5x)       |
+| UMAP                         | 60                                  | 1.6  (37.5x)               | 1.1  (54.5x)      |
+| Louvain clustering           | 6.1                                 | 0.2  (30.5x)               | 0.2  (30.5x)      |
 | End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1634                              | 176                          | 110          |
 | Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
 | Total cost ($)               | 0.937                               | 0.213                      | 0.374             |   
