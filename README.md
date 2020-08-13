@@ -107,6 +107,8 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
 | Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
 | Total cost ($)               | 7.455                               | 1.134                      | 2.287             |   
+
+
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
 
 <img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/visualization/images/dashboard_2.png?raw=true">
@@ -156,6 +158,20 @@ Follow this [Jupyter notebook](notebooks/dsci_bmmc_60k_gpu.ipynb) for RAPIDS ana
 We provide a second notebook with the CPU version of this analysis [here](notebooks/dsci_bmmc_60k_cpu.ipynb).
 
 ### Acceleration
+
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on August 12, 2020 at commit ID `8f75d419f9806777af97a619fa75990858e6084e`.
+
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
+|------------------------------|-------------------------------------|----------------------------|-------------------|
+| PCA                          | 160                                 | 129  (1.2x)                | 59.5  (2.7x)      |
+| t-SNE                        | 237                                 | 3.4  (69.7x)               | 2.1  (112.8x)     |
+| KNN                          | 32.6                                | 4.2  (7.8x)                | 5.0  (6.5x)       |
+| UMAP                         | 60                                  | 1.6  (37.5x)               | 1.1  (54.5x)      |
+| Louvain clustering           | 6.1                                 | 0.2  (30.5x)               | 0.2  (30.5x)      |
+| End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1634                              | 176                          | 110          |
+| Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
+| Total cost ($)               | 0.937                               | 0.213                      | 0.374             |   
+
 
 ## Adapting these examples to another dataset
 
