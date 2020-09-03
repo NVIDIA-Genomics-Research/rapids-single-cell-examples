@@ -60,6 +60,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | KNN                          | 25                                  | 4.9      (5.1x)                 | 6.1  (4.1x)         |
 | UMAP                         | 80                                  | 1.8      (44.4x)                | 1    (80x)          |
 | Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
+| Leiden clustering            |                                   |       (x)                  |   (x)        |
 | Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
 | Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (7.9x)
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 787                              | 122                          | 134          |
@@ -103,6 +104,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | KNN                          | 585                                 | 110  (5.3x)                | 53.4  (11x)       |
 | UMAP                         | 1751                                | 98  (17.9x)                | 20.3  (86.3x)     |
 | Louvain clustering           | 597                                 | 5  (119x)                  | 2.5  (238.8x)     |
+| Leiden clustering            |                                   |       (x)                  |   (x)        |
 | Re-analysis of subgroup      | 230                                 | 12.3  (18.7x)              | 10  (23x)
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
 | Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
@@ -168,6 +170,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | KNN                          | 32.6                                | 4.2  (7.8x)                | 5.0  (6.5x)       |
 | UMAP                         | 60                                  | 1.6  (37.5x)               | 1.1  (54.5x)      |
 | Louvain clustering           | 6.1                                 | 0.2  (30.5x)               | 0.2  (30.5x)      |
+| Leiden clustering            |                                   |       (x)                  |   (x)        |
 | End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1634                              | 176                          | 110          |
 | Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
 | Total cost ($)               | 0.937                               | 0.213                      | 0.374             |   
