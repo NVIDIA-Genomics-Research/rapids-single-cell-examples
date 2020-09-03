@@ -16,8 +16,10 @@
 
 import cupy as cp
 import cudf
+import cugraph
 
 import numpy as np
+import pandas as pd
 import scipy
 import math
 
@@ -279,7 +281,7 @@ def select_groups(labels, groups_order_subset='all'):
     groups_masks = cp.zeros(
         (len(labels.cat.categories), len(labels.cat.codes)), dtype=bool
     )
-    for iname, name in enumerate(labels.cat.categories):
+    for iname, name in enumerate(labels.cat.categories.to_pandas()):
         # if the name is not found, fallback to index retrieval
         if labels.cat.categories[iname] in labels.cat.codes:
             mask = labels.cat.categories[iname] == labels.cat.codes
@@ -452,3 +454,30 @@ def rank_genes_groups(
     print("Note: This operation will be accelerated in a future version")
     
     return scores, names, original_reference
+
+
+def leiden(adata):
+    """
+    Performs Leiden Clustering using cuGraph
+
+    Parameters
+    ----------
+
+    adata : annData object with 'neighbors' field.
+
+    """
+    # Adjacency graph
+    adjacency = adata.uns['neighbors']['connectivities']
+    offsets = cudf.Series(adjacency.indptr)
+    indices = cudf.Series(adjacency.indices)
+    g = cugraph.Graph()
+    g.add_adj_list(offsets, indices, None)
+    
+    # Cluster
+    leiden_parts, _ = cugraph.leiden(g)
+    
+    # Format output
+    clusters = leiden_parts.to_pandas().sort_values('vertex')[['partition']].to_numpy().ravel()
+    clusters = pd.Categorical(clusters)
+    
+    return clusters
