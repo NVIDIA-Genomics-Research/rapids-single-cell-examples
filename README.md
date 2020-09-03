@@ -38,7 +38,7 @@ We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA seque
 The dataset is from [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2). If you wish to run the example notebook using the same data, use the following command to download the count matrix for this dataset and store it in the `data` folder:
 
 ```bash
-wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x_UMIs.sparse.h5ad
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad
 ```
 
 ### Example Code
