@@ -38,7 +38,7 @@ We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA seque
 The dataset is from [Travaglini et al. 2020](https://www.biorxiv.org/content/10.1101/742320v2). If you wish to run the example notebook using the same data, use the following command to download the count matrix for this dataset and store it in the `data` folder:
 
 ```bash
-wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x_UMIs.sparse.h5ad
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad
 ```
 
 ### Example Code
@@ -52,19 +52,20 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  <br> (Acceleration) | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU  <br> (Acceleration) |
-|------------------------------|-------------------------------------|---------------------------------|--------------|
-| Preprocessing                | 311                                 | 74       (4.2x)                 | 84   (3.7x)       |
-| PCA                          | 18                                  | 3.5      (5.1x)                 | 3.4  (5.3x)       |
-| t-SNE                        | 208                                 | 2.8      (74.3x)                | 2.2  (94.5x)        |
-| k-means (single iteration)   | 31                                  | 0.5      (62x)                  | 0.4  (77.5x)        |
-| KNN                          | 25                                  | 4.9      (5.1x)                 | 6.1  (4.1x)         |
-| UMAP                         | 80                                  | 1.8      (44.4x)                | 1    (80x)          |
-| Louvain clustering           | 17                                  | 0.5      (34x)                  | 0.3  (56.7x)        |
-| Differential Gene Expression | 54                                  | 11.3     (4.8x)                 | 10.8 (5x)        |
-| Re-analysis of subgroup      | 27                                  | 3.5      (7.7x)                 | 3.4  (7.9x)
-| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 787                              | 122                          | 134          |
+|------------------------------|-------------------------------------|---------------------------------|----------------|
+| Preprocessing                | 329                                 | 66       (5x)                   | 84   (3.9x)    |
+| PCA                          | 12.2                                | 4.6      (2.7x)                 | 3.1  (3.9x)    |
+| t-SNE                        | 236                                 | 3.0      (79x)                  | 1.8  (131x)    |
+| k-means (single iteration)   | 27                                  | 0.3      (90x)                  | 0.12 (225x)    |
+| KNN                          | 28                                  | 4.9      (5.7x)                 | 5.9  (4.7x)    |
+| UMAP                         | 55                                  | 0.95     (58x)                  | 0.55 (100x)    |
+| Louvain clustering           | 16                                  | 0.19     (84x)                  | 0.17 (94x)     |
+| Leiden clustering            | 17                                  | 0.14     (121x)                 | 0.15 (113x)    |
+| Differential Gene Expression | 99                                  | 2.9      (34x)                  | 2.4  (41x)     |
+| Re-analysis of subgroup      | 21                                  | 3.7      (5.7x)                 | 3.3  (6.4x)    |
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 858                              | 103                          | 122          |
 | Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
-| Total cost ($)               | 0.451                               | 0.018                           | 0.114            |               
+| Total cost ($)               | 0.492                               | 0.015                           | 0.104            |               
 
 
 
@@ -94,19 +95,20 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
-| Preprocessing                | 4033                                | 331  (12.2x)               | 323  (12.5x)      |
-| PCA                          | 34                                  | 24.6  (1.4x)               | 20.6  (1.7x)      |
-| t-SNE                        | 5417                                | 164  (33x)                 | 41  (132.1x)      |
-| k-means (single iteration)   | 106                                 | 13.5  (7.9x)               | 2.1  (50.5x)      |
-| KNN                          | 585                                 | 110  (5.3x)                | 53.4  (11x)       |
-| UMAP                         | 1751                                | 98  (17.9x)                | 20.3  (86.3x)     |
-| Louvain clustering           | 597                                 | 5  (119x)                  | 2.5  (238.8x)     |
-| Re-analysis of subgroup      | 230                                 | 12.3  (18.7x)              | 10  (23x)
-| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 13002                              | 938                          | 673          |
-| Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
-| Total cost ($)               | 7.455                               | 1.134                      | 2.287             |   
+| Preprocessing                | 4337                                | 344  (13x)                 | 336  (13x)        |
+| PCA                          | 29                                  | 28   (1.04x)               | 23   (1.3x)       |
+| t-SNE                        | 5833                                | 134  (44x)                 | 38   (154x)       |
+| k-means (single iteration)   | 113                                 | 13.2 (8.6x)                | 2.4  (47x)        |
+| KNN                          | 670                                 | 106  (6.3x)                | 55.1 (12x)        |
+| UMAP                         | 1405                                | 87   (16x)                 | 19.2 (73x)        |
+| Louvain clustering           | 573                                 | 5.2  (110x)                | 2.8  (205x)       |
+| Leiden clustering            | 6414                                | 3.7  (1733x)               | 1.8  (3563x)      |
+| Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908                              | 912                          | 702          |
+| Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             |
+| Total cost ($)               | 11.414                              | 0.991                      | 2.388             |   
 
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
@@ -137,7 +139,7 @@ Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ip
 
 ## Example 4: Droplet single-cell ATAC-seq of 60K bone marrow cells from Lareau et al. 2019
 
-<img align="left" width="240" height="200" src="https://github.com/rmovva/rapids-single-cell-examples/blob/scatac_gpu/images/60k_bmmc_dsciATAC.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/60k_bmmc_dsciATAC.png?raw=true">
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell ATAC-seq data from 60,495 cells. We start with the peak-cell matrix, then perform peak selection, normalization, dimensionality reduction, clustering, and visualization. We also visualize regulatory activity at marker genes and compute differential peaks.
 
@@ -161,16 +163,18 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on August 12, 2020 at commit ID `8f75d419f9806777af97a619fa75990858e6084e`.
 
-| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.16xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
+| Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
-| PCA                          | 160                                 | 129  (1.2x)                | 59.5  (2.7x)      |
-| t-SNE                        | 237                                 | 3.4  (69.7x)               | 2.1  (112.8x)     |
-| KNN                          | 32.6                                | 4.2  (7.8x)                | 5.0  (6.5x)       |
-| UMAP                         | 60                                  | 1.6  (37.5x)               | 1.1  (54.5x)      |
-| Louvain clustering           | 6.1                                 | 0.2  (30.5x)               | 0.2  (30.5x)      |
-| End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1634                              | 176                          | 110          |
-| Price ($/hr)                 | 2.064                               | 4.352                      | 12.24             |
-| Total cost ($)               | 0.937                               | 0.213                      | 0.374             |   
+| PCA                          | 149                                 | 136  (1.1x)                | 64   (2.3x)       |
+| KNN                          | 39                                  | 3.8  (10x)                 | 4.9  (8x)         |
+| UMAP                         | 38                                  | 1.1  (35x)                 | 0.78 (49x)        |
+| Louvain clustering           | 6.8                                 | 0.13 (52x)                 | 0.12 (57x)        |
+| Leiden clustering            | 19                                  | 0.08 (238x)                | 0.07 (271x)       |
+| t-SNE                        | 252                                 | 3.3  (76x)                 | 2.1  (120x)       |
+| Differential Peak Analysis   | 1006                                | 23   (44x)                 | 20   (50x)        |
+| End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1530                              | 182                          | 111          |
+| Price ($/hr)                 | 2.064                               | 3.912                      | 3.06              |
+| Total cost ($)               | 0.877                               | 0.198                      | 0.095             |   
 
 
 ## Adapting these examples to another dataset
