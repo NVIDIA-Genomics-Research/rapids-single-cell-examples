@@ -29,7 +29,7 @@ RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in
 
 ## Example 1: Single-cell RNA-seq of 70,000 cells from the Human Lung Cell Atlas
 
-<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/70k_lung.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/70k_lung.png?raw=true">
 
 We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking. 
 
@@ -71,7 +71,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 
 ## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
 
-<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/alal/1mil/images/1M_brain.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/1M_brain.png?raw=true">
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
 
