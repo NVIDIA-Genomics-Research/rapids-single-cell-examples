@@ -139,7 +139,7 @@ Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ip
 
 ## Example 4: Droplet single-cell ATAC-seq of 60K bone marrow cells from Lareau et al. 2019
 
-<img align="left" width="240" height="200" src="https://github.com/rmovva/rapids-single-cell-examples/blob/scatac_gpu/images/60k_bmmc_dsciATAC.png?raw=true">
+<img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/60k_bmmc_dsciATAC.png?raw=true">
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell ATAC-seq data from 60,495 cells. We start with the peak-cell matrix, then perform peak selection, normalization, dimensionality reduction, clustering, and visualization. We also visualize regulatory activity at marker genes and compute differential peaks.
 
