@@ -99,7 +99,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 |------------------------------|-------------------------------------|----------------------------|-------------------|
 | Preprocessing                | 4337                                | 344  (13x)                 | 336  (13x)        |
 | PCA                          | 29                                  | 28   (1.04x)               | 23   (1.3x)       |
-| t-SNE                        | 5833                                | 134  (44x)                 | 38.4 (152x)       |
+| t-SNE                        | 5833                                | 134  (44x)                 | 38   (154x)       |
 | k-means (single iteration)   | 113                                 | 13.2 (8.6x)                | 2.4  (47x)        |
 | KNN                          | 670                                 | 106  (6.3x)                | 55.1 (12x)        |
 | UMAP                         | 1405                                | 87   (16x)                 | 19.2 (73x)        |
