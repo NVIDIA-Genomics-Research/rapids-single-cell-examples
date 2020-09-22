@@ -30,7 +30,7 @@ else
 	CREATE_ENV=true
 fi
 
-CONT=${CONT:='claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8:latest'}
+CONT=${CONT:='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'}
 JUPYTER_PORT=${JUPYTER_PORT:-8888}
 PLOTLY_PORT=${PLOTLY_PORT:-5000}
 DASK_PORT=${DASK_PORT:-9001}
