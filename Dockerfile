@@ -15,9 +15,6 @@ RUN git clone \
     rapids-single-cell-examples
 WORKDIR /workspace/rapids-single-cell-examples
 
-RUN ls -l
-RUN pwd
-# ARG GIT_BRANCH=rapids0.15
 ARG GIT_BRANCH=master
 RUN git checkout ${GIT_BRANCH}
 
