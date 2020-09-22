@@ -4,6 +4,7 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 ## Installation 
 
+### conda
 All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. If installing for a system running a CUDA10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`
 
 ```bash
@@ -13,6 +14,18 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
+
+### Docker container
+A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
+
+Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
+
+```bash
+docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
+
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
+
+```
 
 ## Configuration
 
