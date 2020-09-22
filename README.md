@@ -16,14 +16,14 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 After installing the necessary dependencies, you can just run `jupyter lab`.
 
 ### Docker container
-Container with all dependency with notebook and source code are available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8.
+Container with all dependency with notebook and source code are available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
 
 Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
 
 ```bash
-docker pull claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8
+docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
 
-docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
 
 ```
 
