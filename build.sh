@@ -28,8 +28,8 @@
 set -e
 
 BASE_DIR=$(dirname $0)
-# IMAGE_NAME=scrna-examples:rapids_cuda11.0-runtime-ubuntu18.04-py3.8
-IMAGE_NAME=scrna-examples:rapids_cuda10.2-runtime-ubuntu18.04-py3.8
+# IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda11.0-runtime-ubuntu18.04-py3.8
+IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8
 # BASE_IMAGE=rapidsai/rapidsai:cuda11.0-runtime-ubuntu18.04-py3.8
 BASE_IMAGE=rapidsai/rapidsai:cuda10.2-runtime-ubuntu18.04-py3.8
 GIT_BRANCH='master'
@@ -39,14 +39,15 @@ PUSH=false
 
 buildContainer() {
 
-  local IMAGE_NAME=$1
-  local BASE_IMAGE=$2
-  local GIT_BRANCH=$3
+  local image_name=$1
+  local container_tag=$2
+  local base_image=$3
+  local git_branch=$4
 
-  echo "Creating image $IMAGE_NAME from $BASE_IMAGE..."
-  docker build --network=host -t ${IMAGE_NAME} \
-    --build-arg BASE_IMAGE="${BASE_IMAGE}" \
-    --build-arg GIT_BRANCH="${GIT_BRANCH}" \
+  echo "Creating image ${image_name}:${container_tag} from ${base_image}..."
+  docker build --network=host -t ${image_name}:${container_tag} \
+    --build-arg BASE_IMAGE="${base_image}" \
+    --build-arg GIT_BRANCH="${git_branch}" \
     ${BASE_DIR}
 }
 
@@ -103,12 +104,12 @@ EOF
   exit 0
 fi
 
-buildContainer ${IMAGE_NAME} ${BASE_IMAGE} ${GIT_BRANCH}
+buildContainer ${IMAGE_NAME} ${CONTAINER_TAG} ${BASE_IMAGE} ${GIT_BRANCH}
 
 if [ ${PUSH} == true ]; then
   echo "Pushing the images to repository..."
-  docker push $1:${CONTAINER_TAG}
-  if [ ${CONTAINER_LATEST} == true ]; then
-    docker push $1:latest
-  fi
+  docker tag ${IMAGE_NAME}:${CONTAINER_TAG} ${IMAGE_NAME}:latest
+
+  docker push ${IMAGE_NAME}:${CONTAINER_TAG}
+  docker push ${IMAGE_NAME}:latest
 fi

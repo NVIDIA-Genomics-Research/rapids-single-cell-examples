@@ -14,6 +14,7 @@ launch.sh [command]
 	build
 	bash
 	setup
+	container
 	jupyter
 EOF
 	exit
@@ -29,12 +30,12 @@ else
 	CREATE_ENV=true
 fi
 
-CONT=${CONT:=scrna-examples}
+CONT=${CONT:='claraparabricks/single-cell-examples_rapids_cuda10.2-runtime-ubuntu18.04-py3.8:latest'}
 JUPYTER_PORT=${JUPYTER_PORT:-8888}
 PLOTLY_PORT=${PLOTLY_PORT:-5000}
 DASK_PORT=${DASK_PORT:-9001}
 PROJECT_PATH=${PROJECT_PATH:=$(pwd)}
-DATA_PATH=${DATA_PATH:=/tmp}
+DATA_PATH=${DATA_PATH:=/workspace/rapids-single-cell-examples/data}
 
 if [ ${CREATE_ENV} = true ]; then
 	echo CONT=${CONT} >> $LOCAL_ENV
@@ -45,7 +46,15 @@ if [ ${CREATE_ENV} = true ]; then
 	echo DATA_PATH=${DATA_PATH} >> $LOCAL_ENV
 fi
 
-DOCKER_CMD="docker run --gpus all --user $(id -u):$(id -g) -p ${JUPYTER_PORT}:8888 -p ${DASK_PORT}:${DASK_PORT} -p ${PLOTLY_PORT}:5000 -v ${PROJECT_PATH}:/workspace -v ${DATA_PATH}:/data --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -e HOME=/workspace -e TF_CPP_MIN_LOG_LEVEL=3 -w /workspace"
+DOCKER_CMD="docker run --gpus all --user $(id -u):$(id -g) -p ${JUPYTER_PORT}:8888 -p ${DASK_PORT}:${DASK_PORT} -p ${PLOTLY_PORT}:5000 -v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -e HOME=/workspace/rapids-single-cell-examples/data -e TF_CPP_MIN_LOG_LEVEL=3 -w /workspace/rapids-single-cell-examples"
+JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
+		--no-browser \
+		--port=8888 \
+		--ip=0.0.0.0 \
+		--notebook-dir=/workspace \
+		--NotebookApp.password=\"\" \
+		--NotebookApp.token=\"\" \
+		--NotebookApp.password_required=False"
 
 build() {
 	echo 'Building container...'
@@ -92,20 +101,17 @@ setup() {
 	fi
 }
 
-
-jupyter() {
-	set -x
-	setup
-	${DOCKER_CMD} -it ${CONT} jupyter-lab \
-		--no-browser \
-		--port=8888 \
-		--ip=0.0.0.0 \
-		--notebook-dir=/workspace \
-		--NotebookApp.password=\"\" \
-		--NotebookApp.token=\"\" \
-		--NotebookApp.password_required=False
+container() {
+	${DOCKER_CMD} -it ${CONT} ${JUPYTER_CMD}
 	exit
 }
+
+
+jupyter() {
+	${JUPYTER_CMD} --allow-root
+	exit
+}
+
 
 case $1 in
 	build)
@@ -114,6 +120,9 @@ case $1 in
 		;&
 	setup)
 		;&
+	container)
+		$1
+		;;
 	jupyter)
 		$1
 		;;
