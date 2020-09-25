@@ -17,13 +17,16 @@ dependencies:
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
-  - scikit-learn
+  - scikit-learn=0.22.2
   - louvain
   - cupy>=7
   - scanpy
   - umap-learn
   - ipykernel
   - jupyterlab
+  - scvi
+  - pytorch
+  - torchvision
   - pip
   - pip:
       - jupyter-server-proxy
