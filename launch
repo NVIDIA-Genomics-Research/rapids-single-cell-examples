@@ -15,18 +15,23 @@ from subprocess import run, check_output, PIPE
 DOCKER_IMAGE='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'
 
 DATASETS = {
-    'krasnow_hlca_10x': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
-    'dsci_resting': """
+    'example1': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
+    'example2': """
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
             """,
-    '1M_brain_cells_10X': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad'
+    'example3': """
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
+            """
 }
 
 CONDA_ENV_MAPPING = {
     'example1': 'conda/rapidgenomics_cuda10.1.yml',
-    'example2': 'conda/rapidgenomics_cuda10.2.yml'
+    'example2': 'conda/rapidgenomics_cuda10.2.yml',
+    'example3': 'conda/rapidgenomics_cuda10.2.yml'
 }
 
 
@@ -62,6 +67,16 @@ Following commands are wrapped by this tool:
         except FileNotFoundError as ex:
             print("Please install and activate conda.")
             sys.exit(1)
+
+    def download_dataset(self, datasets, dest_dir):
+        for ds in datasets:
+            for url in ds.split(','):
+                url = url.strip()
+                filename = os.path.basename(url)
+                filename = os.path.join(dest_dir, filename)
+                if not os.path.exists(filename):
+                    print("Dowloading %s to %s..." % (url, filename))
+                    wget.download(url, filename)
         
     def dataset(self):
         """
@@ -88,13 +103,8 @@ Following commands are wrapped by this tool:
             datasets.append(DATASETS[args.dataset_name])
         else:
             datasets = DATASETS.values()
-
-        for ds in datasets:
-            print(ds)
-            for url in ds.split(','):
-                url = url.strip()
-                print("Dowloading %s..." % url)
-                wget.download(url)
+        
+        self.download_dataset(datasets, args.data_dir)
 
     def container(self):
         parser = argparse.ArgumentParser(
@@ -164,13 +174,18 @@ Following commands are wrapped by this tool:
                 ' -f ' + CONDA_ENV_MAPPING[args.example]
             print('Creating conda env %s (%s)...' % (args.example, create_cmd))
             run(create_cmd, shell=True)
+        run('python3 -m ipykernel install --user --name=%s' % (args.example),
+            shell=True)
+
+        # make sure the required files are downloaded
+        datasets = [DATASETS[args.example]]
+        self.download_dataset(datasets, args.data_dir)
 
         print('Activating env %s...' % args.example)
-        proc = run(['bash', '-c',
-            'python3 -m ipykernel install --user --name=' + args.example + 
-            '; jupyter-lab -y --port=%d --ip=0.0.0.0' % (args.jupyter_port)], 
+        run(['bash', '-c', 
+            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' % 
+            (args.example, args.jupyter_port)], 
             check=True)
-        print(proc)
 
 
 def main():
