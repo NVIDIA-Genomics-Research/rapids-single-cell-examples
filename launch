@@ -9,6 +9,7 @@ import json
 import argparse
 import subprocess
 
+from distutils.version import StrictVersion
 from subprocess import run, check_output, PIPE
 
 
@@ -56,6 +57,18 @@ Following commands are wrapped by this tool:
             exit(1)
 
         getattr(self, args.command)()
+
+
+    def _fetch_docker_version(self):
+        try:
+            version = subprocess.check_output(
+                ["docker", "version", "--format", "'{{.Client.Version}}'"],
+                universal_newlines=True)
+            return version
+        except FileNotFoundError as ex:
+            print("Please install docker.")
+            sys.exit(1)
+
 
     def _conda_envs(self):
         try:
@@ -122,9 +135,17 @@ Following commands are wrapped by this tool:
                         help='Port for jupyter')
         args = parser.parse_args(sys.argv[2:])
 
+        docker_version = self._fetch_docker_version().strip().strip("'")
+
+        # nvidia docker toolkit command parameter
+        runtime_arg = '--gpus all'
+        if StrictVersion(docker_version.strip()) < StrictVersion("19.03.0"):
+            print('Old docker version %s. Please upgrade docker', \
+                docker_version)
+            runtime_arg = '--runtime=nvidia'
+
         cmd ="""docker run \
-            --rm \
-            --gpus all \
+            %s --rm \
             --user $(id -u):$(id -g) \
             -p %d:8888 \
             -v %s:/workspace/rapids-single-cell-examples/data \
@@ -139,8 +160,7 @@ Following commands are wrapped by this tool:
                 --NotebookApp.password=\"\" \
                 --NotebookApp.token=\"\" \
                 --NotebookApp.password_required=False
-        """ % (args.jupyter_port, args.data_dir, DOCKER_IMAGE)
-
+        """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
         run(cmd, check=True, shell=True)
 
     def host(self):
