@@ -140,8 +140,8 @@ Following commands are wrapped by this tool:
         # nvidia docker toolkit command parameter
         runtime_arg = '--gpus all'
         if StrictVersion(docker_version.strip()) < StrictVersion("19.03.0"):
-            print('Old docker version %s. Please upgrade docker', \
-                docker_version)
+            print('Old docker version %s. Please upgrade docker' % \
+                (docker_version))
             runtime_arg = '--runtime=nvidia'
 
         cmd ="""docker run \
