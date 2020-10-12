@@ -6,3 +6,5 @@
 .npm
 __pycache__
 .ipynb_checkpoints
+.ipython/
+.cache/
