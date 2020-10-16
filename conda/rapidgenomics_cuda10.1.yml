@@ -24,7 +24,7 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
-  - scvi
+  - scvi-tools
   - pytorch
   - torchvision
   - pip
