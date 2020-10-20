@@ -16,23 +16,19 @@ from subprocess import run, check_output, PIPE
 DOCKER_IMAGE='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'
 
 DATASETS = {
-    'example1': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
-    'example2': """
+    'hlca_lung': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
+    'dsci_bmmc_60k': """
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
             """,
-    'example3': """
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
-            """
+    '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad'
 }
 
 CONDA_ENV_MAPPING = {
-    'example1': 'conda/rapidgenomics_cuda10.1.yml',
-    'example2': 'conda/rapidgenomics_cuda10.2.yml',
-    'example3': 'conda/rapidgenomics_cuda10.2.yml'
+    'hlca_lung': 'conda/rapidgenomics_cuda10.1.yml',
+    'dsci_bmmc_60k': 'conda/rapidgenomics_cuda10.2.yml',
+    '1M_brain': 'conda/rapidgenomics_cuda10.2.yml'
 }
 
 
@@ -90,7 +86,7 @@ Following commands are wrapped by this tool:
                 if not os.path.exists(filename):
                     print("Dowloading %s to %s..." % (url, filename))
                     wget.download(url, filename)
-        
+
     def dataset(self):
         """
         Downloads a dataset. Datasets are pre-defined as a dictionary DATASETS.
@@ -98,12 +94,12 @@ Following commands are wrapped by this tool:
         """
         parser = argparse.ArgumentParser(
             description='dataset')
-        parser.add_argument('-d', '--dataDir', 
+        parser.add_argument('-d', '--dataDir',
                         dest='data_dir',
                         type=str,
                         required=True,
                         help='Directory to download dataset')
-        parser.add_argument('-n', '--datasetName', 
+        parser.add_argument('-n', '--datasetName',
                         dest='dataset_name',
                         type=str,
                         required=False,
@@ -116,7 +112,7 @@ Following commands are wrapped by this tool:
             datasets.append(DATASETS[args.dataset_name])
         else:
             datasets = DATASETS.values()
-        
+
         self.download_dataset(datasets, args.data_dir)
 
     def container(self):
@@ -127,7 +123,7 @@ Following commands are wrapped by this tool:
                         type=str,
                         required=True,
                         help='Directory with datasets')
-        parser.add_argument('-p', '--jupyterPort', 
+        parser.add_argument('-p', '--jupyterPort',
                         dest='jupyter_port',
                         type=int,
                         required=False,
@@ -171,13 +167,13 @@ Following commands are wrapped by this tool:
                         type=str,
                         required=True,
                         help='Directory with datasets')
-        parser.add_argument('-e', '--example', 
+        parser.add_argument('-e', '--example',
                         dest='example',
                         type=str,
                         required=True,
-                        help='Example to execute. ' + 
+                        help='Example to execute. ' +
                         ', '.join(list(DATASETS.keys())))
-        parser.add_argument('-p', '--jupyterPort', 
+        parser.add_argument('-p', '--jupyterPort',
                         dest='jupyter_port',
                         type=int,
                         required=False,
@@ -202,9 +198,9 @@ Following commands are wrapped by this tool:
         self.download_dataset(datasets, args.data_dir)
 
         print('Activating env %s...' % args.example)
-        run(['bash', '-c', 
-            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' % 
-            (args.example, args.jupyter_port)], 
+        run(['bash', '-c',
+            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
+            (args.example, args.jupyter_port)],
             check=True)
 
 
