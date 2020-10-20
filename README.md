@@ -4,6 +4,7 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 ## Installation 
 
+### conda
 All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. If installing for a system running a CUDA10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`
 
 ```bash
@@ -13,6 +14,18 @@ python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
+
+### Docker container
+A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
+
+Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
+
+```bash
+docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
+
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
+
+```
 
 ## Configuration
 
@@ -49,7 +62,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  <br> (Acceleration) | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU  <br> (Acceleration) |
 |------------------------------|-------------------------------------|---------------------------------|----------------|
@@ -93,7 +106,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on July 23, 2020 at commit ID `f89e71ae546fe011b9bf222ee5d70ae3fef59d25`.
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
@@ -161,7 +174,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on August 12, 2020 at commit ID `8f75d419f9806777af97a619fa75990858e6084e`.
+We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------------------|----------------------------|-------------------|
