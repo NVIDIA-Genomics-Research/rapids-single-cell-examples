@@ -3,14 +3,12 @@
 import os
 import wget
 import sys
-import glob
-import psutil
 import json
 import argparse
 import subprocess
 
 from distutils.version import StrictVersion
-from subprocess import run, check_output, PIPE
+from subprocess import run
 
 
 DOCKER_IMAGE='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'
@@ -22,13 +20,26 @@ DATASETS = {
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
             """,
+    'dsci_bmmc_60k_viz': """
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
+            """,
     '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad'
 }
 
 CONDA_ENV_MAPPING = {
-    'hlca_lung': 'conda/rapidgenomics_cuda10.1.yml',
+    'hlca_lung': 'conda/rapidgenomics_cuda10.2.yml',
     'dsci_bmmc_60k': 'conda/rapidgenomics_cuda10.2.yml',
-    '1M_brain': 'conda/rapidgenomics_cuda10.2.yml'
+    'dsci_bmmc_60k_viz': 'conda/rapidgenomics_cuda10.2.viz.yml',
+    '1M_brain': 'conda/rapidgenomics_cuda10.2.yml',
+}
+
+NOTEBOOKS = {
+    'hlca_lung': './notebooks/hlca_lung_gpu_analysis.ipynb',
+    'dsci_bmmc_60k': './notebooks/dsci_bmmc_60k_gpu.ipynb',
+    'dsci_bmmc_60k_viz': './notebooks/hlca_lung_gpu_analysis-visualization.ipynb',
+    '1M_brain': './notebooks/1M_brain_gpu_analysis_uvm.ipynb',
 }
 
 
@@ -43,6 +54,8 @@ Following commands are wrapped by this tool:
    dataset    : Download dataset
    container  : Start Jupyter notebook in a container
    host       : Start Jupyter notebook on the host
+   execute    : Execute am example
+   create_env : Create conda environment
 ''')
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
@@ -76,6 +89,26 @@ Following commands are wrapped by this tool:
         except FileNotFoundError as ex:
             print("Please install and activate conda.")
             sys.exit(1)
+
+
+    def _create_conda_env(self, env_name):
+        available_envs = self._conda_envs()
+        if env_name in available_envs:
+            print('Env %s already available.' % env_name)
+        else:
+            try:
+                env_yml = CONDA_ENV_MAPPING[env_name]
+            except KeyError as ex:
+                env_yml = "conda/%s.yml" % (env_name)
+                env_name = env_name.replace(".", "_")
+
+            create_cmd = "conda env create --name " + env_name + \
+                ' -f ' + env_yml
+            print('Creating conda env %s (%s)...' % (env_name, create_cmd))
+            run(create_cmd, shell=True)
+        run('python3 -m ipykernel install --user --name=%s' % (env_name),
+            shell=True)
+
 
     def download_dataset(self, datasets, dest_dir):
         for ds in datasets:
@@ -159,6 +192,19 @@ Following commands are wrapped by this tool:
         """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
         run(cmd, check=True, shell=True)
 
+    def create_env(self):
+        parser = argparse.ArgumentParser(
+            description='miniasm')
+        parser.add_argument('-e', '--env',
+                        dest='env',
+                        type=str,
+                        required=True,
+                        help='Example for which to create conda env. ' +
+                        ', '.join(list(DATASETS.keys())))
+
+        args = parser.parse_args(sys.argv[2:])
+        self._create_conda_env(args.env)
+
     def host(self):
         parser = argparse.ArgumentParser(
             description='miniasm')
@@ -181,6 +227,33 @@ Following commands are wrapped by this tool:
                         help='Port for jupyter')
 
         args = parser.parse_args(sys.argv[2:])
+        self._create_conda_env(args.example)
+
+        # make sure the required files are downloaded
+        self.download_dataset([DATASETS[args.example]], args.data_dir)
+
+        print('Activating env %s...' % args.example)
+        run(['bash', '-c',
+            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
+            (args.example, args.jupyter_port)],
+            check=True)
+
+    def execute(self):
+        parser = argparse.ArgumentParser(
+            description='miniasm')
+        parser.add_argument('-d', '--dataDir',
+                        dest='data_dir',
+                        type=str,
+                        required=True,
+                        help='Directory with datasets')
+        parser.add_argument('-e', '--example',
+                        dest='example',
+                        type=str,
+                        required=True,
+                        help='Example to execute. ' +
+                        ', '.join(list(DATASETS.keys())))
+
+        args = parser.parse_args(sys.argv[2:])
 
         available_envs = self._conda_envs()
         if args.example in available_envs:
@@ -199,10 +272,9 @@ Following commands are wrapped by this tool:
 
         print('Activating env %s...' % args.example)
         run(['bash', '-c',
-            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
-            (args.example, args.jupyter_port)],
+            'source activate %s; jupyter nbconvert --execute --clear-output %s' %
+            (args.example, NOTEBOOKS[args.example])],
             check=True)
-
 
 def main():
     Launcher()

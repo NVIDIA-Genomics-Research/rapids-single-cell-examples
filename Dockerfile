@@ -19,6 +19,18 @@ ARG GIT_BRANCH=master
 RUN git checkout ${GIT_BRANCH}
 
 RUN mkdir -p /opt/nvidia/scrna/
-COPY launch.sh /opt/nvidia/scrna/
+COPY launch /opt/nvidia/scrna/
 
-CMD /opt/nvidia/scrna/launch.sh jupyter
+RUN /opt/conda/envs/rapids/bin/python3 /opt/nvidia/scrna/launch create_env -e hlca_lung
+RUN /opt/conda/envs/rapids/bin/python3 /opt/nvidia/scrna/launch create_env -e dsci_bmmc_60k
+RUN /opt/conda/envs/rapids/bin/python3 /opt/nvidia/scrna/launch create_env -e dsci_bmmc_60k_viz
+RUN /opt/conda/envs/rapids/bin/python3 /opt/nvidia/scrna/launch create_env -e 1M_brain
+
+CMD /opt/conda/envs/rapids/bin/jupyter-lab \
+		--no-browser \
+		--port=8888 \
+		--ip=0.0.0.0 \
+		--notebook-dir=/workspace \
+		--NotebookApp.password=\"\" \
+		--NotebookApp.token=\"\" \
+		--NotebookApp.password_required=False
