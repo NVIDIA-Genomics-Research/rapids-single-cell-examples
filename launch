@@ -54,7 +54,7 @@ Following commands are wrapped by this tool:
    dataset    : Download dataset
    container  : Start Jupyter notebook in a container
    host       : Start Jupyter notebook on the host
-   execute    : Execute am example
+   execute    : Execute an example
    create_env : Create conda environment
 ''')
         parser.add_argument('command', help='Subcommand to run')
