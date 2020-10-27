@@ -106,7 +106,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
+We report the runtime of these notebooks on various AWS & GCP instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
 | Step                         | AWS <br> CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | AWS <br> GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | AWS <br> GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) | GCP <br> GPU runtime <br> a2-highgpu-1g <br> Tesla A100 40GB GPU |
 |------------------------------|-------------------------------------|----------------------------|-------------------|---------|
