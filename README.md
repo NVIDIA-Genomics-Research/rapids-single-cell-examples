@@ -108,18 +108,18 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
-| Step                         | AWS CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | AWS GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | AWS GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) | GCP GPU runtime <br> a2-highgpu-1g <br> Tesla A100 40GB GPU |
+| Step                         | AWS <br> CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | AWS <br> GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | AWS <br> GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) | GCP <br> GPU runtime <br> a2-highgpu-1g <br> Tesla A100 40GB GPU |
 |------------------------------|-------------------------------------|----------------------------|-------------------|---------|
-| Preprocessing                | 4337                                | 344  (13x)                 | 336  (13x)        | 201 |
-| PCA                          | 29                                  | 28   (1.04x)               | 23   (1.3x)       | 11.4 |
-| t-SNE                        | 5833                                | 134  (44x)                 | 38   (154x)       | 27.6 |
-| k-means (single iteration)   | 113                                 | 13.2 (8.6x)                | 2.4  (47x)        | 1.88 |
-| KNN                          | 670                                 | 106  (6.3x)                | 55.1 (12x)        | 46.3 |
-| UMAP                         | 1405                                | 87   (16x)                 | 19.2 (73x)        | 13.4 |
-| Louvain clustering           | 573                                 | 5.2  (110x)                | 2.8  (205x)       | 1.92 |
-| Leiden clustering            | 6414                                | 3.7  (1733x)               | 1.8  (3563x)      | 1.35 |
-| Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)        | 9.3 |
-| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908    | 912  | 702    | 502 |
+| Preprocessing                | 4337                                | 344  (13x)                 | 336  (13x)        | 201 (21.6x) |
+| PCA                          | 29                                  | 28   (1.04x)               | 23   (1.3x)       | 11.4 (2.5x) |
+| t-SNE                        | 5833                                | 134  (44x)                 | 38   (154x)       | 27.6 (211x)  |
+| k-means (single iteration)   | 113                                 | 13.2 (8.6x)                | 2.4  (47x)        | 1.88 (60x)  |
+| KNN                          | 670                                 | 106  (6.3x)                | 55.1 (12x)        | 46.3 (14.5x)  |
+| UMAP                         | 1405                                | 87   (16x)                 | 19.2 (73x)        | 13.4 (105x) |
+| Louvain clustering           | 573                                 | 5.2  (110x)                | 2.8  (205x)       | 1.92 (298x) |
+| Leiden clustering            | 6414                                | 3.7  (1733x)               | 1.8  (3563x)      | 1.35 (4751x)  |
+| Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)        | 9.3 (26.8x) |
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908    | 912  | 702    | 502 (39.7x) |
 | Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             | 4 |
 | Total cost ($)               | 11.414                              | 0.991                      | 2.388             | 0.553 |
 
