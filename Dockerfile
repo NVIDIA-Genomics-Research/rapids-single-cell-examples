@@ -6,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git python3-setuptools python3-pip build-essential
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy python-igraph louvain leidenalg
+    scanpy python-igraph louvain leidenalg wget
 
 WORKDIR /workspace
 ENV HOME /workspace
@@ -31,6 +31,9 @@ RUN source activate rapidgenomics && \
 	python3 -m ipykernel install --user --name=rapidgenomics
 RUN source activate rapidgenomics_viz && \
 	python3 -m ipykernel install --user --name=rapidgenomics_viz
+
+RUN /opt/conda/envs/rapidgenomics/bin/pip install wget
+RUN /opt/conda/envs/rapidgenomics_viz/bin/pip install wget
 
 CMD jupyter-lab \
 		--no-browser \

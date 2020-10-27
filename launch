@@ -130,6 +130,7 @@ To execute 'hlca_lung' example in container, please execute following command:
             create_cmd = "conda env create --name %s -f %s" % \
                 (env_name, env_yml)
             print('Creating conda env %s (%s)...' % (env_name, create_cmd))
+            run('cat %s ' % env_yml, shell=True)
             run(create_cmd, shell=True)
 
         run(['bash', '-c',
