@@ -12,7 +12,7 @@ RUN git clone \
     rapids-single-cell-examples
 
 ARG GIT_BRANCH=master
-RUN cd rapids-single-cell-examples && git checkout ${GIT_BRANCH}
+RUN cd rapids-single-cell-examples && git checkout ${GIT_BRANCH} && git pull
 
 RUN mkdir -p /opt/nvidia/scrna/
 COPY launch /opt/nvidia/scrna/
