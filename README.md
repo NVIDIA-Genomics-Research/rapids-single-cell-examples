@@ -88,7 +88,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 
 We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
 
-This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available.
+This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available. Oversubscribing a GPU by more than a factor of 2x can cause thrashing in UVM, which can ultimately lead to a notebook freezing.
 
 ### Example Dataset
 
@@ -100,7 +100,7 @@ wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us
 
 ### Example Code
 
-Follow this [Jupyter notebook](notebooks/1M_brain_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook. This notebook runs completely in under 15 minutes on a Tesla V100 GPU with 32 GB memory.
+Follow this [Jupyter notebook](notebooks/1M_brain_gpu_analysis_uvm.ipynb) for RAPIDS analysis of this dataset. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [utils.py](notebooks/utils.py) need to be in the same folder as the notebook. This notebook runs completely in under 15 minutes on a Tesla V100 GPU with 32 GB memory on a DGX with 256GB of main memory.
 
 We provide a second notebook with the CPU version of this analysis [here](notebooks/1M_brain_cpu_analysis.ipynb).
 
@@ -121,7 +121,7 @@ We report the runtime of these notebooks on various AWS & GCP instances below. A
 | Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)        | 9.3 (26.8x) |
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908    | 912  | 702    | 502 (39.7x) |
 | Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             | 4 |
-| Total cost ($)               | 11.414                              | 0.991                      | 2.388<sup>*</sup>             | 0.553 |
+| Total cost ($)               | 11.414                              | 0.991                      | 2.388<sup>*</sup> | 0.553 |
 
 <sup>* The amount of main memory needed to execute this notebook required an instance with 4x GPUs</sup>
 
