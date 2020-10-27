@@ -77,7 +77,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | Differential Gene Expression | 99                                  | 2.9      (34x)                  | 2.4  (41x)     | 1.96 (50.5x)|
 | Re-analysis of subgroup      | 21                                  | 3.7      (5.7x)                 | 3.3  (6.4x)    | 4.1  (5.12x) |
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)  | 858  | 103    | 122            | 125  (6.86x) |
-| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06           | 4  |
+| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06           | 4.00  |
 | Total cost ($)               | 0.492                               | 0.015                           | 0.104          | 0.139           |
 
 
@@ -120,7 +120,7 @@ We report the runtime of these notebooks on various AWS & GCP instances below. A
 | Leiden clustering            | 6414                                | 3.7  (1733x)               | 1.8  (3563x)      | 1.35 (4751x)  |
 | Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)        | 9.3  (26.8x) |
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908    | 912  | 702    | 502  (39.7x) |
-| Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             | 4 |
+| Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             | 4.00 |
 | Total cost ($)               | 11.414                              | 0.991                      | 2.388<sup>*</sup> | 0.553 |
 
 <sup>* The amount of main memory needed to execute this notebook required an instance with 4x GPUs</sup>
@@ -189,7 +189,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | t-SNE                        | 252                                 | 3.3  (76x)                 | 2.1  (120x)       | 2.3  (110x) |
 | Differential Peak Analysis   | 1006                                | 23   (44x)                 | 20   (50x)        | 9.8  (103x) |
 | End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1530        | 182    | 111  | 86.9 |
-| Price ($/hr)                 | 2.064                               | 3.912                      | 3.06              | 4 | 
+| Price ($/hr)                 | 2.064                               | 3.912                      | 3.06              | 4.00 | 
 | Total cost ($)               | 0.877                               | 0.198                      | 0.095             | 0.096 |
 
 
