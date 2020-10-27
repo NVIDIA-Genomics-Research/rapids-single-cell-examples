@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-import wget
 import sys
 import json
 import argparse
@@ -11,8 +10,10 @@ from distutils.version import StrictVersion
 from subprocess import run
 
 
-DOCKER_IMAGE='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'
+DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
 
+# Key: String: Example name
+# Value: String: Comma seperated HTTP URL to dataset files.
 DATASETS = {
     'hlca_lung': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
     'dsci_bmmc_60k': """
@@ -28,11 +29,13 @@ DATASETS = {
     '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad'
 }
 
+# Key: String: Example name
+# Value: (String, String): conda env. name, relative path the conda yml file.
 CONDA_ENV_MAPPING = {
-    'hlca_lung': 'conda/rapidgenomics_cuda10.2.yml',
-    'dsci_bmmc_60k': 'conda/rapidgenomics_cuda10.2.yml',
-    'dsci_bmmc_60k_viz': 'conda/rapidgenomics_cuda10.2.viz.yml',
-    '1M_brain': 'conda/rapidgenomics_cuda10.2.yml',
+    'hlca_lung': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
+    'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
+    'dsci_bmmc_60k_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda10.2.viz.yml'),
+    '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
 }
 
 NOTEBOOKS = {
@@ -51,12 +54,16 @@ class Launcher(object):
             usage='''launch <command> [<args>]
 
 Following commands are wrapped by this tool:
-   dataset    : Download dataset
    container  : Start Jupyter notebook in a container
    host       : Start Jupyter notebook on the host
+   dataset    : Download dataset
    execute    : Execute an example
-   create_env : Create conda environment
+   create_env : Create conda environment for an example
+
+To execute 'hlca_lung' example in container, please execute following command:
+./launch container -d /path/to/store/dataset -e hlca_lung
 ''')
+
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
 
@@ -66,7 +73,6 @@ Following commands are wrapped by this tool:
             exit(1)
 
         getattr(self, args.command)()
-
 
     def _fetch_docker_version(self):
         try:
@@ -78,65 +84,88 @@ Following commands are wrapped by this tool:
             print("Please install docker.")
             sys.exit(1)
 
-
     def _conda_envs(self):
+        """
+        Query conda to retrieve all available env name
+            Returns:
+                    envs: List of envs on the host
+        """
         try:
             output = subprocess.check_output(["conda", "info", "--envs", "--json"],
-                universal_newlines=True)
-            envs =  json.loads(output)
-            envs = [envFile.split('/')[-1]  for envFile in envs['envs']]
+                                             universal_newlines=True)
+
+            envs = json.loads(output)
+            envs = [envFile.split('/')[-1] for envFile in envs['envs']]
+
             return envs
+
         except FileNotFoundError as ex:
             print("Please install and activate conda.")
             sys.exit(1)
 
-
     def _create_conda_env(self, env_name):
+        """
+        Creates a new conda env.
+        """
+
+        try:
+            (env_name, env_yml) = CONDA_ENV_MAPPING[env_name]
+        except KeyError as ex:
+            print("%s not configured." % env_name)
+            sys.exit(1)
+
         available_envs = self._conda_envs()
         if env_name in available_envs:
             print('Env %s already available.' % env_name)
         else:
-            try:
-                env_yml = CONDA_ENV_MAPPING[env_name]
-            except KeyError as ex:
-                env_yml = "conda/%s.yml" % (env_name)
-                env_name = env_name.replace(".", "_")
-
-            create_cmd = "conda env create --name " + env_name + \
-                ' -f ' + env_yml
+            create_cmd = "conda env create --name %s -f %s" % \
+                (env_name, env_yml)
             print('Creating conda env %s (%s)...' % (env_name, create_cmd))
             run(create_cmd, shell=True)
-        run('python3 -m ipykernel install --user --name=%s' % (env_name),
+
+        run('conda activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name),
             shell=True)
 
+        return env_name
 
     def download_dataset(self, datasets, dest_dir):
+        """
+        Downloads datasets to the destination directory
+        """
         for ds in datasets:
+
             for url in ds.split(','):
                 url = url.strip()
+
                 filename = os.path.basename(url)
                 filename = os.path.join(dest_dir, filename)
+
                 if not os.path.exists(filename):
                     print("Dowloading %s to %s..." % (url, filename))
-                    wget.download(url, filename)
+                    run('wget -q --show-progress %s -O %s' % (url, filename),
+                        shell=True)
+                else:
+                    print("Dataset file %s already available." % (filename))
 
     def dataset(self):
         """
+        Implementation for the command 'dataset'
+
         Downloads a dataset. Datasets are pre-defined as a dictionary DATASETS.
         Each dataset can be a comma seperated HTTP URL.
         """
         parser = argparse.ArgumentParser(
             description='dataset')
         parser.add_argument('-d', '--dataDir',
-                        dest='data_dir',
-                        type=str,
-                        required=True,
-                        help='Directory to download dataset')
+                            dest='data_dir',
+                            type=str,
+                            required=True,
+                            help='Directory to download dataset')
         parser.add_argument('-n', '--datasetName',
-                        dest='dataset_name',
-                        type=str,
-                        required=False,
-                        help='Name of dataset. Without this parameter all datasets will be downloaded. Available datasets are %s' %
+                            dest='dataset_name',
+                            type=str,
+                            required=False,
+                            help='Name of dataset. Without this parameter all datasets will be downloaded. Available datasets are %s' %
                             ', '.join(list(DATASETS.keys())))
         args = parser.parse_args(sys.argv[2:])
 
@@ -149,19 +178,22 @@ Following commands are wrapped by this tool:
         self.download_dataset(datasets, args.data_dir)
 
     def container(self):
+        """
+        Implementation for command 'container'. Starts a docker container.
+        """
         parser = argparse.ArgumentParser(
             description='container')
         parser.add_argument('-d', '--dataDir',
-                        dest='data_dir',
-                        type=str,
-                        required=True,
-                        help='Directory with datasets')
+                            dest='data_dir',
+                            type=str,
+                            required=True,
+                            help='Directory with datasets')
         parser.add_argument('-p', '--jupyterPort',
-                        dest='jupyter_port',
-                        type=int,
-                        required=False,
-                        default=8888,
-                        help='Port for jupyter')
+                            dest='jupyter_port',
+                            type=int,
+                            required=False,
+                            default=8888,
+                            help='Port for jupyter')
         args = parser.parse_args(sys.argv[2:])
 
         docker_version = self._fetch_docker_version().strip().strip("'")
@@ -169,16 +201,17 @@ Following commands are wrapped by this tool:
         # nvidia docker toolkit command parameter
         runtime_arg = '--gpus all'
         if StrictVersion(docker_version.strip()) < StrictVersion("19.03.0"):
-            print('Old docker version %s. Please upgrade docker' % \
-                (docker_version))
+            print('Old docker version %s. Please upgrade docker' %
+                  (docker_version))
             runtime_arg = '--runtime=nvidia'
 
-        cmd ="""docker run \
+        # --user $(id -u):$(id -g) \
+        cmd = """docker run \
             %s --rm \
-            --user $(id -u):$(id -g) \
+            --network host \
             -p %d:8888 \
             -v %s:/workspace/rapids-single-cell-examples/data \
-            -e HOME=/workspace/rapids-single-cell-examples/data \
+            -e HOME=/workspace \
             -w /workspace/rapids-single-cell-examples \
             -it %s \
             /opt/conda/envs/rapids/bin/jupyter-lab \
@@ -188,43 +221,56 @@ Following commands are wrapped by this tool:
                 --notebook-dir=/workspace \
                 --NotebookApp.password=\"\" \
                 --NotebookApp.token=\"\" \
-                --NotebookApp.password_required=False
+                --NotebookApp.password_required=False \
+                --allow-root
         """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
+
         run(cmd, check=True, shell=True)
 
     def create_env(self):
+        """
+        Implementation for the command 'create_env'
+
+        Creates a conda env.
+        """
         parser = argparse.ArgumentParser(
             description='miniasm')
         parser.add_argument('-e', '--env',
-                        dest='env',
-                        type=str,
-                        required=True,
-                        help='Example for which to create conda env. ' +
-                        ', '.join(list(DATASETS.keys())))
+                            dest='env',
+                            type=str,
+                            required=True,
+                            help='Example for which to create conda env. ' +
+                            ', '.join(list(DATASETS.keys())))
 
         args = parser.parse_args(sys.argv[2:])
         self._create_conda_env(args.env)
 
     def host(self):
+        """
+        Implementation for the command 'host'
+
+        If required creates the required conda env, downloads datasets and
+        starts jupyter lab.
+        """
         parser = argparse.ArgumentParser(
             description='miniasm')
         parser.add_argument('-d', '--dataDir',
-                        dest='data_dir',
-                        type=str,
-                        required=True,
-                        help='Directory with datasets')
+                            dest='data_dir',
+                            type=str,
+                            required=True,
+                            help='Directory with datasets')
         parser.add_argument('-e', '--example',
-                        dest='example',
-                        type=str,
-                        required=True,
-                        help='Example to execute. ' +
-                        ', '.join(list(DATASETS.keys())))
+                            dest='example',
+                            type=str,
+                            required=True,
+                            help='Example to execute. ' +
+                            ', '.join(list(DATASETS.keys())))
         parser.add_argument('-p', '--jupyterPort',
-                        dest='jupyter_port',
-                        type=int,
-                        required=False,
-                        default=8888,
-                        help='Port for jupyter')
+                            dest='jupyter_port',
+                            type=int,
+                            required=False,
+                            default=8888,
+                            help='Port for jupyter')
 
         args = parser.parse_args(sys.argv[2:])
         self._create_conda_env(args.example)
@@ -234,24 +280,29 @@ Following commands are wrapped by this tool:
 
         print('Activating env %s...' % args.example)
         run(['bash', '-c',
-            'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
-            (args.example, args.jupyter_port)],
+             'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
+             (args.example, args.jupyter_port)],
             check=True)
 
     def execute(self):
+        """
+        Implementation for the command 'execute'
+
+        Executes a notebook in conda env.
+        """
         parser = argparse.ArgumentParser(
             description='miniasm')
         parser.add_argument('-d', '--dataDir',
-                        dest='data_dir',
-                        type=str,
-                        required=True,
-                        help='Directory with datasets')
+                            dest='data_dir',
+                            type=str,
+                            required=True,
+                            help='Directory with datasets')
         parser.add_argument('-e', '--example',
-                        dest='example',
-                        type=str,
-                        required=True,
-                        help='Example to execute. ' +
-                        ', '.join(list(DATASETS.keys())))
+                            dest='example',
+                            type=str,
+                            required=True,
+                            help='Example to execute. ' +
+                            ', '.join(list(DATASETS.keys())))
 
         args = parser.parse_args(sys.argv[2:])
 
@@ -272,9 +323,10 @@ Following commands are wrapped by this tool:
 
         print('Activating env %s...' % args.example)
         run(['bash', '-c',
-            'source activate %s; jupyter nbconvert --execute --clear-output %s' %
-            (args.example, NOTEBOOKS[args.example])],
+             'source activate %s; jupyter nbconvert --execute --clear-output %s' %
+             (args.example, NOTEBOOKS[args.example])],
             check=True)
+
 
 def main():
     Launcher()
