@@ -121,7 +121,9 @@ We report the runtime of these notebooks on various AWS & GCP instances below. A
 | Re-analysis of subgroup      | 249                                 | 10.9 (23x)                 | 8.9  (28x)        | 9.3 (26.8x) |
 | End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 19908    | 912  | 702    | 502 (39.7x) |
 | Price ($/hr)                 | 2.064                               | 3.912                      | 12.24             | 4 |
-| Total cost ($)               | 11.414                              | 0.991                      | 2.388             | 0.553 |
+| Total cost ($)               | 11.414                              | 0.991                      | 2.388<sup>*</sup>             | 0.553 |
+
+<sup>* The amount of main memory needed to execute this notebook required an instance with 4x GPUs</sup>
 
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
