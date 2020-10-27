@@ -3,11 +3,13 @@
 import os
 import sys
 import json
+import atexit
+import signal
 import argparse
 import subprocess
 
 from distutils.version import StrictVersion
-from subprocess import run
+from subprocess import run, Popen
 
 
 DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
@@ -44,6 +46,15 @@ NOTEBOOKS = {
     'dsci_bmmc_60k_viz': './notebooks/hlca_lung_gpu_analysis-visualization.ipynb',
     '1M_brain': './notebooks/1M_brain_gpu_analysis_uvm.ipynb',
 }
+
+PROCESSES = []
+
+@atexit.register
+def cleanup_processes():
+    print('Killing child processes if any...')
+    for proc in PROCESSES:
+        print('killing ', proc)
+        os.kill(proc.pid, signal.SIGSTOP)
 
 
 class Launcher(object):
@@ -123,8 +134,9 @@ To execute 'hlca_lung' example in container, please execute following command:
             print('Creating conda env %s (%s)...' % (env_name, create_cmd))
             run(create_cmd, shell=True)
 
-        run('conda activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name),
-            shell=True)
+        run(['bash', '-c',
+            'source activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name)],
+            check=True)
 
         return env_name
 
@@ -273,16 +285,25 @@ To execute 'hlca_lung' example in container, please execute following command:
                             help='Port for jupyter')
 
         args = parser.parse_args(sys.argv[2:])
-        self._create_conda_env(args.example)
+        env_name = self._create_conda_env(args.example)
 
         # make sure the required files are downloaded
         self.download_dataset([DATASETS[args.example]], args.data_dir)
 
-        print('Activating env %s...' % args.example)
-        run(['bash', '-c',
-             'source activate %s; jupyter-lab -y --port=%d --ip=0.0.0.0' %
-             (args.example, args.jupyter_port)],
-            check=True)
+        cmd = """
+        source activate %s; \
+            jupyter-lab -y \
+                --port=%d \
+                --ip=0.0.0.0 \
+                --NotebookApp.password=\"\" \
+                --NotebookApp.token=\"\" \
+                --NotebookApp.password_required=False
+        """ % (env_name, args.jupyter_port)
+
+        proc = Popen(['bash', '-c', cmd])
+
+        PROCESSES.append(proc)
+        proc.wait()
 
     def execute(self):
         """

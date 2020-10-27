@@ -14,7 +14,7 @@ RUN git clone \
     https://github.com/clara-parabricks/rapids-single-cell-examples.git \
     rapids-single-cell-examples
 
-ARG GIT_BRANCH=master
+ARG GIT_BRANCH=master4
 RUN cd rapids-single-cell-examples && git checkout ${GIT_BRANCH} && git pull
 
 RUN mkdir -p /opt/nvidia/scrna/
