@@ -33,6 +33,7 @@ dependencies:
   - gunicorn=20.0
   - requests=2.22.0
   - pyproj
+  - wget
   - pip
   - pip:
       - jupyter-server-proxy

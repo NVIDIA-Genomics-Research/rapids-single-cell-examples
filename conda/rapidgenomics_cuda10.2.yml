@@ -24,6 +24,7 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
+  - wget
   - pip
   - pip:
       - jupyter-server-proxy
