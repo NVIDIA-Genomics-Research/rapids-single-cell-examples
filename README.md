@@ -64,21 +64,22 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 We report the runtime of these notebooks on various AWS instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed at commit ID `6747214a3dff2bdc016a6df2b997cc8db7173d54`.
 
+| Step                         | AWS <br> CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | AWS <br> GPU runtime <br> g4dn.12xlarge <br> T4 16 GB GPU <br> (Acceleration)  | AWS <br> GPU runtime <br> p3.8xlarge <br> Tesla V100 16 GB GPU <br> (Acceleration) | GCP <br> GPU runtime <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 | Step                         | CPU runtime <br> m5a.12xlarge <br> Intel Xeon Platinum <br> 8000, 48 vCPUs | GPU runtime <br> g4dn.xlarge <br> T4 16 GB GPU  <br> (Acceleration) | GPU runtime <br> p3.2xlarge <br> Tesla V100 16 GB GPU  <br> (Acceleration) |
-|------------------------------|-------------------------------------|---------------------------------|----------------|
-| Preprocessing                | 329                                 | 66       (5x)                   | 84   (3.9x)    |
-| PCA                          | 12.2                                | 4.6      (2.7x)                 | 3.1  (3.9x)    | 
-| t-SNE                        | 236                                 | 3.0      (79x)                  | 1.8  (131x)    |
-| k-means (single iteration)   | 27                                  | 0.3      (90x)                  | 0.12 (225x)    |
-| KNN                          | 28                                  | 4.9      (5.7x)                 | 5.9  (4.7x)    |
-| UMAP                         | 55                                  | 0.95     (58x)                  | 0.55 (100x)    |
-| Louvain clustering           | 16                                  | 0.19     (84x)                  | 0.17 (94x)     |
-| Leiden clustering            | 17                                  | 0.14     (121x)                 | 0.15 (113x)    |
-| Differential Gene Expression | 99                                  | 2.9      (34x)                  | 2.4  (41x)     |
-| Re-analysis of subgroup      | 21                                  | 3.7      (5.7x)                 | 3.3  (6.4x)    |
-| End-to-end notebook run<br>(steps above + data load and <br> additional processing)      | 858                              | 103                          | 122          |
-| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06             |
-| Total cost ($)               | 0.492                               | 0.015                           | 0.104            |               
+|------------------------------|-------------------------------------|---------------------------------|----------------|--------|
+| Preprocessing                | 329                                 | 66       (5x)                   | 84   (3.9x)    | 91 (3.6x) |
+| PCA                          | 12.2                                | 4.6      (2.7x)                 | 3.1  (3.9x)    | 2.68 (4.6x) |
+| t-SNE                        | 236                                 | 3.0      (79x)                  | 1.8  (131x)    | 2.23 (105x) |
+| k-means (single iteration)   | 27                                  | 0.3      (90x)                  | 0.12 (225x)    | .897 (30x) |
+| KNN                          | 28                                  | 4.9      (5.7x)                 | 5.9  (4.7x)    | 5.34 (5.2x) |
+| UMAP                         | 55                                  | 0.95     (58x)                  | 0.55 (100x)    | .627 (87.7x)|
+| Louvain clustering           | 16                                  | 0.19     (84x)                  | 0.17 (94x)     | .145 (110x) |
+| Leiden clustering            | 17                                  | 0.14     (121x)                 | 0.15 (113x)    | .123 (138x) |
+| Differential Gene Expression | 99                                  | 2.9      (34x)                  | 2.4  (41x)     | 1.96 (50.5x)|
+| Re-analysis of subgroup      | 21                                  | 3.7      (5.7x)                 | 3.3  (6.4x)    | 4.1 (5.12x) |
+| End-to-end notebook run<br>(steps above + data load and <br> additional processing)  | 858  | 103    | 122            | 125 (6.86x) |
+| Price ($/hr)                 | 2.064                               | 0.526                           | 3.06           | 4  |
+| Total cost ($)               | 0.492                               | 0.015                           | 0.104          | .139           |
 
 
 
