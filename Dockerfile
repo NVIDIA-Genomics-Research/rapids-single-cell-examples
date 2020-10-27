@@ -19,9 +19,10 @@ COPY launch /opt/nvidia/scrna/
 
 SHELL ["/bin/bash", "-c"]
 RUN cd /workspace/rapids-single-cell-examples && source activate rapids && \
+	python3 /opt/nvidia/scrna/launch create_env -e dsci_bmmc_60k_viz  && \
 	python3 /opt/nvidia/scrna/launch create_env -e hlca_lung && \
 	python3 /opt/nvidia/scrna/launch create_env -e dsci_bmmc_60k  && \
-	python3 /opt/nvidia/scrna/launch create_env -e dsci_bmmc_60k_viz  && \
+
 	python3 /opt/nvidia/scrna/launch create_env -e 1M_brain
 
 RUN source activate rapidgenomics && \

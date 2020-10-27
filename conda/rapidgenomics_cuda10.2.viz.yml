@@ -24,8 +24,6 @@ dependencies:
   - plotly=4.5
   - dash=1.8
   - pandas=0.25.3
-  - datashader=0.10
-  - dash-daq=0.3.2
   - dash-bootstrap-components
   - gunicorn=20.0
   - requests=2.22.0
