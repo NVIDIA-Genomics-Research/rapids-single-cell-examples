@@ -51,9 +51,7 @@ PROCESSES = []
 
 @atexit.register
 def cleanup_processes():
-    print('Killing child processes if any...')
     for proc in PROCESSES:
-        print('killing ', proc)
         os.kill(proc.pid, signal.SIGSTOP)
 
 
