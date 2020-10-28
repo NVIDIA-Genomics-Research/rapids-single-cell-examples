@@ -8,13 +8,13 @@ channels:
 dependencies:
   - rapids=0.16*
   - python=3.7
-  - cudatoolkit=10.1
+  - cudatoolkit=11.0
   - cudf
   - dask-cuda
   - dask-cudf
   - cuml
   - cugraph
-  - numba>=0.48*
+  - numba=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
@@ -25,6 +25,16 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
+  - plotly=4.5
+  - dash=1.8
+  - pandas=0.25.3
+  - cupy=7.1
+  - datashader=0.10
+  - dash-daq=0.3.2
+  - dash-html-components
+  - gunicorn=20.0
+  - requests=2.22.0
+  - pyproj
   - pip
   - pip:
       - jupyter-server-proxy

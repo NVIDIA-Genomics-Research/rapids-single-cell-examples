@@ -1,10 +1,12 @@
 channels:
+  - rapidsai-nightly
   - rapidsai
   - nvidia
   - conda-forge
   - bioconda
   - defaults
 dependencies:
+  - rapids=0.16*
   - python=3.7
   - cudatoolkit=10.2
   - cudf
@@ -18,7 +20,7 @@ dependencies:
   - ucx-proc=*=gpu
   - scikit-learn
   - louvain
-  - cupy=7
+  - cupy>=8
   - scanpy
   - umap-learn
   - ipykernel
