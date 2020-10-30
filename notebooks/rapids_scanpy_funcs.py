@@ -184,7 +184,7 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     return outputs
 
 
-def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, barcodes=None):
+def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, barcodes=None, on_device=True):
     """
     Filter cells that have genes greater than a max number of genes or less than
     a minimum number of genes.
@@ -208,6 +208,11 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
     barcodes : series
         cudf series containing cell barcodes.
 
+        
+    on_device : bool
+        cusparse requires 32-bit indexing. Larger datasets might need to be
+        processed on host
+
     Returns
     -------
 
@@ -217,6 +222,8 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
     barcodes : If barcodes are provided, also returns a series of 
         filtered barcodes.
     """
+    
+    vstack_lib = cp if on_device else scipy
 
     n_batches = math.ceil(sparse_gpu_array.shape[0] / rows_per_batch)
     filtered_list = []
@@ -231,27 +238,31 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
         filtered_list.append(_filter_cells(arr_batch, 
                                             min_genes=min_genes, 
                                             max_genes=max_genes, 
-                                            barcodes=barcodes_batch))
+                                            barcodes=barcodes_batch,
+                                            on_device=on_device))
 
     if barcodes is None:
-        return cp.sparse.vstack(filtered_list)
+        return vstack_lib.sparse.vstack(filtered_list)
     else:
         filtered_data = [x[0] for x in filtered_list]
         filtered_barcodes = [x[1] for x in filtered_list]
         filtered_barcodes = cudf.concat(filtered_barcodes)
-        return cp.sparse.vstack(filtered_data), filtered_barcodes.reset_index(drop=True)
+        return vstack_lib.sparse.vstack(filtered_data), filtered_barcodes.reset_index(drop=True)
 
 
-def _filter_cells(sparse_gpu_array, min_genes, max_genes, barcodes=None):
+def _filter_cells(sparse_gpu_array, min_genes, max_genes, barcodes=None, on_device=True):
     degrees = cp.diff(sparse_gpu_array.indptr)
     query = ((min_genes <= degrees) & (degrees <= max_genes)).ravel()
+    query = query if on_device else query.get()
+    sparse_gpu_array = sparse_gpu_array if on_device else sparse_gpu_array.get()
+
     if barcodes is None:
         return sparse_gpu_array[query]
     else:
         return sparse_gpu_array[query], barcodes[query]
 
 
-def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
+def filter_genes(sparse_gpu_array, genes_idx, min_cells=0, on_device=True):
     """
     Filters out genes that contain less than a specified number of cells
 
@@ -266,10 +277,18 @@ def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
 
     min_cells : int
         Genes containing a number of cells below this value will be filtered
+        
+    on_device : bool
+        cusparse requires 32-bit indexing. Larger datasets might need to be
+        processed on host
     """
-    thr = cp.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
+    query_lib = cp if on_device else np
+    
+    thr = query_lib.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
     filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:, thr])
-    genes_idx = genes_idx[cp.where(thr).get()[0]]
+    where = query_lib.where(thr)[0]
+    where = where.get() if on_device else where
+    genes_idx = genes_idx[where]
     
     return filtered_genes, genes_idx.reset_index(drop=True)
 
