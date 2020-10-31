@@ -489,7 +489,7 @@ def leiden(adata):
     offsets = cudf.Series(adjacency.indptr)
     indices = cudf.Series(adjacency.indices)
     g = cugraph.Graph()
-    g = g.from_cudf_adjlist(indptr, indices, None)
+    g.from_cudf_adjlist(offsets, indices, None)
     
     # Cluster
     leiden_parts, _ = cugraph.leiden(g)
@@ -516,7 +516,7 @@ def louvain(adata):
     offsets = cudf.Series(adjacency.indptr)
     indices = cudf.Series(adjacency.indices)
     g = cugraph.Graph()
-    g = g.from_cudf_adjlist(indptr, indices, None)
+    g.from_cudf_adjlist(offsets, indices, None)
     
     # Cluster
     louvain_parts, _ = cugraph.louvain(g)

@@ -14,7 +14,6 @@ dependencies:
   - dask-cudf
   - cuml
   - cugraph
-  - numba=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
@@ -27,13 +26,13 @@ dependencies:
   - jupyterlab
   - plotly=4.5
   - dash=1.8
-  - pandas=0.25.3
-  - cupy=7.1
-  - datashader=0.10
+  - datashader
   - dash-daq=0.3.2
   - dash-html-components
-  - gunicorn=20.0
-  - requests=2.22.0
+  - dash-bootstrap-components
+  - dash-core-components
+  - gunicorn
+  - requests
   - pyproj
   - pip
   - pip:
