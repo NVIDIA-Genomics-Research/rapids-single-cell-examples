@@ -13,7 +13,6 @@ dependencies:
   - dask-cudf
   - cuml
   - cugraph
-  - numba>=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
