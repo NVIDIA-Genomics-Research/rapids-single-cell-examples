@@ -3,22 +3,17 @@ from subprocess import Popen, PIPE
 
 import os
 import cudf
-import torch
+import cupy
 import time
 import tabix
 import numpy as np
 import pandas as pd
 from numba import cuda
 
-import gzip
-
-from collections.abc import Sequence
-
-import torch
-from atacworks.dl4atac.layers import ZeroSamePad1d, Activation, ConvAct1d, ResBlock
 from atacworks.dl4atac.models.models import DenoisingResNet
 from atacworks.dl4atac.models.model_utils import load_model
 
+import torch
 
 def count_fragments(fragment_file):
     """
@@ -50,20 +45,6 @@ def tabix_query(filename, chrom, start, end):
     return records
 
 
-@cuda.jit
-def expand_interval(start, end, index, end_index,
-                    interval_start, interval_end, interval_index, step):
-    for i in range(cuda.threadIdx.x, start.size, cuda.blockDim.x):
-        # Starting position in the target frame
-        first_index = end_index[i] - (end[i] - start[i])
-        chrom_start = start[i]
-        for j in range(first_index, end_index[i], step):
-            interval_start[j] = chrom_start
-            chrom_start += 1
-            interval_end[j] = chrom_start
-            interval_index[j] = index[i]
-
-
 def read_fragments(chrom, start, end, fragment_file, pad=0):
     #Create a DF from the output of tabix query
     reads = cudf.DataFrame(
@@ -77,38 +58,60 @@ def read_fragments(chrom, start, end, fragment_file, pad=0):
     return reads
 
 
-def get_coverages(reads_orig, chrom, start, end, pad=0):
+@cuda.jit
+def expand_interval(start, end, index, end_index,
+                    interval_start, interval_end, interval_index, step):
+    i = cuda.grid(1)
+
+    # Starting position in the target frame
+    first_index = end_index[i] - (end[i] - start[i])
+    chrom_start = start[i]
+    for j in range(first_index, end_index[i], step):
+        interval_start[j] = chrom_start
+        chrom_start = chrom_start + 1
+        interval_end[j] = chrom_start
+        interval_index[j] = index[i]
+
+def get_coverages(reads_orig, pad):
+    start = reads_orig['start'][0]
+    end = reads_orig['end'][len(reads_orig) - 1]
 
     reads = reads_orig.copy()
-    reads = reads.sort_values(by='row_num').reset_index(drop=True)
-    
-    # List all clusters
-    clusters = sorted(np.unique(reads['cluster'].to_array()))
-    num_clusters = len(clusters)
 
     # Get total window length
-    window_size = end - start + 2*pad
+    cum_sum = reads['len'].cumsum()
+    window_size = cum_sum[len(reads_orig) - 1].tolist()
 
     # Create expanded coverage dataframe
-    expanded_coverage_size = reads['len'].sum()
     expanded_coverage = cudf.DataFrame()
-    expanded_coverage['start'] = np.zeros(window_size, dtype=np.int32)
-    expanded_coverage['end'] = np.zeros(window_size, dtype=np.int32)
-    expanded_coverage['row_num'] = np.zeros(window_size, dtype=np.int32)
-    expand_interval.forall(reads.shape[0])(
+    start_arr = cupy.zeros(window_size, dtype=cupy.int32)
+    end_arr = cupy.zeros(window_size, dtype=cupy.int32)
+    rownum_arr = cupy.zeros(window_size, dtype=cupy.int32)
+
+    expand_interval.forall(reads.shape[0], 1)(
         reads['start'],
         reads['end'],
         reads['row_num'],
-        reads['len'].cumsum(),
-        expanded_coverage['start'],
-        expanded_coverage['end'],
-        expanded_coverage['row_num'],
+        cum_sum,
+        start_arr,
+        end_arr,
+        rownum_arr,
         1)
+
+    expanded_coverage['start'] = start_arr
+    expanded_coverage['end'] = end_arr
+    expanded_coverage['row_num'] = rownum_arr
+
+    reads = reads_orig.copy()
     reads.drop(['start', 'end'], inplace=True)
     expanded_coverage = expanded_coverage.merge(reads, on='row_num')
 
     # Get summed coverage at each position
     summed_coverage = expanded_coverage.groupby(['chrom', 'start', 'end', 'cluster'], as_index=False).count()
+
+    # List all clusters
+    clusters = sorted(np.unique(reads['cluster'].to_array()))
+    num_clusters = len(clusters)
 
     # Create empty array
     x = np.zeros(shape=(num_clusters, window_size))
@@ -160,5 +163,3 @@ def atacworks_denoise(coverage, model, gpu, interval_size, pad):
         pred = pred[:, center, :]
         pred = pred.reshape((coverage.shape[0], coverage.shape[1] - 2*pad, pred.shape[2]))
         return pred
-
-                
