@@ -191,6 +191,8 @@ We report the runtime of these notebooks on various AWS instances below. All run
 
 ## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
 
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/tree/rilango/mem-fix/images/atacworks_notebook_img.png?raw=true">
+
 We analyze single-cell ATAC-seq data from 5000 PBMC cells as in example 4. Additionally, we use cuDF to calculate and visualize cluster-specific chromatin accessibility in selected marker regions. Finally, we use a deep learning model trained with [AtacWorks](https://github.com/clara-parabricks/AtacWorks), to improve the accuracy of the chromatin accessibility track and call peaks in individual clusters.
 
 ### Example Data
