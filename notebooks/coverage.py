@@ -45,15 +45,16 @@ def tabix_query(filename, chrom, start, end):
     return records
 
 
-def read_fragments(chrom, start, end, fragment_file, pad=0):
+def read_fragments(chrom, start, end, fragment_file):
     #Create a DF from the output of tabix query
     reads = cudf.DataFrame(
-        data=tabix_query(fragment_file, chrom, start - pad, end + pad),
+        data=tabix_query(fragment_file, chrom, start, end),
         columns=['chrom', 'start', 'end', 'cell', 'duplicate'])
     reads = reads.iloc[:, :4]
     reads['row_num'] = reads.index
     reads = reads.astype({"start": np.int32, "end": np.int32})
     reads['len'] = reads['end'] - reads['start']
+    #reads.drop('duplicate', inplace=True)
 
     return reads
 
@@ -72,21 +73,18 @@ def expand_interval(start, end, index, end_index,
         interval_end[j] = chrom_start
         interval_index[j] = index[i]
 
-def get_coverages(reads_orig, pad):
-    start = reads_orig['start'][0]
-    end = reads_orig['end'][len(reads_orig) - 1]
-
+def get_coverages(start, end, reads_orig):
+    
     reads = reads_orig.copy()
 
-    # Get total window length
     cum_sum = reads['len'].cumsum()
-    window_size = cum_sum[len(reads_orig) - 1].tolist()
+    expanded_size = cum_sum[len(reads) - 1].tolist()
 
     # Create expanded coverage dataframe
     expanded_coverage = cudf.DataFrame()
-    start_arr = cupy.zeros(window_size, dtype=cupy.int32)
-    end_arr = cupy.zeros(window_size, dtype=cupy.int32)
-    rownum_arr = cupy.zeros(window_size, dtype=cupy.int32)
+    start_arr = cupy.zeros(expanded_size, dtype=cupy.int32)
+    end_arr = cupy.zeros(expanded_size, dtype=cupy.int32)
+    rownum_arr = cupy.zeros(expanded_size, dtype=cupy.int32)
 
     expand_interval.forall(reads.shape[0], 1)(
         reads['start'],
@@ -102,7 +100,6 @@ def get_coverages(reads_orig, pad):
     expanded_coverage['end'] = end_arr
     expanded_coverage['row_num'] = rownum_arr
 
-    reads = reads_orig.copy()
     reads.drop(['start', 'end'], inplace=True)
     expanded_coverage = expanded_coverage.merge(reads, on='row_num')
 
@@ -114,14 +111,14 @@ def get_coverages(reads_orig, pad):
     num_clusters = len(clusters)
 
     # Create empty array
-    x = np.zeros(shape=(num_clusters, window_size))
+    x = np.zeros(shape=(num_clusters, (end - start)))
 
     # Iterate over clusters to add coverage values
     for (i, cluster) in enumerate(clusters):
         df_group = summed_coverage.loc[summed_coverage['cluster'] == cluster]
-        coords = df_group['start'] - start + pad
+        coords = df_group['start'] - start
         values = df_group['row_num']
-        ind = (coords >= 0) & (coords < (end-start+(2*pad)))
+        ind = (coords >= 0) & (coords < (end-start))
         coords = coords[ind].values.get()
         values = values[ind].values.get()
         x[i][coords] = values
@@ -137,13 +134,15 @@ def load_atacworks_model(weights_path, interval_size, gpu):
 
 
 def reshape_with_padding(coverage, interval_size, pad):
+    if(len(coverage.shape)==1):
+        coverage = coverage.reshape((1, coverage.shape[0]))
     num_clusters = int(coverage.shape[0])
     padded_interval_size = int(interval_size + 2*pad)
     n_intervals = int((coverage.shape[1] - 2*pad) / interval_size)
     if n_intervals == 1:
         interval_starts = [0]
     else:
-        interval_starts = range(0, coverage.shape[1] - padded_interval_size, interval_size + pad)
+        interval_starts = range(0, coverage.shape[1], interval_size + pad)
     reshaped_coverage = np.zeros(shape=(num_clusters*n_intervals, padded_interval_size))
     for i in range(num_clusters):
         reshaped_cluster_coverage = np.stack([coverage[i, start:start+padded_interval_size] for start in interval_starts])
@@ -151,7 +150,7 @@ def reshape_with_padding(coverage, interval_size, pad):
     return reshaped_coverage
 
 
-def atacworks_denoise(coverage, model, gpu, interval_size, pad):
+def atacworks_denoise(coverage, model, gpu, interval_size, pad=0):
     input_arr = reshape_with_padding(coverage, interval_size, pad)
     with torch.no_grad():
         input_arr = torch.tensor(input_arr, dtype=float)
