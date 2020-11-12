@@ -268,12 +268,11 @@ def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
     min_cells : int
         Genes containing a number of cells below this value will be filtered
     """
-    thr = np.asarray((sparse_gpu_array.sum(axis=0).get()) >= min_cells).ravel()
-
+    thr = np.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
     filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:, thr])
     genes_idx = genes_idx[np.where(thr)[0]]
 
-    return filtered_genes, genes_idx
+    return filtered_genes, genes_idx.reset_index(drop=True)
 
 
 def select_groups(labels, groups_order_subset='all'):

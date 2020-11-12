@@ -46,10 +46,11 @@ if [ ${CREATE_ENV} = true ]; then
 	echo DATA_PATH=${DATA_PATH} >> $LOCAL_ENV
 fi
 
-DOCKER_CMD="docker run --gpus all --user $(id -u):$(id -g) -p ${JUPYTER_PORT}:8888 -p ${DASK_PORT}:${DASK_PORT} -p ${PLOTLY_PORT}:5000 -v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -e HOME=/workspace/rapids-single-cell-examples/data -e TF_CPP_MIN_LOG_LEVEL=3 -w /workspace/rapids-single-cell-examples"
+DOCKER_CMD="docker run --runtime nvidia --network host -p ${JUPYTER_PORT}:8888 -p ${DASK_PORT}:${DASK_PORT} -p ${PLOTLY_PORT}:5000 -v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -e HOME=/workspace/rapids-single-cell-examples/data -e TF_CPP_MIN_LOG_LEVEL=3 -w /workspace/rapids-single-cell-examples"
 JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
 		--no-browser \
 		--port=8888 \
+	    --allow-root \
 		--ip=0.0.0.0 \
 		--notebook-dir=/workspace \
 		--NotebookApp.password=\"\" \
