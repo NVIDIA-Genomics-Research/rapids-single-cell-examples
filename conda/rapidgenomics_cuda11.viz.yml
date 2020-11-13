@@ -8,7 +8,7 @@ channels:
 dependencies:
   - rapids=0.16*
   - python=3.7
-  - cudatoolkit=10.1
+  - cudatoolkit=11.0
   - cudf
   - dask-cuda
   - dask-cudf
@@ -24,12 +24,19 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
+  - plotly=4.5
+  - dash=1.8
+  - datashader
+  - dash-daq=0.3.2
+  - dash-html-components
+  - dash-bootstrap-components
+  - dash-core-components
+  - gunicorn
+  - requests
+  - pyproj
   - pip
-  - tabix
-  - pytabix
   - pip:
       - jupyter-server-proxy
       - git+https://github.com/dask/dask.git
       - git+https://github.com/dask/distributed.git
       - wget
-      - atacworks

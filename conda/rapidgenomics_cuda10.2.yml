@@ -5,7 +5,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - rapids=0.15*
+  - rapids=0.16*
   - python=3.7
   - cudatoolkit=10.2
   - cudf
@@ -13,13 +13,12 @@ dependencies:
   - dask-cudf
   - cuml
   - cugraph
-  - numba>=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
   - scikit-learn
   - louvain
-  - cupy>=7
+  - cupy>=8
   - scanpy
   - umap-learn
   - ipykernel
@@ -33,4 +32,3 @@ dependencies:
       - git+https://github.com/dask/distributed.git
       - wget
       - atacworks
-      
