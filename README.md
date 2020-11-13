@@ -40,7 +40,7 @@ cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter. 
 
-## Example 1: Single-cell RNA-seq of 70,000 cells from the Human Lung Cell Atlas
+## Example 1: Single-cell RNA-seq of 70,000 Human Lung Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/70k_lung.png?raw=true">
 
@@ -82,7 +82,7 @@ We report the runtime of these notebooks on various AWS instances below. All run
 
 
 
-## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells from 10X Genomics
+## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/1M_brain.png?raw=true">
 
@@ -126,7 +126,7 @@ We report the runtime of these notebooks on various AWS & GCP instances below. A
 <sup>* The amount of main memory needed to execute this notebook required an instance with 4x GPUs</sup>
 
 
-## Example 3: GPU-based Interactive Visualization of 70,000 cells (beta version)
+## Example 3: GPU-based Interactive Visualization of 70,000 Human Lung Cells (beta version)
 
 ![Interactive browser Demo](images/viz3-2.gif)
 
@@ -152,7 +152,7 @@ The dataset used here is the same as in example 1.
 
 Follow this [Jupyter notebook](notebooks/hlca_lung_gpu_analysis-visualization.ipynb) to create the interactive visualization. In order for the notebook to run, the files [rapids_scanpy_funcs.py](notebooks/rapids_scanpy_funcs.py) and [visualize.py](notebooks/visualize.py) need to be in the same folder as the notebook.
 
-## Example 4: Droplet single-cell ATAC-seq of 60K bone marrow cells from Lareau et al. 2019
+## Example 4: Droplet Single-cell ATAC-seq of 60K Bone Marrow Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/60k_bmmc_dsciATAC.png?raw=true">
 
@@ -191,6 +191,33 @@ We report the runtime of these notebooks on various AWS instances below. All run
 | End-to-end notebook run<br>(steps above + data load and <br> pre-processing)      | 1530        | 182    | 111  | 86.9 |
 | Price ($/hr)                 | 2.064                               | 3.912                      | 3.06              | 4.00 | 
 | Total cost ($)               | 0.877                               | 0.198                      | 0.095             | 0.096 |
+
+## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
+
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/rilango/mem-fix/images/atacworks_notebook_img.png?raw=true">
+
+We analyze single-cell ATAC-seq data from 5000 PBMC cells as in example 4. Additionally, we use cuDF to calculate and visualize cluster-specific chromatin accessibility in selected marker regions. Finally, we use a deep learning model trained with [AtacWorks](https://github.com/clara-parabricks/AtacWorks), to improve the accuracy of the chromatin accessibility track and call peaks in individual clusters.
+
+### Example Data
+
+The dataset was made publicly available by 10X Genomics. Use the following command to download the peak x cell count matrix and the fragment file for this dataset, and store both in the `data` folder:
+
+```bash
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X.sparse.h5ad
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz.tbi
+```
+
+### Example Model
+
+We use a pre-trained deep learning model to denoise the chromatin accessibility track and call peaks. This model can be downloaded into the `models` folder:
+```bash
+wget -P <path to this repository>/models https://api.ngc.nvidia.com/v2/models/nvidia/atac_bulk_lowcov_5m_50m/versions/0.3/files/models/model.pth.tar
+```
+
+### Example Code
+Follow this [Jupyter notebook](notebooks/5k_pbmc_coverage_gpu.ipynb) for GPU analysis of this dataset. In order for the notebook to run, the files [utils.py](notebooks/utils.py), and [coverage.py](notebooks/coverage.py) need to be in the same folder as the notebook.
+
 
 
 ## Adapting these examples to another dataset
