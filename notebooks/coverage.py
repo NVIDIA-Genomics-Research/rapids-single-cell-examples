@@ -132,7 +132,7 @@ def read_fragments(chrom, start, end, fragment_file):
     fragments = cudf.DataFrame(
         data=tabix_query(fragment_file, chrom, start, end),
         columns=['chrom', 'start', 'end', 'cell', 'duplicate'])
-    fragments.drop('duplicate', inplace=True)
+    fragments.drop('duplicate', inplace=True, axis=1)
     fragments['row_num'] = fragments.index
     fragments = fragments.astype({"start": np.int32, "end": np.int32})
     fragments['len'] = fragments['end'] - fragments['start']
@@ -228,7 +228,7 @@ def get_coverages(start, end, fragments):
     expanded_fragments['end'] = end_arr
     expanded_fragments['row_num'] = rownum_arr
 
-    fragments_copy.drop(['start', 'end'], inplace=True)
+    fragments_copy.drop(['start', 'end'], inplace=True, axis=1)
     expanded_fragments = expanded_fragments.merge(fragments_copy, on='row_num')
 
     # Count number of fragments at each position
