@@ -1,12 +1,11 @@
 channels:
-  - rapidsai-nightly
   - rapidsai
   - nvidia
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - rapids=0.16*
+  - rapids=0.15*
   - python=3.7
   - cudatoolkit=10.1
   - cudf
@@ -14,22 +13,23 @@ dependencies:
   - dask-cudf
   - cuml
   - cugraph
+  - numba>=0.48*
   - scipy
   - ucx-py
   - ucx-proc=*=gpu
+  - python-wget
   - scikit-learn
   - louvain
-  - cupy>=8
+  - cupy=7*
   - scanpy
   - umap-learn
   - ipykernel
   - jupyterlab
-  - pip
   - tabix
   - pytabix
+  - pip
   - pip:
       - jupyter-server-proxy
       - git+https://github.com/dask/dask.git
       - git+https://github.com/dask/distributed.git
-      - wget
       - atacworks

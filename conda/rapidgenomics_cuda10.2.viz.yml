@@ -1,15 +1,15 @@
 channels:
-  - rapidsai-nightly
   - rapidsai
   - nvidia
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - rapids=0.16*
+  - rapids=0.15*
   - python=3.7
   - cudatoolkit=10.2
   - cudf
+  - cuxfilter
   - dask-cuda
   - dask-cudf
   - cuml
@@ -19,24 +19,22 @@ dependencies:
   - ucx-proc=*=gpu
   - scikit-learn
   - louvain
-  - cupy>=8
+  - cupy=7*
+  - python-wget
   - scanpy
   - umap-learn
   - ipykernel
   - jupyterlab
-  - plotly=4.5
-  - dash=1.8
+  - plotly
+  - dash
   - datashader
-  - dash-daq=0.3.2
+  - dash-daq
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
-  - gunicorn
-  - requests
   - pyproj
   - pip
   - pip:
       - jupyter-server-proxy
       - git+https://github.com/dask/dask.git
       - git+https://github.com/dask/distributed.git
-      - wget
