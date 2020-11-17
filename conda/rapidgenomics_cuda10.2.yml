@@ -25,8 +25,11 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
+  - tabix
+  - pytabix
   - pip
   - pip:
       - jupyter-server-proxy
       - git+https://github.com/dask/dask.git
       - git+https://github.com/dask/distributed.git
+      - atacworks

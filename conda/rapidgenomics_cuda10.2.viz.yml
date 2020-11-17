@@ -9,6 +9,7 @@ dependencies:
   - python=3.7
   - cudatoolkit=10.2
   - cudf
+  - cuxfilter
   - dask-cuda
   - dask-cudf
   - cuml
@@ -24,10 +25,10 @@ dependencies:
   - umap-learn
   - ipykernel
   - jupyterlab
-  - plotly=4.5
-  - dash=1.8
-  - datashader=0.10
-  - dash-daq=0.3.2
+  - plotly
+  - dash
+  - datashader
+  - dash-daq
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
