@@ -6,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git python3-setuptools python3-pip build-essential
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy wget python-igraph louvain leidenalg scanpy
+    scanpy wget python-igraph louvain leidenalg
 
 WORKDIR /workspace
 
