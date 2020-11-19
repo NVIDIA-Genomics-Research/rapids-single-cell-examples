@@ -33,6 +33,7 @@ dependencies:
   - dash-bootstrap-components
   - dash-core-components
   - pyproj
+  - multicore-tsne
   - pip
   - pip:
       - jupyter-server-proxy

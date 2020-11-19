@@ -27,6 +27,7 @@ dependencies:
   - jupyterlab
   - tabix
   - pytabix
+  - multicore-tsne
   - pip
   - pip:
       - jupyter-server-proxy
