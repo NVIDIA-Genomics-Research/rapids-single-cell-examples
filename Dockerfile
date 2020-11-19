@@ -1,13 +1,12 @@
 ARG BASE_IMAGE=rapidsai/rapidsai:0.15-cuda11.0-runtime-ubuntu18.04-py3.8
 
 FROM ${BASE_IMAGE}
-RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git python3-setuptools python3-pip build-essential libcurl4-gnutls-dev \
-    zlib1g-dev rsync vim
+    zlib1g-dev rsync vim cmake
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy wget python-igraph louvain leidenalg
+    scanpy wget python-igraph louvain leidenalg MulticoreTSNE pynndescent
 
 WORKDIR /workspace
 
@@ -23,6 +22,5 @@ RUN mkdir -p /opt/nvidia/scrna/
 COPY launch.sh /opt/nvidia/scrna/
 
 RUN echo "export PATH=$PATH:/workspace/data" >> ~/.bashrc
-
 
 CMD /opt/nvidia/scrna/launch.sh jupyter
