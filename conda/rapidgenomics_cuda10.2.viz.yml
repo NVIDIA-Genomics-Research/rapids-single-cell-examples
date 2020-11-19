@@ -34,6 +34,7 @@ dependencies:
   - dash-core-components
   - pyproj
   - multicore-tsne
+  - pynndescent
   - pip
   - pip:
       - jupyter-server-proxy

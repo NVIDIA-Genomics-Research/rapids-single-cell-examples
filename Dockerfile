@@ -6,7 +6,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     zlib1g-dev rsync vim cmake
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy wget python-igraph louvain leidenalg MulticoreTSNE
+    scanpy wget python-igraph louvain leidenalg MulticoreTSNE pynndescent
 
 WORKDIR /workspace
 
