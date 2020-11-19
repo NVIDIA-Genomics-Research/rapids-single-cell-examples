@@ -19,7 +19,7 @@ dependencies:
   - ucx-proc=*=gpu
   - scikit-learn
   - louvain
-  - cupy>=7
+  - cupy>=8
   - scanpy
   - umap-learn
   - ipykernel

@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:cuda11.0-runtime-ubuntu18.04-py3.8
+ARG BASE_IMAGE=rapidsai/rapidsai-dev:0.16-cuda10.2-devel-ubuntu18.04-py3.8
 
 FROM ${BASE_IMAGE}
 RUN apt update
