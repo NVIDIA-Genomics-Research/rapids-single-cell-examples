@@ -1,9 +1,9 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:0.16-cuda11.0-runtime-ubuntu18.04-py3.8
+ARG BASE_IMAGE=rapidsai/rapidsai-dev:0.16-cuda10.2-devel-ubuntu18.04-py3.8
 
 FROM ${BASE_IMAGE}
 RUN apt update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    git python3-setuptools python3-pip build-essential vim
+    git python3-setuptools python3-pip build-essential
 
 RUN /opt/conda/envs/rapids/bin/pip install \
     scanpy wget python-igraph louvain leidenalg

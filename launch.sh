@@ -30,7 +30,7 @@ else
 	CREATE_ENV=true
 fi
 
-CONT=${CONT:='claraparabricks/single-cell-examples_rapids_cuda10.2:latest'}
+CONT='claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
 JUPYTER_PORT=${JUPYTER_PORT:-8888}
 PLOTLY_PORT=${PLOTLY_PORT:-5000}
 DASK_PORT=${DASK_PORT:-9001}
@@ -46,13 +46,24 @@ if [ ${CREATE_ENV} = true ]; then
 	echo DATA_PATH=${DATA_PATH} >> $LOCAL_ENV
 fi
 
-DOCKER_CMD="docker run --runtime nvidia --network host -p ${JUPYTER_PORT}:8888 -p ${DASK_PORT}:${DASK_PORT} -p ${PLOTLY_PORT}:5000 -v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -e HOME=/workspace/rapids-single-cell-examples/data -e TF_CPP_MIN_LOG_LEVEL=3 -w /workspace/rapids-single-cell-examples"
+DOCKER_CMD="docker run --gpus all \
+		--shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
+		-e HOME=/workspace \
+		-e TF_CPP_MIN_LOG_LEVEL=3 \
+		-p ${JUPYTER_PORT}:8888 \
+		-p ${DASK_PORT}:${DASK_PORT} \
+		-p ${PLOTLY_PORT}:5000 \
+		-v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data \
+		-v /home/rilango/Projects/github/rapids-single-cell-examples:/workspace/examples \
+		-w /workspace/examples"
+
 JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
 		--no-browser \
+		--allow-root \
 		--port=8888 \
 	    --allow-root \
 		--ip=0.0.0.0 \
-		--notebook-dir=/workspace \
+		--notebook-dir=/workspace/examples \
 		--NotebookApp.password=\"\" \
 		--NotebookApp.token=\"\" \
 		--NotebookApp.password_required=False"
@@ -72,7 +83,7 @@ bash() {
 
 setup() {
 	local DATA_DIR=${DATA_PATH}/data
-	
+
 	if [ ! -d "$DATA_DIR" ]; then
 		echo "Downloading datasets..."
 		mkdir -p ${DATA_DIR}
