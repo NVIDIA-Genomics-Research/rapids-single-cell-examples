@@ -17,7 +17,6 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      # - atacworks
       - scanpy
       - python-igraph
       - louvain
