@@ -5,6 +5,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - python=3.7
   - rapids=0.15*
   - cudatoolkit=10.2
   - python-wget
@@ -14,6 +15,7 @@ dependencies:
   - pytabix
   - cmake
   - jupyterlab
+  - pyBigWig
   - pip
   - pip:
       - jupyter-server-proxy
@@ -23,3 +25,4 @@ dependencies:
       - leidenalg
       - MulticoreTSNE
       - pynndescent
+      - atacworks
