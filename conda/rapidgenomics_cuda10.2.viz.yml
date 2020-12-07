@@ -6,37 +6,24 @@ channels:
   - defaults
 dependencies:
   - rapids=0.15*
-  - python=3.7
   - cudatoolkit=10.2
-  - cudf
-  - cuxfilter
-  - dask-cuda
-  - dask-cudf
-  - cuml
-  - cugraph
-  - scipy
-  - ucx-py
-  - ucx-proc=*=gpu
-  - scikit-learn
-  - louvain
-  - cupy=7*
   - python-wget
-  - scanpy
+  - cupy=7*
   - umap-learn
-  - ipykernel
+  - tabix
+  - pytabix
+  - cmake
   - jupyterlab
-  - plotly
-  - dash
-  - datashader
   - dash-daq
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
-  - pyproj
-  - multicore-tsne
-  - pynndescent
   - pip
   - pip:
       - jupyter-server-proxy
-      - git+https://github.com/dask/dask.git
-      - git+https://github.com/dask/distributed.git
+      - scanpy
+      - python-igraph
+      - louvain
+      - leidenalg
+      - MulticoreTSNE
+      - pynndescent
