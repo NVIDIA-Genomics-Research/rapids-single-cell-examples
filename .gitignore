@@ -1,2 +1,13 @@
-.ipynb_checkpoints/
-__pycache__/
+.bash_history
+.config
+.jupyter
+.local
+.local_env
+.npm
+__pycache__
+.ipynb_checkpoints
+.ipython/
+.cache/
+
+data/
+notebooks/dask-worker-space/

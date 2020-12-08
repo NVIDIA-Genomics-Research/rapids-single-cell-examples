@@ -15,6 +15,7 @@ dependencies:
   - pytabix
   - cmake
   - jupyterlab
+  - wget
   - pyBigWig
   - pip
   - pip:
