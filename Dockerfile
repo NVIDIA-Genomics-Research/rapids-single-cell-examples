@@ -37,6 +37,7 @@ RUN /opt/conda/envs/rapidgenomics_viz/bin/pip install wget
 
 CMD jupyter-lab \
 		--no-browser \
+		--allow-root \
 		--port=8888 \
 		--ip=0.0.0.0 \
 		--notebook-dir=/workspace \
@@ -44,6 +45,5 @@ CMD jupyter-lab \
 		--NotebookApp.token="" \
 		--NotebookApp.password_required=False
 
+ENV LD_LIBRARY_PATH /usr/local/cuda-10.2/compat
 RUN echo "export PATH=$PATH:/workspace/data" >> ~/.bashrc
-
-CMD /opt/nvidia/scrna/launch.sh jupyter
