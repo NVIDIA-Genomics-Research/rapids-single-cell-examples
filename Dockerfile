@@ -1,12 +1,12 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:cuda11.0-runtime-ubuntu18.04-py3.8
+ARG BASE_IMAGE=rapidsai/rapidsai:0.15-cuda11.0-runtime-ubuntu18.04-py3.8
 
 FROM ${BASE_IMAGE}
-RUN apt update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    git python3-setuptools python3-pip build-essential
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    git python3-setuptools python3-pip build-essential libcurl4-gnutls-dev \
+    zlib1g-dev rsync vim cmake
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy python-igraph louvain leidenalg wget
+    scanpy wget python-igraph louvain leidenalg MulticoreTSNE pynndescent
 
 WORKDIR /workspace
 ENV HOME /workspace
@@ -43,3 +43,7 @@ CMD jupyter-lab \
 		--NotebookApp.password="" \
 		--NotebookApp.token="" \
 		--NotebookApp.password_required=False
+
+RUN echo "export PATH=$PATH:/workspace/data" >> ~/.bashrc
+
+CMD /opt/nvidia/scrna/launch.sh jupyter

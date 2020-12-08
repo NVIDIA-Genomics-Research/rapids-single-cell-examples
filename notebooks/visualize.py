@@ -253,7 +253,7 @@ class Visualization:
 
     def start_graph(self, df):
         fig = go.Figure(layout = {'colorscale' : {}})
-
+        
         for i in df['labels'].unique().values_host:
             si = str(i)
             query = 'labels == ' + si
@@ -333,7 +333,7 @@ class Visualization:
         marker_val = marker + '_val'
 
         df[marker + '_val'] = df[marker].round(1)
-        for i in clusters:
+        for i in clusters.values_host:
             si = str(i)
 
             query = 'labels == ' + si
