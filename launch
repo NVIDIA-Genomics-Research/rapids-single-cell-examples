@@ -326,25 +326,14 @@ To execute 'hlca_lung' example in container, please execute following command:
 
         args = parser.parse_args(sys.argv[2:])
 
-        available_envs = self._conda_envs()
-        if args.example in available_envs:
-            print('Env %s already available.' % args.example)
-        else:
-            create_cmd = "conda env create --name " + args.example + \
-                ' -f ' + CONDA_ENV_MAPPING[args.example]
-            print('Creating conda env %s (%s)...' % (args.example, create_cmd))
-            run(create_cmd, shell=True)
-        run('python3 -m ipykernel install --user --name=%s' % (args.example),
-            shell=True)
-
-        # make sure the required files are downloaded
-        datasets = [DATASETS[args.example]]
-        self.download_dataset(datasets, args.data_dir)
+        env = self._create_conda_env(args.example)
 
         print('Activating env %s...' % args.example)
+        print('source activate %s; jupyter nbconvert --execute --clear-output %s' %
+             (env, NOTEBOOKS[args.example]))
         run(['bash', '-c',
              'source activate %s; jupyter nbconvert --execute --clear-output %s' %
-             (args.example, NOTEBOOKS[args.example])],
+             (env, NOTEBOOKS[args.example])],
             check=True)
 
 
