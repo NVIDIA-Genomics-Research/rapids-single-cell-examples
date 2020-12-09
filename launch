@@ -28,7 +28,12 @@ DATASETS = {
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
             """,
-    '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad'
+    '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad',
+    '5k_pbmc_coverage': """
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X.sparse.h5ad,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz.tbi
+    """
 }
 
 # Key: String: Example name
@@ -38,6 +43,7 @@ CONDA_ENV_MAPPING = {
     'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
     'dsci_bmmc_60k_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda10.2.viz.yml'),
     '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
+    '5k_pbmc_coverage': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
 }
 
 NOTEBOOKS = {
@@ -45,6 +51,7 @@ NOTEBOOKS = {
     'dsci_bmmc_60k': './notebooks/dsci_bmmc_60k_gpu.ipynb',
     'dsci_bmmc_60k_viz': './notebooks/hlca_lung_gpu_analysis-visualization.ipynb',
     '1M_brain': './notebooks/1M_brain_gpu_analysis_uvm.ipynb',
+    '5k_pbmc_coverage': './notebooks/5k_pbmc_coverage_gpu.ipynb',
 }
 
 PROCESSES = []
@@ -112,7 +119,7 @@ To execute 'hlca_lung' example in container, please execute following command:
             print("Please install and activate conda.")
             sys.exit(1)
 
-    def _create_conda_env(self, env_name):
+    def _create_conda_env(self, env_name, exit_if_found=True):
         """
         Creates a new conda env.
         """
@@ -121,7 +128,8 @@ To execute 'hlca_lung' example in container, please execute following command:
             (env_name, env_yml) = CONDA_ENV_MAPPING[env_name]
         except KeyError as ex:
             print("%s not configured." % env_name)
-            sys.exit(1)
+            if exit_if_found:
+                sys.exit(1)
 
         available_envs = self._conda_envs()
         if env_name in available_envs:
@@ -326,7 +334,7 @@ To execute 'hlca_lung' example in container, please execute following command:
 
         args = parser.parse_args(sys.argv[2:])
 
-        env = self._create_conda_env(args.example)
+        env = self._create_conda_env(args.example, exit_if_found=True)
 
         print('Activating env %s...' % args.example)
         print('source activate %s; jupyter nbconvert --execute --clear-output %s' %
