@@ -12,7 +12,7 @@ from distutils.version import StrictVersion
 from subprocess import run, Popen
 
 
-DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
+DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.2'
 
 # Key: String: Example name
 # Value: String: Comma seperated HTTP URL to dataset files.
@@ -337,11 +337,11 @@ To execute 'hlca_lung' example in container, please execute following command:
         env = self._create_conda_env(args.example, exit_if_found=True)
 
         print('Activating env %s...' % args.example)
-        print('source activate %s; jupyter nbconvert --execute --clear-output %s' %
-             (env, NOTEBOOKS[args.example]))
+        print('source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
+             (env, NOTEBOOKS[args.example], env))
         run(['bash', '-c',
-             'source activate %s; jupyter nbconvert --execute --clear-output %s' %
-             (env, NOTEBOOKS[args.example])],
+             'source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
+             (env, NOTEBOOKS[args.example], env)],
             check=True)
 
 
