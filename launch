@@ -337,6 +337,8 @@ To execute 'hlca_lung' example in container, please execute following command:
             ex_to_run = [args.example]
 
         for example in ex_to_run:
+            if '_viz' in example:
+                continue
             env = self._create_conda_env(example, exit_if_found=True)
 
             print('Activating env %s...' % example)
