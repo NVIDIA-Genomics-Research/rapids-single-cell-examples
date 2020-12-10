@@ -324,20 +324,27 @@ To execute 'hlca_lung' example in container, please execute following command:
         parser.add_argument('-e', '--example',
                             dest='example',
                             type=str,
-                            required=True,
-                            help='Example to execute. ' +
+                            required=False,
+                            default=None,
+                            help='Example to execute. Without this flag all examples will be executed ' +
                             ', '.join(list(DATASETS.keys())))
 
         args = parser.parse_args(sys.argv[2:])
 
-        env = self._create_conda_env(args.example, exit_if_found=True)
+        if args.example is None:
+            ex_to_run = list(DATASETS.keys())
+        else:
+            ex_to_run = [args.example]
 
-        print('Activating env %s...' % args.example)
-        print('source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
-             (env, NOTEBOOKS[args.example], env))
-        run(['bash', '-c',
-             'source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
-             (env, NOTEBOOKS[args.example], env)],
+        for example in ex_to_run:
+            env = self._create_conda_env(example, exit_if_found=True)
+
+            print('Activating env %s...' % example)
+            print('source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
+                (env, NOTEBOOKS[example], env))
+            run(['bash', '-c',
+                'source activate %s; jupyter nbconvert --execute --clear-output %s --ExecutePreprocessor.kernel_name=%s' %
+                (env, NOTEBOOKS[example], env)],
             check=True)
 
 
