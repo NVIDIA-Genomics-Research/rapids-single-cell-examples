@@ -4,6 +4,38 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 ## Installation 
 
+### Launch Script
+Lanuch script (./launch) can be used to start example notebooks either on a host or in a docker container. This script prepares the environment and acquires the dataset for the examples.
+
+```bash
+# rapids-single-cell-examples$ ./launch -h
+usage: launch <command> [<args>]
+
+Following commands are wrapped by this tool:
+   container  : Start Jupyter notebook in a container
+   host       : Start Jupyter notebook on the host
+   dataset    : Download dataset
+   execute    : Execute an example
+   create_env : Create conda environment for an example
+
+To execute 'hlca_lung' example in container, please execute following command:
+./launch container -d /path/to/store/dataset -e hlca_lung
+
+Example launcher
+
+positional arguments:
+  command     Subcommand to run
+
+optional arguments:
+  -h, --help  show this help message and exit
+```
+
+```./launch host``` can be used to create a conda env. for executing any of the sample. To list all supported example, please execute ```./launch host -h```.
+
+```./launch container``` can be used to setup a container for the example.
+
+```./launch execute```, can be used to run an example in the background. Results are saved inplace.
+
 ### conda
 All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. 
 
