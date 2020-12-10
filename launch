@@ -14,20 +14,17 @@ from subprocess import run, Popen
 
 DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.2'
 
+dsci_bmmc_60k_dataset = """
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
+            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
+            """
 # Key: String: Example name
 # Value: String: Comma seperated HTTP URL to dataset files.
 DATASETS = {
     'hlca_lung': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/krasnow_hlca_10x.sparse.h5ad',
-    'dsci_bmmc_60k': """
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
-            """,
-    'dsci_bmmc_60k_viz': """
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_nonzeropeaks.h5ad,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_peaknames_nonzero.npy,
-            https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/dsci_resting_cell_metadata.csv
-            """,
+    'dsci_bmmc_60k': dsci_bmmc_60k_dataset,
+    'dsci_bmmc_60k_viz': dsci_bmmc_60k_dataset,
     '1M_brain': 'https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/1M_brain_cells_10X.sparse.h5ad',
     '5k_pbmc_coverage': """
             https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X.sparse.h5ad,
