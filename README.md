@@ -4,7 +4,7 @@ This repository contains example notebooks demonstrating how to use [RAPIDS](htt
 
 RAPIDS is a suite of open-source Python libraries that can speed up data science workflows using GPU acceleration.Starting from a single-cell count matrix, RAPIDS libraries can be used to perform data processing, dimensionality reduction, clustering, visualization, and comparison of cell clusters.
 
-Several of our examples are inspired by the (Scanpy tutorials)[https://scanpy.readthedocs.io/en/stable/tutorials.html] and based upon the (AnnData)[https://anndata.readthedocs.io/en/latest/index.html] format. Currently, we provide examples for scRNA-seq and scATAC-seq, and we have scaled up to 1 million cells. We also show how to create GPU-powered interactive, in-browser visualizations to explore single-cell datasets.
+Several of our examples are inspired by the [Scanpy tutorials](https://scanpy.readthedocs.io/en/stable/tutorials.html) and based upon the [AnnData](https://anndata.readthedocs.io/en/latest/index.html) format. Currently, we provide examples for scRNA-seq and scATAC-seq, and we have scaled up to 1 million cells. We also show how to create GPU-powered interactive, in-browser visualizations to explore single-cell datasets.
 
 Dataset sizes for single-cell genomics studies are increasing, presently reaching millions of cells. With RAPIDS, it becomes easy to analyze large datasets interactively and in real time, enabling faster scientific discoveries.
 
