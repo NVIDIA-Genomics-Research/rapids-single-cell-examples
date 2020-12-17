@@ -10,6 +10,29 @@ Dataset sizes for single-cell genomics studies are increasing, presently reachin
 
 ## Installation 
 
+### Docker container
+A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
+
+Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
+
+```bash
+docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
+
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
+```
+
+### conda
+All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. 
+
+```bash
+conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
+conda activate rapidgenomics
+python -m ipykernel install --user --display-name "Python (rapidgenomics)"
+```
+If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`.
+
+After installing the necessary dependencies, you can just run `jupyter lab`.
+
 ### Launch Script
 Lanuch script (./launch) can be used to start example notebooks either on a host or in a docker container. This script prepares the environment and acquires the dataset for the examples.
 
@@ -42,29 +65,6 @@ optional arguments:
 
 ```./launch execute```, can be used to run an example in the background. Results are saved inplace.
 
-### conda
-All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. 
-
-```bash
-conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
-conda activate rapidgenomics
-python -m ipykernel install --user --display-name "Python (rapidgenomics)"
-```
-If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`.
-
-After installing the necessary dependencies, you can just run `jupyter lab`.
-
-### Docker container
-A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
-
-Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
-
-```bash
-docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
-
-docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
-
-```
 
 ## Configuration
 
