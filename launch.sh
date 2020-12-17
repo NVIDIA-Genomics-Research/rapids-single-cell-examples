@@ -46,15 +46,26 @@ if [ ${CREATE_ENV} = true ]; then
 	echo DATA_PATH=${DATA_PATH} >> $LOCAL_ENV
 fi
 
-DOCKER_CMD="docker run --gpus all \
+DOCKER_VERSION_WITH_GPU_SUPPORT="19.03.0"                                       
+DOCKER_VERSION=$(docker version | grep -i version | head -1 | awk '{print $2'}) 
+
+PARAM_RUNTIME="--runtime=nvidia"
+if [ "$DOCKER_VERSION_WITH_GPU_SUPPORT" == "$(echo -e "$DOCKER_VERSION\n$DOCKER_VERSION_WITH_GPU_SUPPORT" | sort -V | head -1)" ]; 
+then
+    PARAM_RUNTIME="--gpus all"
+fi
+
+DOCKER_CMD="docker run \
+		${PARAM_RUNTIME} \
+        --network host \
 		--shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
 		-e HOME=/workspace \
 		-e TF_CPP_MIN_LOG_LEVEL=3 \
 		-p ${JUPYTER_PORT}:8888 \
-		-p ${DASK_PORT}:${DASK_PORT} \
+		-p ${DASK_PORT}:8787 \
 		-p ${PLOTLY_PORT}:5000 \
 		-v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data \
-		-v /home/rilango/Projects/github/rapids-single-cell-examples:/workspace/examples \
+		-v ${PROJECT_PATH}:/workspace/examples \
 		-w /workspace/examples"
 
 JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
