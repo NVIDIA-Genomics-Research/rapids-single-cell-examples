@@ -15,6 +15,7 @@ dependencies:
   - pytabix
   - cmake
   - jupyterlab
+  - wget
   - dash-daq
   - dash-html-components
   - dash-bootstrap-components
