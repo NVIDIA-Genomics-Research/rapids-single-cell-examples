@@ -1,0 +1,14 @@
+.git/
+.cache
+.config
+.cupy
+data
+.git
+.ipynb_checkpoints
+.ipython
+.jupyter
+.local
+.local_env
+.npm
+.nv
+
