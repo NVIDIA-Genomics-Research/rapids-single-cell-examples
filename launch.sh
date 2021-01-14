@@ -30,12 +30,12 @@ else
 	CREATE_ENV=true
 fi
 
-CONT='claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
+CONT='claraparabricks/single-cell-examples_rapids_cuda11.0:v0.0.1'
 JUPYTER_PORT=${JUPYTER_PORT:-8888}
 PLOTLY_PORT=${PLOTLY_PORT:-5000}
 DASK_PORT=${DASK_PORT:-9001}
 PROJECT_PATH=${PROJECT_PATH:=$(pwd)}
-DATA_PATH=${DATA_PATH:=/workspace/rapids-single-cell-examples/data}
+DATA_PATH=${DATA_PATH:=../data}
 
 if [ ${CREATE_ENV} = true ]; then
 	echo CONT=${CONT} >> $LOCAL_ENV
@@ -46,11 +46,11 @@ if [ ${CREATE_ENV} = true ]; then
 	echo DATA_PATH=${DATA_PATH} >> $LOCAL_ENV
 fi
 
-DOCKER_VERSION_WITH_GPU_SUPPORT="19.03.0"                                       
-DOCKER_VERSION=$(docker version | grep -i version | head -1 | awk '{print $2'}) 
+DOCKER_VERSION_WITH_GPU_SUPPORT="19.03.0"
+DOCKER_VERSION=$(docker version | grep -i version | head -1 | awk '{print $2'})
 
 PARAM_RUNTIME="--runtime=nvidia"
-if [ "$DOCKER_VERSION_WITH_GPU_SUPPORT" == "$(echo -e "$DOCKER_VERSION\n$DOCKER_VERSION_WITH_GPU_SUPPORT" | sort -V | head -1)" ]; 
+if [ "$DOCKER_VERSION_WITH_GPU_SUPPORT" == "$(echo -e "$DOCKER_VERSION\n$DOCKER_VERSION_WITH_GPU_SUPPORT" | sort -V | head -1)" ];
 then
     PARAM_RUNTIME="--gpus all"
 fi
