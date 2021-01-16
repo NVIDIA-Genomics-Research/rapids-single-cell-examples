@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 LOCAL_ENV=.local_env
 CREATE_ENV=false
@@ -30,7 +31,7 @@ else
 	CREATE_ENV=true
 fi
 
-CONT='claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.1'
+CONT='claraparabricks/single-cell-examples_rapids_cuda11.0:v0.0.1'
 JUPYTER_PORT=${JUPYTER_PORT:-8888}
 PLOTLY_PORT=${PLOTLY_PORT:-5000}
 DASK_PORT=${DASK_PORT:-9001}
@@ -65,8 +66,8 @@ DOCKER_CMD="docker run \
 		-p ${DASK_PORT}:8787 \
 		-p ${PLOTLY_PORT}:5000 \
 		-v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data \
-		-v ${PROJECT_PATH}:/workspace/examples \
-		-w /workspace/examples"
+		-v ${PROJECT_PATH}:/workspace/rapids-single-cell-examples \
+		-w /workspace/rapids-single-cell-examples"
 
 JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
 		--no-browser \
