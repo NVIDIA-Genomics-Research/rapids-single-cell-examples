@@ -28,11 +28,12 @@
 set -e
 
 BASE_DIR=$(dirname $0)
-# IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda11.0
-IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda10.2
+IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda11.0
+# IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda10.2
 # BASE_IMAGE=rapidsai/rapidsai:cuda11.0-runtime-ubuntu18.04-py3.8
 # BASE_IMAGE=rapidsai/rapidsai:cuda10.2-runtime-ubuntu18.04-py3.8
-BASE_IMAGE=rapidsai/rapidsai-dev:0.17-cuda10.2-devel-ubuntu18.04-py3.8
+# BASE_IMAGE=rapidsai/rapidsai-dev:0.17-cuda10.2-devel-ubuntu18.04-py3.8
+BASE_IMAGE=rapidsai/rapidsai-dev:0.17-cuda11.0-devel-ubuntu18.04-py3.8
 GIT_BRANCH='master'
 CONTAINER_TAG='v0.0.1'
 

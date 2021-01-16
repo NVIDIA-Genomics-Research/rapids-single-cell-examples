@@ -8,3 +8,8 @@ __pycache__
 .ipynb_checkpoints
 .ipython/
 .cache/
+
+
+data/
+notebooks/dask-worker-space/
+
