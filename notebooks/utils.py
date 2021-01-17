@@ -385,7 +385,7 @@ def sparse_array_to_df(sparse_dask_array, n_workers):
     return dask.dataframe.from_delayed(dls, meta=meta_df)
 
 
-def show_tsne(df, x, y, cluster_col, title):
+def show_scatter(df, x, y, cluster_col, title):
     tsne_fig = figure(title=title, width=800, output_backend="webgl")
     clusters = df[cluster_col].unique().values_host
 
@@ -398,16 +398,15 @@ def show_tsne(df, x, y, cluster_col, title):
                         cdf[y].to_array(),
                         size=2,
                         color=COLORS[cluster],
-                        legend = 'Cluster ' + str(cluster))
+                        legend = str(cluster))
 
     tsne_fig.legend.location = 'top_right'
-    tsne_fig.legend.title = 'Clusters'
 
     tsne_fig_handle = show(tsne_fig, notebook_handle=True)
     push_notebook(handle=tsne_fig_handle)
 
 
-def show_tsne_grad(df, x, y, color_col, title):
+def show_scatter_grad(df, x, y, color_col, title):
 
     color_array = cp.fromDlpack(df[color_col].to_dlpack())
     source = ColumnDataSource(dict(x=df[x].to_array(),
