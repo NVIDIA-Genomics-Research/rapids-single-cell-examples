@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 LOCAL_ENV=.local_env
 CREATE_ENV=false
@@ -65,8 +66,8 @@ DOCKER_CMD="docker run \
 		-p ${DASK_PORT}:8787 \
 		-p ${PLOTLY_PORT}:5000 \
 		-v ${DATA_PATH}:/workspace/rapids-single-cell-examples/data \
-		-v ${PROJECT_PATH}:/workspace/examples \
-		-w /workspace/examples"
+		-v ${PROJECT_PATH}:/workspace/rapids-single-cell-examples \
+		-w /workspace/rapids-single-cell-examples"
 
 JUPYTER_CMD="/opt/conda/envs/rapids/bin/jupyter-lab \
 		--no-browser \

@@ -14,7 +14,35 @@ from statsmodels import robust
 from cuml.dask.common.part_utils import _extract_partitions
 from cuml.common.memory_utils import with_cupy_rmm
 
+from bokeh.plotting import figure
+from bokeh.io import push_notebook, show
+
+from bokeh.models import ColorBar, ColumnDataSource
+from bokeh.palettes import Blues9 as Blues
+from bokeh.models import LinearColorMapper, ColorBar
+
 import rapids_scanpy_funcs
+
+
+COLORS = ["#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941",
+          "#006FA6", "#A30059", "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC",
+          "#B79762", "#004D43", "#8FB0FF", "#997D87", "#5A0007", "#809693",
+          "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+          "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9",
+          "#B903AA", "#D16100", "#DDEFFF", "#000035", "#7B4F4B", "#A1C299",
+          "#300018", "#0AA6D8", "#013349", "#00846F", "#372101", "#FFB500",
+          "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+          "#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68",
+          "#7A87A1", "#788D66", "#885578", "#FAD09F", "#FF8A9A", "#D157A0",
+          "#BEC459", "#456648", "#0086ED", "#886F4C", "#34362D", "#B4A8BD",
+          "#00A6AA", "#452C2C", "#636375", "#A3C8C9", "#FF913F", "#938A81",
+          "#575329", "#00FECF", "#B05B6F", "#8CD0FF", "#3B9700", "#04F757",
+          "#C8A1A1", "#1E6E00", "#7900D7", "#A77500", "#6367A9", "#A05837",
+          "#6B002C", "#772600", "#D790FF", "#9B9700", "#549E79", "#FFF69F",
+          "#201625", "#72418F", "#BC23FF", "#99ADC0", "#3A2465", "#922329",
+          "#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804",
+          "#324E72", "#6A3A4C",]
+
 
 def pca(adata, n_components=50, train_ratio=0.35, n_batches=50, gpu=False):
 
@@ -355,3 +383,52 @@ def sparse_array_to_df(sparse_dask_array, n_workers):
 
     print("Creating Dataframe from futures...")
     return dask.dataframe.from_delayed(dls, meta=meta_df)
+
+
+def show_scatter(df, x, y, cluster_col, title):
+    tsne_fig = figure(title=title, width=800, output_backend="webgl")
+    clusters = df[cluster_col].unique().values_host
+
+    for cluster in clusters:
+        cdf = df.query(cluster_col + ' == ' + str(cluster))
+        if cdf.shape[0] == 0:
+            continue
+
+        tsne_fig.circle(cdf[x].to_array(),
+                        cdf[y].to_array(),
+                        size=2,
+                        color=COLORS[cluster],
+                        legend = str(cluster))
+
+    tsne_fig.legend.location = 'top_right'
+
+    tsne_fig_handle = show(tsne_fig, notebook_handle=True)
+    push_notebook(handle=tsne_fig_handle)
+
+
+def show_scatter_grad(df, x, y, color_col, title):
+
+    color_array = cp.fromDlpack(df[color_col].to_dlpack())
+    source = ColumnDataSource(dict(x=df[x].to_array(),
+                                   y=df[y].to_array(),
+                                   color_col=color_array.get()))
+
+    mapper = LinearColorMapper(palette=Blues,
+                               low=df[color_col].min(),
+                               high=df[color_col].max())
+
+    tsne_fig = figure(title=title,
+                      width=800,
+                      output_backend="webgl")
+
+
+    tsne_fig.scatter('x', 'y',
+                     color={'field': 'color_col', 'transform':mapper},
+                     source=source,
+                     size=2)
+
+    color_bar = ColorBar(color_mapper=mapper, width=8,  location=(0,0))
+    tsne_fig.add_layout(color_bar, 'right')
+
+    tsne_fig_handle = show(tsne_fig, notebook_handle=True)
+    push_notebook(handle=tsne_fig_handle)
