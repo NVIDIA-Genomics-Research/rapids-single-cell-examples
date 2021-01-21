@@ -12,7 +12,7 @@ from distutils.version import StrictVersion
 from subprocess import run, Popen
 
 
-DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda10.2:v0.0.2'
+DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda11.0:v0.0.1'
 
 # Key: String: Example name
 # Value: String: Comma seperated HTTP URL to dataset files.
@@ -71,6 +71,7 @@ Following commands are wrapped by this tool:
    dataset    : Download dataset
    execute    : Execute an example
    create_env : Create conda environment for an example
+   c_dev      : Places the user in bash shell in a container - For development
 
 To execute 'hlca_lung' example in container, please execute following command:
 ./launch container -d /path/to/store/dataset -e hlca_lung
@@ -192,7 +193,7 @@ To execute 'hlca_lung' example in container, please execute following command:
 
         self.download_dataset(datasets, args.data_dir)
 
-    def container(self):
+    def _container(self, start_cmd="bash", retain_container=False):
         """
         Implementation for command 'container'. Starts a docker container.
         """
@@ -209,38 +210,64 @@ To execute 'hlca_lung' example in container, please execute following command:
                             required=False,
                             default=8888,
                             help='Port for jupyter')
+        parser.add_argument('-a', '--additional_param',
+                            dest='additional_param',
+                            type=str,
+                            required=False,
+                            default=None,
+                            help='Additional parameter to container')
+        parser.add_argument('-r', '--retain_container',
+                            dest='retain_container',
+                            default=False,
+                            action='store_true',
+                            help='Retain container')
+
         args = parser.parse_args(sys.argv[2:])
 
         docker_version = self._fetch_docker_version().strip().strip("'")
 
         # nvidia docker toolkit command parameter
-        runtime_arg = '--gpus all'
+        runtime_arg = '--gpus all '
         if StrictVersion(docker_version.strip()) < StrictVersion("19.03.0"):
             print('Old docker version %s. Please upgrade docker' %
                   (docker_version))
-            runtime_arg = '--runtime=nvidia'
+            runtime_arg = '--runtime=nvidia '
+
+        if not retain_container and not args.retain_container:
+            runtime_arg += ' --rm '
+
+        if args.additional_param:
+            runtime_arg += args.additional_param
 
         # --user $(id -u):$(id -g) \
         cmd = """docker run \
-            %s --rm \
+            %s \
             --network host \
             -p %d:8888 \
             -v %s:/workspace/rapids-single-cell-examples/data \
             -e HOME=/workspace \
             -w /workspace/rapids-single-cell-examples \
             -it %s \
-            /opt/conda/envs/rapids/bin/jupyter-lab \
-                --no-browser \
-                --port=8888 \
-                --ip=0.0.0.0 \
-                --notebook-dir=/workspace/rapids-single-cell-examples/notebooks \
-                --NotebookApp.password=\"\" \
-                --NotebookApp.token=\"\" \
-                --NotebookApp.password_required=False \
-                --allow-root
-        """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
+            %s
+        """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE, start_cmd)
 
         run(cmd, check=True, shell=True)
+
+    def container(self):
+        jupter_start_cmd = """/opt/conda/envs/rapids/bin/jupyter-lab \
+                    --no-browser \
+                    --port=8888 \
+                    --ip=0.0.0.0 \
+                    --notebook-dir=/workspace/rapids-single-cell-examples/notebooks \
+                    --NotebookApp.password=\"\" \
+                    --NotebookApp.token=\"\" \
+                    --NotebookApp.password_required=False \
+                    --allow-root
+            """
+        self._container(start_cmd=jupter_start_cmd, retain_container=False)
+
+    def c_dev(self):
+        self._container(start_cmd='bash', retain_container=True)
 
     def create_env(self):
         """
