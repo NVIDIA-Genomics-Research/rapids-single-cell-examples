@@ -130,9 +130,10 @@ class Visualization:
         self.new_df = cudf.DataFrame()
 
     def build_tdf(self, l_adata):
-        df = cudf.DataFrame.from_gpu_matrix(
-            l_adata.obsm["X_umap"], columns=["x", "y"]
-        )
+        #df = cudf.DataFrame.from_gpu_matrix(
+        #    l_adata.obsm["X_umap"], columns=["x", "y"]
+        #)
+        df = cudf.DataFrame(l_adata.obsm["X_umap"], columns=["x", "y"])
 
         ldf = cudf.Series(l_adata.obs["louvain"].values)
         df["labels"] = ldf.astype('int32')
@@ -333,7 +334,8 @@ class Visualization:
         marker_val = marker + '_val'
 
         df[marker + '_val'] = df[marker].round(1)
-        for i in clusters.values_host:
+        #for i in clusters.values_host:
+        for i in clusters:
             si = str(i)
 
             query = 'labels == ' + si
