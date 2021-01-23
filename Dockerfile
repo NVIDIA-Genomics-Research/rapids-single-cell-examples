@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:cuda11.0-base-ubuntu18.04
+ARG BASE_IMAGE=rapidsai/rapidsai:0.17-cuda11.0-base-ubuntu18.04
 
 FROM ${BASE_IMAGE}
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
