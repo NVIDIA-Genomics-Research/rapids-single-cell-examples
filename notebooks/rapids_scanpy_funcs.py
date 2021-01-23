@@ -54,7 +54,7 @@ def scale(normalized, max_value=10):
     stddev = cp.sqrt(normalized.var(axis=0))
     normalized /= stddev
     del stddev
-    
+
     return normalized.clip(a_max=max_value)
 
 
@@ -79,11 +79,11 @@ def _regress_out_chunk(X, y):
         Adjusted column
     """
     y_d = y.todense()
-    
+
     lr = LinearRegression(fit_intercept=False, output_type="cupy")
     lr.fit(X, y_d, convert_dtype=True)
     return y_d.reshape(y_d.shape[0],) - lr.predict(X).reshape(y_d.shape[0])
-    
+
 
 def normalize_total(csr_arr, target_sum):
     """
@@ -104,16 +104,16 @@ def normalize_total(csr_arr, target_sum):
     csr_arr : cupy.sparse.csr_arr of shape (n_cells, n_genes)
         Normalized sparse matrix
     """
-    
+
     mul_kernel = cp.RawKernel(r'''
     extern "C" __global__
-    void mul_kernel(const int *indptr, float *data, 
+    void mul_kernel(const int *indptr, float *data,
                     int nrows, int tsum) {
         int row = blockDim.x * blockIdx.x + threadIdx.x;
-        
+
         if(row >= nrows)
             return;
-        
+
         float scale = 0.0;
         int start_idx = indptr[row];
         int stop_idx = indptr[row+1];
@@ -128,13 +128,13 @@ def normalize_total(csr_arr, target_sum):
         }
     }
     ''', 'mul_kernel')
-    
+
     mul_kernel((math.ceil(csr_arr.shape[0] / 32.0),), (32,),
                (csr_arr.indptr,
                 csr_arr.data,
                 csr_arr.shape[0],
                int(target_sum)))
-    
+
     return csr_arr
 
 
@@ -171,16 +171,16 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
 
     regressors[:, 1] = n_counts
     regressors[:, 2] = percent_mito
-    
+
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
-    
+
     for i in range(normalized.shape[1]):
         if verbose and i % 500 == 0:
             print("Regressed %s out of %s" %(i, normalized.shape[1]))
         X = regressors
         y = normalized[:,i]
         outputs[:, i] = _regress_out_chunk(X, y)
-    
+
     return outputs
 
 
@@ -214,7 +214,7 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
     filtered : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
         Matrix on host with filtered cells
 
-    barcodes : If barcodes are provided, also returns a series of 
+    barcodes : If barcodes are provided, also returns a series of
         filtered barcodes.
     """
 
@@ -228,9 +228,9 @@ def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, b
         arr_batch = sparse_gpu_array[start_idx:stop_idx]
         if barcodes is not None:
             barcodes_batch = barcodes[start_idx:stop_idx]
-        filtered_list.append(_filter_cells(arr_batch, 
-                                            min_genes=min_genes, 
-                                            max_genes=max_genes, 
+        filtered_list.append(_filter_cells(arr_batch,
+                                            min_genes=min_genes,
+                                            max_genes=max_genes,
                                             barcodes=barcodes_batch))
 
     if barcodes is None:
@@ -271,8 +271,8 @@ def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
     thr = np.asarray(sparse_gpu_array.sum(axis=0) >= min_cells).ravel()
     filtered_genes = cp.sparse.csr_matrix(sparse_gpu_array[:, thr])
     genes_idx = genes_idx[np.where(thr)[0]]
-    
-    return filtered_genes, genes_idx.reset_index(drop=True)
+
+    return filtered_genes, genes_idx
 
 
 def select_groups(labels, groups_order_subset='all'):
@@ -303,7 +303,7 @@ def select_groups(labels, groups_order_subset='all'):
                     cp.array(groups_order_subset),
                 )
             )[0]
-            
+
         groups_ids = [groups_id.item() for groups_id in groups_ids]
         groups_masks = groups_masks[groups_ids]
         groups_order_subset = labels.cat.categories[groups_ids].to_array().astype(int)
@@ -352,9 +352,9 @@ def rank_genes_groups(
     #### Wherever we see "adata.obs[groupby], we should just replace w/ the groups"
 
     import time
-    
+
     start = time.time()
-    
+
     # for clarity, rename variable
     if groups == 'all':
         groups_order = 'all'
@@ -376,9 +376,9 @@ def rank_genes_groups(
         )
 
     groups_order, groups_masks = select_groups(labels, groups_order)
-    
+
     original_reference = reference
-    
+
     n_vars = len(var_names)
 
     # for clarity, rename variable
@@ -401,7 +401,7 @@ def rank_genes_groups(
     rankings_gene_names = []
 
     # Perform LogReg
-        
+
     # if reference is not set, then the groups listed will be compared to the rest
     # if reference is set, then the groups listed will be compared only to the other groups listed
     from cuml.linear_model import LogisticRegression
@@ -410,14 +410,14 @@ def rank_genes_groups(
         raise Exception('Cannot perform logistic regression on a single cluster.')
     grouping_mask = labels.astype('int').isin(cudf.Series(groups_order))
     grouping = labels.loc[grouping_mask]
-    
+
     X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault
     y = labels.loc[grouping]
-    
+
     clf = LogisticRegression(**kwds)
     clf.fit(X.get(), grouping.to_array().astype('float32'))
     scores_all = cp.array(clf.coef_).T
-    
+
     for igroup, group in enumerate(groups_order):
         if len(groups_order) <= 2:  # binary logistic regression
             scores = scores_all[0]
@@ -435,24 +435,24 @@ def rank_genes_groups(
     groups_order_save = [str(g) for g in groups_order]
     if (len(groups) == 2):
         groups_order_save = [g for g in groups_order if g != reference]
-    
+
     print("Ranking took (GPU): " + str(time.time() - start))
-    
+
     start = time.time()
-    
+
     scores = np.rec.fromarrays(
         [n for n in rankings_gene_scores],
         dtype=[(rn, 'float32') for rn in groups_order_save],
     )
-    
+
     names = np.rec.fromarrays(
         [n for n in rankings_gene_names],
         dtype=[(rn, 'U50') for rn in groups_order_save],
     )
-    
+
     print("Preparing output np.rec.fromarrays took (CPU): " + str(time.time() - start))
     print("Note: This operation will be accelerated in a future version")
-    
+
     return scores, names, original_reference
 
 
@@ -471,13 +471,71 @@ def leiden(adata):
     offsets = cudf.Series(adjacency.indptr)
     indices = cudf.Series(adjacency.indices)
     g = cugraph.Graph()
-    g.add_adj_list(offsets, indices, None)
-    
+    if hasattr(g, 'add_adj_list'):
+        g.add_adj_list(offsets, indices, None)
+    else:
+        g.from_cudf_adjlist(offsets, indices, None)
+        
     # Cluster
     leiden_parts, _ = cugraph.leiden(g)
-    
+
     # Format output
     clusters = leiden_parts.to_pandas().sort_values('vertex')[['partition']].to_numpy().ravel()
     clusters = pd.Categorical(clusters)
-    
+
     return clusters
+
+
+def highly_variable_genes_filter(data_mat,
+                                 genes,
+                                 sum_mat=None,
+                                 sum_sq_mat=None,
+                                 n_top_genes=None):
+    """
+    Finds the most variable genes.
+    """
+    if n_top_genes is None:
+        n_top_genes = genes.shape[0] // 10
+
+    if not sum_mat:
+        data_mat
+        
+    mean = sum_mat / data_mat.shape[0]
+    mean[mean == 0] = 1e-12
+
+    mean_sq = sum_sq_mat / data_mat.shape[0]
+    variance = mean_sq - mean ** 2
+    variance *= data_mat.shape[1] / (data_mat.shape[0] - 1)
+    dispersion = variance / mean
+
+    df = pd.DataFrame()
+    df['genes'] = genes.to_array()
+    df['means'] = mean.tolist()
+    df['dispersions'] = dispersion.tolist()
+    df['mean_bin'] = pd.cut(
+        df['means'],
+        np.r_[-np.inf, np.percentile(df['means'], np.arange(10, 105, 5)), np.inf],
+    )
+
+    disp_grouped = df.groupby('mean_bin')['dispersions']
+    disp_median_bin = disp_grouped.median()
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        disp_mad_bin = disp_grouped.apply(robust.mad)
+        df['dispersions_norm'] = (
+            df['dispersions'].values - disp_median_bin[df['mean_bin'].values].values
+        ) / disp_mad_bin[df['mean_bin'].values].values
+
+    dispersion_norm = df['dispersions_norm'].values
+
+    dispersion_norm = dispersion_norm[~np.isnan(dispersion_norm)]
+    dispersion_norm[::-1].sort()
+
+    if n_top_genes > df.shape[0]:
+        n_top_genes = df.shape[0]
+
+    disp_cut_off = dispersion_norm[n_top_genes - 1]
+    vaiable_genes = np.nan_to_num(df['dispersions_norm'].values) >= disp_cut_off
+
+    return vaiable_genes
