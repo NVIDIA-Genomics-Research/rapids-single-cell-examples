@@ -117,7 +117,7 @@ class Visualization:
 
     def re_cluster(self, adata_copy):
         #### rerun clusterings
-        adata_copy.obsm["X_pca"] = PCA(n_components=self.n_components).fit_transform(adata_copy.X).get()
+        adata_copy.obsm["X_pca"] = PCA(n_components=self.n_components, output_type="numpy").fit_transform(adata_copy.X)
         sc.pp.neighbors(adata_copy, n_neighbors=self.n_neighbors, n_pcs=self.knn_n_pcs, method='rapids')
         sc.tl.umap(adata_copy, min_dist=self.umap_min_dist, spread=self.umap_spread, method='rapids')
         sc.tl.louvain(adata_copy, flavor='rapids', resolution=self.louvain_resolution)
