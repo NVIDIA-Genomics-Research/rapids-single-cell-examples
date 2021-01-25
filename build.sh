@@ -28,8 +28,8 @@
 set -e
 
 BASE_DIR=$(dirname $0)
-IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda10.2
-BASE_IMAGE=rapidsai/rapidsai:0.15-cuda10.2-runtime-ubuntu18.04-py3.7
+IMAGE_NAME=claraparabricks/single-cell-examples_rapids_cuda11.0
+BASE_IMAGE=rapidsai/rapidsai:0.17-cuda11.0-runtime-ubuntu18.04-py3.7
 GIT_BRANCH='master'
 CONTAINER_TAG='v0.0.2'
 HELP=false
