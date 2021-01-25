@@ -22,14 +22,14 @@ docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-exampl
 ```
 
 ### conda
-All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. 
+All dependencies for these examples can be installed with conda. CUDA versions 10.1 and higher are supported currently. 
 
 ```bash
 conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
 conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
-If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`.
+If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`. For CUDA 11.0, use `conda/rapidgenomics_cuda11.0.yml`
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
 
