@@ -11,14 +11,14 @@ Dataset sizes for single-cell genomics studies are increasing, presently reachin
 ## Installation 
 
 ### Docker container
-A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
+A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda11.0.
 
 Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
 
 ```bash
-docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
+docker pull claraparabricks/single-cell-examples_rapids_cuda11.0
 
-docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda11.0
 ```
 
 ### conda
