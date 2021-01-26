@@ -7,17 +7,17 @@ channels:
 dependencies:
   - python=3.7
   - rapids=0.17*
-  - cudatoolkit=10.2
+  - cudatoolkit=11.0
   - python-wget
   - cupy=8*
+  - tabix
+  - pytabix
   - cmake
   - jupyterlab
   - wget
-  - dash-daq
-  - dash-html-components
-  - dash-bootstrap-components
-  - dash-core-components
+  - pyBigWig
   - pip
   - pip:
       - jupyter-server-proxy
       - scanpy==1.7.0rc1
+      - atacworks

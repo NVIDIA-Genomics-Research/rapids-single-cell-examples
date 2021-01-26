@@ -11,25 +11,25 @@ Dataset sizes for single-cell genomics studies are increasing, presently reachin
 ## Installation 
 
 ### Docker container
-A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda10.2.
+A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda11.0.
 
 Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
 
 ```bash
-docker pull claraparabricks/single-cell-examples_rapids_cuda10.2
+docker pull claraparabricks/single-cell-examples_rapids_cuda11.0
 
-docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda10.2
+docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda11.0
 ```
 
 ### conda
-All dependencies for these examples can be installed with conda. CUDA versions 10.1 and 10.2 are supported currently. 
+All dependencies for these examples can be installed with conda. CUDA versions 10.1 and higher are supported currently. 
 
 ```bash
 conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
 conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
-If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`.
+If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`. For CUDA 11.0, use `conda/rapidgenomics_cuda11.0.yml`
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
 

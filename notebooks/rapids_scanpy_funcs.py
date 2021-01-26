@@ -471,7 +471,10 @@ def leiden(adata):
     offsets = cudf.Series(adjacency.indptr)
     indices = cudf.Series(adjacency.indices)
     g = cugraph.Graph()
-    g.add_adj_list(offsets, indices, None)
+    if hasattr(g, 'add_adj_list'):
+        g.add_adj_list(offsets, indices, None)
+    else:
+        g.from_cudf_adjlist(offsets, indices, None)
     
     # Cluster
     leiden_parts, _ = cugraph.leiden(g)
