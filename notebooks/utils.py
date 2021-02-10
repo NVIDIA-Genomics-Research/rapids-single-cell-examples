@@ -14,6 +14,8 @@ from statsmodels import robust
 from cuml.dask.common.part_utils import _extract_partitions
 from cuml.common.memory_utils import with_cupy_rmm
 
+import matplotlib.pyplot as plt
+
 from bokeh.plotting import figure
 from bokeh.io import push_notebook, show
 
@@ -366,7 +368,7 @@ def sparse_array_to_df(sparse_dask_array, n_workers):
 
 
 def show_scatter(df, x, y, cluster_col, title):
-    tsne_fig = figure(title=title, width=800, output_backend="webgl")
+    fig, ax = plt.subplots(figsize=(10, 8))
     clusters = df[cluster_col].unique().values_host
 
     a = ((np.random.random(size=clusters.shape[0]) * 255))
@@ -380,41 +382,29 @@ def show_scatter(df, x, y, cluster_col, title):
         cdf = df.query(cluster_col + ' == ' + str(cluster))
         if cdf.shape[0] == 0:
             continue
-        tsne_fig.circle(cdf[x].to_array(),
-                        cdf[y].to_array(),
-                        size=2,
-                        color=colors[cluster],
-                        legend = str(cluster))
+        ax.scatter(cdf[x].to_array(),
+                   cdf[y].to_array(),
+                   c=colors[cluster],
+                   label=str(cluster),
+                   alpha=0.3, edgecolors='none', s=1)
 
-    tsne_fig.legend.location = 'top_right'
+    num_ledgend_cols = len(clusters)//25
+    ax.legend(loc='upper right', ncol=num_ledgend_cols, bbox_to_anchor=(1.05 + num_ledgend_cols/10, 1))
+    ax.grid(True)
 
-    tsne_fig_handle = show(tsne_fig, notebook_handle=True)
-    push_notebook(handle=tsne_fig_handle)
+    plt.show()
 
 
 def show_scatter_grad(df, x, y, color_col, title):
-
     color_array = cp.fromDlpack(df[color_col].to_dlpack())
-    source = ColumnDataSource(dict(x=df[x].to_array(),
-                                   y=df[y].to_array(),
-                                   color_col=color_array.get()))
+    fig, ax = plt.subplots(figsize=(12, 8))
 
-    mapper = LinearColorMapper(palette=Blues,
-                               low=df[color_col].min(),
-                               high=df[color_col].max())
+    sc = plt.scatter(df[x].to_array(),
+               df[y].to_array(),
+               c=color_array.get(),
+               cmap = 'Blues', s=1)
 
-    tsne_fig = figure(title=title,
-                      width=800,
-                      output_backend="webgl")
+    fig.colorbar(sc)
+    ax.grid(True)
 
-
-    tsne_fig.scatter('x', 'y',
-                     color={'field': 'color_col', 'transform':mapper},
-                     source=source,
-                     size=2)
-
-    color_bar = ColorBar(color_mapper=mapper, width=8,  location=(0,0))
-    tsne_fig.add_layout(color_bar, 'right')
-
-    tsne_fig_handle = show(tsne_fig, notebook_handle=True)
-    push_notebook(handle=tsne_fig_handle)
+    plt.show()
