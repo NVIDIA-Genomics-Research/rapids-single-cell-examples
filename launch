@@ -12,7 +12,7 @@ from distutils.version import StrictVersion
 from subprocess import run, Popen
 
 
-DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda11.0:latest'
+DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda11.0:v0.0.3'
 
 # Key: String: Example name
 # Value: String: Comma seperated HTTP URL to dataset files.
