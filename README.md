@@ -8,12 +8,18 @@ Several of our examples are inspired by the [Scanpy tutorials](https://scanpy.re
 
 Dataset sizes for single-cell genomics studies are increasing, presently reaching millions of cells. With RAPIDS, it becomes easy to analyze large datasets interactively and in real time, enabling faster scientific discoveries.
 
-## Installation 
+## Installation
 
 ### Docker container
 A container with all dependencies, notebooks and source code is available at https://hub.docker.com/r/claraparabricks/single-cell-examples_rapids_cuda11.0.
 
 Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
+
+```bash
+./launch container -d /path/to/data/folder
+```
+
+or
 
 ```bash
 docker pull claraparabricks/single-cell-examples_rapids_cuda11.0
@@ -22,7 +28,7 @@ docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-exampl
 ```
 
 ### conda
-All dependencies for these examples can be installed with conda. CUDA versions 10.1 and higher are supported currently. 
+All dependencies for these examples can be installed with conda. CUDA versions 10.1 and higher are supported currently.
 
 ```bash
 conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
@@ -77,13 +83,13 @@ rmm.reinitialize(managed_memory=True)
 cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 ```
 
-RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter. 
+RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter.
 
 ## Example 1: Single-cell RNA-seq of 70,000 Human Lung Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/70k_lung.png?raw=true">
 
-We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking. 
+We use RAPIDS to accelerate the analysis of a ~70,000-cell single-cell RNA sequencing dataset from human lung cells. This example includes preprocessing, dimension reduction, clustering, visualization and gene ranking.
 
 ### Example Dataset
 
@@ -226,7 +232,7 @@ We report the runtime of these notebooks on various GCP instances below. All run
 | t-SNE                        | 266                     | 3.6  (74x)                 | 2.1  (127x)       | 2.3  (116x) |
 | Differential Peak Analysis   | 992                     | 23   (43x)                 | 17.6 (56x)        | 9.8  (101x) |
 | End-to-end notebook run      | 1561                    | 182                        | 130               | 87          |
-| Price ($/hr)                 | 1.073                   | 1.110                      | 2.953             | 4.00        | 
+| Price ($/hr)                 | 1.073                   | 1.110                      | 2.953             | 4.00        |
 | Total cost ($)               | 0.465                   | 0.063                      | 0.106             | 0.096       |
 
 ## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
