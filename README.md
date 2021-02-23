@@ -16,12 +16,6 @@ A container with all dependencies, notebooks and source code is available at htt
 Please execute the following commands to start the notebook and follow the URL in the log to open Jupyter web application.
 
 ```bash
-./launch container -d /path/to/data/folder
-```
-
-or
-
-```bash
 docker pull claraparabricks/single-cell-examples_rapids_cuda11.0
 
 docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-examples_rapids_cuda11.0
