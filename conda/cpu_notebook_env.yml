@@ -1,23 +1,20 @@
 channels:
-  - rapidsai
-  - nvidia
   - conda-forge
   - bioconda
   - defaults
 dependencies:
   - python=3.7
-  - rapids=0.17*
-  - cudatoolkit=10.2
   - python-wget
-  - cupy=8*
+  - umap-learn
   - cmake
   - jupyterlab
   - wget
-  - dash-daq
-  - dash-html-components
-  - dash-bootstrap-components
-  - dash-core-components
   - pip
   - pip:
       - jupyter-server-proxy
       - scanpy==1.7.0rc1
+      - python-igraph
+      - louvain
+      - leidenalg
+      - MulticoreTSNE
+      - pynndescent

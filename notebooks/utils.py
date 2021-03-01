@@ -80,6 +80,7 @@ def pca(adata, n_components=50, train_ratio=0.35, n_batches=50, gpu=False):
     adata.obsm["X_pca"] = embeddings
     return adata
 
+
 def tf_idf(filtered_cells):
     '''
     Input: 2D numpy.ndarray or 2D sparse matrix with X[i, j] = (binary or continuous) read count for cell i, peak j
@@ -408,3 +409,13 @@ def show_scatter_grad(df, x, y, color_col, title):
     ax.grid(True)
 
     plt.show()
+
+def filter_peaks(adata, n_top_peaks):
+    '''
+    Retains the top N most frequent peaks in the count matrix.
+    '''
+    peak_occurrences = np.sum(adata.X > 0, axis=0)
+    peak_frequency = np.array(peak_occurrences / adata.X.shape[0]).flatten()
+    frequent_peak_idxs = np.argsort(peak_frequency)
+    use = frequent_peak_idxs[-n_top_peaks : ]
+    return adata[:, use]

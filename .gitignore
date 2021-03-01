@@ -8,9 +8,6 @@ __pycache__
 .ipynb_checkpoints
 .ipython/
 .cache/
-.cupy/
-.nv/
 
 data/
 notebooks/dask-worker-space/
-
