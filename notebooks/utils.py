@@ -389,7 +389,7 @@ def show_scatter(df, x, y, cluster_col, title):
                    label=str(cluster),
                    alpha=0.3, edgecolors='none', s=1)
 
-    num_ledgend_cols = len(clusters)//25
+    num_ledgend_cols = math.ceil(len(clusters)/25)
     ax.legend(loc='upper right', ncol=num_ledgend_cols, bbox_to_anchor=(1.05 + num_ledgend_cols/10, 1))
     ax.grid(True)
 
