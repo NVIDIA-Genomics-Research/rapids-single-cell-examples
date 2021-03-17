@@ -202,7 +202,7 @@ def read_with_filter(client,
         # TODO: Add barcode filtering here.
         degrees = cp.diff(partial_sparse_array.indptr)
         query = ((min_genes_per_cell <= degrees) & (degrees <= max_genes_per_cell))
-        return partial_sparse_array[query]
+        return partial_sparse_array[query].get()
 
 
     with h5py.File(sample_file, 'r') as h5f:
@@ -228,8 +228,8 @@ def read_with_filter(client,
                    dtype=cp.float32,
                    shape=(batch_size, total_cols)))
 
-    dask_sparse_arr=  dask.array.concatenate(dls)
-    print('cell cnt after cell filter', dask_sparse_arr.shape)
+    dask_sparse_arr =  dask.array.concatenate(dls)
+    print('Cell cnt after cell filter', dask_sparse_arr.shape)
 
     # Filter by genes (i.e. cell count per gene)
     gene_wise_cell_cnt = sum_csr_matrix(dask_sparse_arr, client).compute().sum(axis=0)
@@ -238,4 +238,7 @@ def read_with_filter(client,
     # Filter genes for var
     genes = genes[query]
     genes = genes.reset_index(drop=True)
-    return dask_sparse_arr.compute()[:, query], genes
+
+    sparse_gpu_array = cp.sparse.csr_matrix(dask_sparse_arr.compute()[:, query])
+    return sparse_gpu_array, genes
+
