@@ -79,6 +79,13 @@ cp.cuda.set_allocator(rmm.rmm_cupy_allocator)
 
 RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in-jupyter-lab-757b17aae1d5), which contains useful tools to monitor GPU hardware right in Jupyter.
 
+
+## Citation
+
+If you use this code, please cite: <a href="https://zenodo.org/badge/latestdoi/265649968"><img src="https://zenodo.org/badge/265649968.svg" alt="DOI"></a>
+
+
+
 ## Example 1: Single-cell RNA-seq of 70,000 Human Lung Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/70k_lung.png?raw=true">
@@ -260,7 +267,3 @@ Follow this [Jupyter notebook](notebooks/5k_pbmc_coverage_gpu.ipynb) for GPU ana
 ## Adapting these examples to another dataset
 
 For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
-
-
-## Citation
-If you use this code, please cite: <a href="https://zenodo.org/badge/latestdoi/265649968"><img src="https://zenodo.org/badge/265649968.svg" alt="DOI"></a>
