@@ -261,3 +261,6 @@ Follow this [Jupyter notebook](notebooks/5k_pbmc_coverage_gpu.ipynb) for GPU ana
 
 For our examples, we stored the count matrix in a sparse `.h5ad` format. To convert a different count matrix into this format, follow the instructions in [this notebook](notebooks/csv_to_h5ad.ipynb).
 
+
+## Citation
+If you use this code, please cite: <a href="https://zenodo.org/badge/latestdoi/265649968"><img src="https://zenodo.org/badge/265649968.svg" alt="DOI"></a>
