@@ -186,7 +186,7 @@ def sum_csr_matrix(client, csr_matrix, axis=0):
                                       shape=futures[i].result().shape,
                                       dtype=cp.float32)
         objs.append(obj)
-    return dask.array.concatenate(objs, axis=axis)
+    return dask.array.concatenate(objs, axis=axis).compute().sum(axis=axis)
 
 
 def read_with_filter(client,
@@ -241,7 +241,7 @@ def read_with_filter(client,
         if post_processor is not None:
             partial_sparse_array = post_processor(partial_sparse_array)
 
-        return partial_sparse_array.get()
+        return partial_sparse_array
 
 
     with h5py.File(sample_file, 'r') as h5f:
@@ -271,18 +271,20 @@ def read_with_filter(client,
 
     dask_sparse_arr =  dask.array.concatenate(dls)
     print('Cell cnt. before filter', dask_sparse_arr.shape)
-    dask_sparse_arr = dask_sparse_arr.persist()
+    # dask_sparse_arr = dask_sparse_arr.persist()
 
     # Filter by genes (i.e. cell count per gene)
-    gene_wise_cell_cnt = sum_csr_matrix(client, dask_sparse_arr).compute().sum(axis=0)
+    gene_wise_cell_cnt = sum_csr_matrix(client, dask_sparse_arr)
     query = gene_wise_cell_cnt >= min_cells
 
     # Filter genes for var
     genes = genes[query]
     genes = genes.reset_index(drop=True)
-    dask_sparse_arr = dask_sparse_arr[:, query].persist()
 
-    return dask_sparse_arr, genes
+    query = cp.where(query == True)[0]
+    dask_sparse_arr = dask_sparse_arr[:, query.get()].persist()
+
+    return dask_sparse_arr, genes, query
 
 
 def highly_variable_genes_filter(client,
@@ -293,7 +295,7 @@ def highly_variable_genes_filter(client,
     if n_top_genes is None:
         n_top_genes = genes.shape[0] // 10
 
-    data_sum = sum_csr_matrix(client, data_mat).compute().sum(axis=0)
+    data_sum = sum_csr_matrix(client, data_mat, axis=0)
 
     mean = data_sum / data_mat.shape[0]
     mean[mean == 0] = 1e-12
