@@ -456,7 +456,7 @@ def rank_genes_groups(
     return scores, names, original_reference
 
 
-def leiden(adata):
+def leiden(adata, resolution=1.0):
     """
     Performs Leiden Clustering using cuGraph
 
@@ -464,6 +464,10 @@ def leiden(adata):
     ----------
 
     adata : annData object with 'neighbors' field.
+       
+    resolution : float, optional (default: 1)
+        A parameter value controlling the coarseness of the clustering.
+        Higher values lead to more clusters.
 
     """
     # Adjacency graph
@@ -477,7 +481,7 @@ def leiden(adata):
         g.from_cudf_adjlist(offsets, indices, None)
     
     # Cluster
-    leiden_parts, _ = cugraph.leiden(g)
+    leiden_parts, _ = cugraph.leiden(g,resolution = resolution)
     
     # Format output
     clusters = leiden_parts.to_pandas().sort_values('vertex')[['partition']].to_numpy().ravel()
