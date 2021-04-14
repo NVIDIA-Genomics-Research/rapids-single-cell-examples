@@ -146,7 +146,7 @@ def sq_sum_csr_matrix(client, csr_matrix, axis=0):
     client = dask.distributed.default_client()
 
     def __sq_sum(x):
-        x = x.sqrt()
+        x = x.multiply(x)
         return x.sum(axis=axis)
 
     parts = client.sync(_extract_partitions, csr_matrix)
@@ -161,7 +161,7 @@ def sq_sum_csr_matrix(client, csr_matrix, axis=0):
                                       shape=futures[i].result().shape,
                                       dtype=cp.float32)
         objs.append(obj)
-    return dask.array.concatenate(objs, axis=axis)
+    return dask.array.concatenate(objs, axis=axis).compute().sum(axis=axis)
 
 
 @with_cupy_rmm
@@ -193,9 +193,9 @@ def read_with_filter(client,
                      sample_file,
                      min_genes_per_cell=200,
                      max_genes_per_cell=6000,
-                     min_cells = 1,
+                     min_cells = 0,
                      num_cells=None,
-                     batch_size=5000,
+                     batch_size=50000,
                      partial_post_processor=None):
     """
     Reads an h5ad file and applies cell and geans count filter. Dask Array is
@@ -270,12 +270,11 @@ def read_with_filter(client,
                    shape=(actual_batch_size, total_cols)))
 
     dask_sparse_arr =  dask.array.concatenate(dls)
-    print('Cell cnt. before filter', dask_sparse_arr.shape)
-    # dask_sparse_arr = dask_sparse_arr.persist()
+    dask_sparse_arr = dask_sparse_arr.persist()
 
     # Filter by genes (i.e. cell count per gene)
     gene_wise_cell_cnt = sum_csr_matrix(client, dask_sparse_arr)
-    query = gene_wise_cell_cnt >= min_cells
+    query = gene_wise_cell_cnt > min_cells
 
     # Filter genes for var
     genes = genes[query]
@@ -295,12 +294,10 @@ def highly_variable_genes_filter(client,
     if n_top_genes is None:
         n_top_genes = genes.shape[0] // 10
 
-    data_sum = sum_csr_matrix(client, data_mat, axis=0)
-
-    mean = data_sum / data_mat.shape[0]
+    mean = sum_csr_matrix(client, data_mat, axis=0) / data_mat.shape[0]
     mean[mean == 0] = 1e-12
 
-    mean_sq = sq_sum_csr_matrix(client, data_mat).compute().sum(axis=0) / data_mat.shape[0]
+    mean_sq = sq_sum_csr_matrix(client, data_mat, axis=0) / data_mat.shape[0]
     variance = mean_sq - mean ** 2
     variance *= data_mat.shape[1] / (data_mat.shape[0] - 1)
     dispersion = variance / mean
