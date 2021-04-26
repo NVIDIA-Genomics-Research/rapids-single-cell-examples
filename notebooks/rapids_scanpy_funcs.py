@@ -471,7 +471,7 @@ def leiden(adata, resolution=1.0):
 
     """
     # Adjacency graph
-    adjacency = adata.uns['neighbors']['connectivities']
+    adjacency = adata.obsp['connectivities']
     offsets = cudf.Series(adjacency.indptr)
     indices = cudf.Series(adjacency.indices)
     g = cugraph.Graph()
