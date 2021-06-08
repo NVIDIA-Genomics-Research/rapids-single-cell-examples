@@ -12,7 +12,7 @@ from distutils.version import StrictVersion
 from subprocess import run, Popen
 
 
-DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda11.0:v0.0.3'
+DOCKER_IMAGE = 'claraparabricks/single-cell-examples_rapids_cuda11.2:v0.0.4'
 
 # Key: String: Example name
 # Value: String: Comma seperated HTTP URL to dataset files.
@@ -241,6 +241,49 @@ To execute 'hlca_lung' example in container, please execute following command:
         """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
 
         run(cmd, check=True, shell=True)
+
+    def dev(self):
+        """
+        Implementation for command 'container'. Starts a docker container.
+        """
+        parser = argparse.ArgumentParser(description='dev')
+        parser.add_argument('-d', '--dataDir',
+                            dest='data_dir',
+                            type=str,
+                            required=True,
+                            help='Directory with datasets')
+        parser.add_argument('-p', '--jupyterPort',
+                            dest='jupyter_port',
+                            type=int,
+                            required=False,
+                            default=8888,
+                            help='Port for jupyter')
+        args = parser.parse_args(sys.argv[2:])
+
+        docker_version = self._fetch_docker_version().strip().strip("'")
+
+        # nvidia docker toolkit command parameter
+        runtime_arg = '--gpus all'
+        if StrictVersion(docker_version.strip()) < StrictVersion("19.03.0"):
+            print('Old docker version %s. Please upgrade docker' %
+                (docker_version))
+            runtime_arg = '--runtime=nvidia'
+
+        # --user $(id -u):$(id -g) \
+        cmd = """docker run \
+            %s \
+            --network host \
+            -p %d:8888 \
+            -v %s:/workspace/rapids-single-cell-examples/data \
+            -e HOME=/workspace \
+            -v $(pwd):/workspace/rapids-single-cell-examples \
+            -w /workspace/rapids-single-cell-examples \
+            -it %s \
+            bash
+        """ % (runtime_arg, args.jupyter_port, args.data_dir, DOCKER_IMAGE)
+
+        run(cmd, check=True, shell=True)
+
 
     def create_env(self):
         """

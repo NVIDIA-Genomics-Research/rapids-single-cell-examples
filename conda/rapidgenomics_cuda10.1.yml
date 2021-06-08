@@ -6,7 +6,7 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - rapids=0.17*
+  - rapids=0.19*
   - cudatoolkit=10.1
   - python-wget
   - cupy=8*
@@ -19,5 +19,5 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.7.0rc1
+      - scanpy==1.7.2
       - atacworks

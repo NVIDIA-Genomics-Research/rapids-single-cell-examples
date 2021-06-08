@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:0.17-cuda11.0-runtime-ubuntu18.04-py3.7
+ARG BASE_IMAGE=rapidsai/rapidsai:0.19-cuda11.2-runtime-ubuntu18.04-py3.7
 
 FROM ${BASE_IMAGE}
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -6,7 +6,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     zlib1g-dev rsync vim cmake tabix
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.7.0rc1 wget pytabix atacworks==0.3.3 dash-daq \
+    scanpy==1.7.2 wget pytabix atacworks==0.3.3 dash-daq pandas==1.2.4 \
     dash-html-components dash-bootstrap-components dash-core-components
 
 WORKDIR /workspace
@@ -27,6 +27,3 @@ CMD jupyter-lab \
 		--NotebookApp.password="" \
 		--NotebookApp.token="" \
 		--NotebookApp.password_required=False
-
-# ENV LD_LIBRARY_PATH /usr/local/cuda-10.2/compat
-# RUN echo "export PATH=$PATH:/workspace/data" >> ~/.bashrc
