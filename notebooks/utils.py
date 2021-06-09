@@ -1,12 +1,7 @@
 import math
-import h5py
 import numpy as np
 import scipy
 import pandas as pd
-
-import warnings
-warnings.filterwarnings('ignore', 'Expected ')
-warnings.simplefilter('ignore')
 
 
 def pca(adata, n_components=50, train_ratio=0.35, n_batches=50, gpu=False):
