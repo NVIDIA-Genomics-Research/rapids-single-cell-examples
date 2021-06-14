@@ -408,7 +408,7 @@ def rank_genes_groups(
     reference = groups_order[0]
     if len(groups) == 1:
         raise Exception('Cannot perform logistic regression on a single cluster.')
-    grouping_mask = labels.astype('int').isin(cudf.Series(groups_order))
+    grouping_mask = labels.isin(cudf.Series(groups_order))
     grouping = labels.loc[grouping_mask]
     
     X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault
@@ -451,7 +451,6 @@ def rank_genes_groups(
     )
     
     print("Preparing output np.rec.fromarrays took (CPU): " + str(time.time() - start))
-    print("Note: This operation will be accelerated in a future version")
     
     return scores, names, original_reference
 
