@@ -26,38 +26,6 @@ import math
 from cuml.linear_model import LinearRegression
 
 
-def scale(normalized, max_value=10):
-    """
-    Scales matrix to unit variance and clips values
-
-    Parameters
-    ----------
-
-    normalized : cupy.ndarray or numpy.ndarray of shape (n_cells, n_genes)
-                 Matrix to scale
-    max_value : int
-                After scaling matrix to unit variance,
-                values will be clipped to this number
-                of std deviations.
-
-    Return
-    ------
-
-    normalized : cupy.ndarray of shape (n_cells, n_genes)
-        Dense normalized matrix
-    """
-
-    normalized = cp.asarray(normalized)
-    mean = normalized.mean(axis=0)
-    normalized -= mean
-    del mean
-    stddev = cp.sqrt(normalized.var(axis=0))
-    normalized /= stddev
-    del stddev
-    
-    return normalized.clip(a_max=max_value)
-
-
 def _regress_out_chunk(X, y):
     """
     Performs a data_cunk.shape[1] number of local linear regressions,
