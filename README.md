@@ -22,48 +22,15 @@ docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-exampl
 ```
 
 ### conda
-All dependencies for these examples can be installed with conda. CUDA versions 10.1 and higher are supported currently.
+All dependencies for these examples can be installed with conda.
 
 ```bash
-conda env create --name rapidgenomics -f conda/rapidgenomics_cuda10.2.yml
+conda env create --name rapidgenomics -f conda/rapidgenomics_cuda11.0.yml
 conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
-If installing for a system running a CUDA 10.1 driver, use `conda/rapidgenomics_cuda10.1.yml`. For CUDA 11.0, use `conda/rapidgenomics_cuda11.0.yml`
 
 After installing the necessary dependencies, you can just run `jupyter lab`.
-
-### Launch Script
-Lanuch script (./launch) can be used to start example notebooks either on a host or in a docker container. This script prepares the environment and acquires the dataset for the examples.
-
-```bash
-# rapids-single-cell-examples$ ./launch -h
-usage: launch <command> [<args>]
-
-Following commands are wrapped by this tool:
-   container  : Start Jupyter notebook in a container
-   host       : Start Jupyter notebook on the host
-   dataset    : Download dataset
-   execute    : Execute an example
-   create_env : Create conda environment for an example
-
-To execute 'hlca_lung' example in container, please execute the following command:
-./launch container -d /path/to/store/dataset -e hlca_lung
-
-Example launcher
-
-positional arguments:
-  command     Subcommand to run
-
-optional arguments:
-  -h, --help  show this help message and exit
-```
-
-```./launch host``` can be used to create a conda environment for executing any of the examples. To list all supported examples, please execute ```./launch host -h```.
-
-```./launch container``` can be used to setup a container for the example.
-
-```./launch execute```, can be used to run an example in the background. Results are saved inplace.
 
 
 ## Configuration
@@ -181,7 +148,7 @@ We demonstrate how to use RAPIDS, Scanpy and Plotly Dash to create an interactiv
 Additional dependencies are needed for this example. Follow these instructions for conda installation:
 
 ```bash
-conda env create --name rapidgenomics-viz -f conda/rapidgenomics_cuda10.2.viz.yml
+conda env create --name rapidgenomics-viz -f conda/rapidgenomics_cuda11.0.viz.yml
 conda activate rapidgenomics-viz
 python -m ipykernel install --user --display-name "Python (rapidgenomics-viz)"
 ```
