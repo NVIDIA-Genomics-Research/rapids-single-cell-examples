@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:0.19-cuda11.2-runtime-ubuntu18.04-py3.7
+ARG BASE_IMAGE=rapidsai/rapidsai:21.06-cuda11.2-runtime-ubuntu18.04-py3.7
 
 FROM ${BASE_IMAGE}
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -6,8 +6,9 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     zlib1g-dev rsync vim cmake tabix
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.7.2 wget pytabix atacworks==0.3.3 dash-daq pandas==1.2.4 \
+    scanpy==1.7.2 wget pytabix dash-daq pandas==1.2.4 \
     dash-html-components dash-bootstrap-components dash-core-components
+	# atacworks==0.3.3
 
 WORKDIR /workspace
 ENV HOME /workspace
