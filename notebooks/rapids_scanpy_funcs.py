@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 import scipy
 import math
+import warnings
 
 from cuml.linear_model import LinearRegression
 
@@ -455,3 +456,63 @@ def leiden(adata, resolution=1.0):
     clusters = pd.Categorical(clusters)
     
     return clusters
+
+
+def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
+    """
+    Identifies highly variable genes using the 'cellranger' method.
+    
+    Parameters
+    ----------
+    
+    sparse_gpu_array : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
+    
+    genes : cudf series containing genes
+    
+    n_top_genes : number of variable genes
+    """
+
+    if n_top_genes is None:
+        n_top_genes = genes.shape[0] // 10
+
+    n_cells = sparse_gpu_array.shape[0]
+    mean = sparse_gpu_array.sum(axis=0).flatten() / n_cells
+    mean[mean == 0] = 1e-12
+
+    mean_sq = sparse_gpu_array.multiply(sparse_gpu_array).sum(axis=0).flatten() / n_cells
+    variance = mean_sq - mean ** 2
+    variance *= sparse_gpu_array.shape[1] / (n_cells - 1)
+    dispersion = variance / mean
+
+    df = pd.DataFrame()
+    # Note - can be replaced with cudf once 'cut' is added in 21.08
+    df['genes'] = genes.to_array()
+    df['means'] = mean.tolist()
+    df['dispersions'] = dispersion.tolist()
+    df['mean_bin'] = pd.cut(
+        df['means'],
+        np.r_[-np.inf, np.percentile(df['means'], np.arange(10, 105, 5)), np.inf],
+    )
+
+    disp_grouped = df.groupby('mean_bin')['dispersions']
+    disp_median_bin = disp_grouped.median()
+    
+    from statsmodels import robust
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        disp_mad_bin = disp_grouped.apply(robust.mad)
+        df['dispersions_norm'] = (
+            df['dispersions'].values - disp_median_bin[df['mean_bin'].values].values
+        ) / disp_mad_bin[df['mean_bin'].values].values
+
+    dispersion_norm = df['dispersions_norm'].values
+    dispersion_norm = dispersion_norm[~np.isnan(dispersion_norm)]
+    dispersion_norm[::-1].sort()
+
+    if n_top_genes > df.shape[0]:
+        n_top_genes = df.shape[0]
+
+    disp_cut_off = dispersion_norm[n_top_genes - 1]
+    variable_genes = np.nan_to_num(df['dispersions_norm'].values) >= disp_cut_off
+
+    return variable_genes
