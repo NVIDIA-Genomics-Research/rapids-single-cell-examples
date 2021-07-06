@@ -19,5 +19,5 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.8.0
+      - scanpy==1.7.2
       - atacworks==0.3.4
