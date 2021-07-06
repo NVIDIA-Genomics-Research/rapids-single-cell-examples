@@ -319,11 +319,7 @@ def rank_genes_groups(
     """
 
     #### Wherever we see "adata.obs[groupby], we should just replace w/ the groups"
-
-    import time
-    
-    start = time.time()
-    
+        
     # for clarity, rename variable
     if groups == 'all':
         groups_order = 'all'
@@ -404,11 +400,7 @@ def rank_genes_groups(
     groups_order_save = [str(g) for g in groups_order]
     if (len(groups) == 2):
         groups_order_save = [g for g in groups_order if g != reference]
-    
-    print("Ranking took (GPU): " + str(time.time() - start))
-    
-    start = time.time()
-    
+            
     scores = np.rec.fromarrays(
         [n for n in rankings_gene_scores],
         dtype=[(rn, 'float32') for rn in groups_order_save],
@@ -418,9 +410,7 @@ def rank_genes_groups(
         [n for n in rankings_gene_names],
         dtype=[(rn, 'U50') for rn in groups_order_save],
     )
-    
-    print("Preparing output np.rec.fromarrays took (CPU): " + str(time.time() - start))
-    
+        
     return scores, names, original_reference
 
 
