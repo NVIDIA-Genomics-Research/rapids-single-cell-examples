@@ -79,19 +79,19 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> e2-standard-32 <br> 32 vCPUs | GPU <br> n1-standard-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-8 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|---------------------------|---------------|--------------|
-| Preprocessing                | 351                       | 87       (4x)             | 78   (5x)     | 91   (4x)    |
-| PCA                          | 5.7                       | 4.6      (1.2x)           | 3.2  (2x)     | 2.7  (2x)    |
-| t-SNE                        | 235                       | 3.8      (62x)            | 1.9  (124x)   | 2.2  (107x)  |
-| k-means (single iteration)   | 17.6                      | 0.55     (32x)            | 0.14 (126x)   | 0.09 (196x)  |
-| KNN                          | 39                        | 20.6     (2x)             | 20.9 (2x)     | 5.3  (7x)    |
-| UMAP                         | 46                        | 0.97     (47x)            | 0.52 (88x)    | 0.63 (73x)   |
-| Louvain clustering           | 16.9                      | 0.22     (77x)            | 0.19 (89x)    | 0.14 (121x)  |
-| Leiden clustering            | 16.5                      | 0.15     (110x)           | 0.12 (138x)   | 0.12 (138x)  |
-| Differential Gene Expression | 108                       | 6.9      (16x)            | 2.5  (43x)    | 2.0  (54x)   |
-| Re-analysis of subgroup      | 28                        | 5.1      (5x)             | 4.3  (7x)     | 4.1  (7x)    |
-| End-to-end notebook run      | 883                       | 154                       | 142           | 125          |
+| Preprocessing                |                        |        (x)             |  86  (x)     |    (x)    |
+| PCA                          |                        |       (x)           | 3.3  (x)     |   (x)    |
+| t-SNE                        |                        |       (x)            | 1.4  (x)   |   (x)  |
+| k-means (single iteration)   |                       |      (x)            | 0.12 (x)   |  (x)  |
+| KNN                          |                         |      (x)             | 21 (x)     |   (x)    |
+| UMAP                         |                        |      (x)            | 0.57 (x)    |  (x)   |
+| Louvain clustering           |                       |      (x)            | 0.16 (x)    |  (x)  |
+| Leiden clustering            |                      |      (x)           | 0.10 (x)   |  (x)  |
+| Differential Gene Expression |                        |       (x)            | 7.6  (x)    |   (x)   |
+| Re-analysis of subgroup      |                        |       (x)             | 3.8  (x)     |   (x)    |
+| End-to-end notebook run      |                        |                        |  141          |           |
 | Price ($/hr)                 | 1.073                     | 1.110                     | 2.953         | 4.00         |
-| Total cost ($)               | 0.263                     | 0.047                     | 0.116         | 0.139        |
+| Total cost ($)               |                      |                      |          |         |
 
 
 
@@ -123,18 +123,18 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> n1-highmem-32 <br> 32 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|----------------------------|-------------------|--------------|
-| Preprocessing                | 1715                      | 756  (2.3x)                | 308  (6x)         | 201  (9x)    |
-| PCA                          | 29.2                      | 28   (1.04x)               | 24   (1.2x)       | 11.4 (2.6x)  |
-| t-SNE                        | 4990                      | 128  (39x)                 | 39   (128x)       | 28   (178x)  |
-| k-means (single iteration)   | 126                       | 13.7 (9x)                  | 2.7  (47x)        | 1.9  (66x)   |
-| KNN                          | 185                       | 150  (1.2x)                | 89   (2.1x)       | 46   (4x)    |
-| UMAP                         | 1307                      | 79   (17x)                 | 18.8 (70x)        | 13.4 (98x)   |
-| Louvain clustering           | 905                       | 5.0  (181x)                | 2.8  (323x)       | 1.9  (476x)  |
-| Leiden clustering            | 3061                      | 4.4  (696x)                | 2.0  (1531x)      | 1.4  (2186x) |
-| Re-analysis of subgroup      | 159                       | 15.8 (10x)                 | 13   (12x)        | 9.3  (17x)   |
-| End-to-end notebook run      | 12708                     | 1399                       | 702               | 502          |
+| Preprocessing                |                       |   (x)                |   (x)         |   (x)    |
+| PCA                          |                       |    (x)               |    (x)       |  (x)  |
+| t-SNE                        |                       |   (x)                 |    (x)       |    (x)  |
+| k-means (single iteration)   |                        |  (x)                  |   (x)        |   (x)   |
+| KNN                          |                        |   (x)                |    (x)       |    (x)    |
+| UMAP                         |                       |    (x)                 |  (x)        |  (x)   |
+| Louvain clustering           |                        |   (x)                |   (x)       |   (x)  |
+| Leiden clustering            |                       |   (x)                |   (x)      |   (x) |
+| Re-analysis of subgroup      |                        |  (x)                 |    (x)        |   (x)   |
+| End-to-end notebook run      |                      |                        |                |           |
 | Price ($/hr)                 | 1.893                     | 1.296                      | 5.906             | 4.00         |
-| Total cost ($)               | 6.682                     | 0.504                      | 1.164             | 0.553        |
+| Total cost ($)               |                      |                       |              |         |
 
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 Human Lung Cells (beta version)
@@ -192,16 +192,44 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> e2-standard-32 <br> 32 vCPUs | GPU <br> n1-standard-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-8 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------|----------------------------|-------------------|-------------|
-| PCA                          | 190                     | 137  (1.4x)                | 68   (2.8x)       | 52   (4x)   |
-| KNN                          | 37                      | 17.9 (2.1x)                | 19.2 (2x)         | 4.6  (8x)   |
-| UMAP                         | 33                      | 1.3  (25x)                 | 0.94 (35x)        | 0.68 (49x)  |
-| Louvain clustering           | 7.5                     | 0.16 (47x)                 | 0.16 (47x)        | 0.10 (75x)  |
-| Leiden clustering            | 11.4                    | 0.09 (127x)                | 0.08 (143x)       | 0.08 (143x) |
-| t-SNE                        | 266                     | 3.6  (74x)                 | 2.1  (127x)       | 2.3  (116x) |
-| Differential Peak Analysis   | 992                     | 23   (43x)                 | 17.6 (56x)        | 9.8  (101x) |
-| End-to-end notebook run      | 1561                    | 182                        | 130               | 87          |
+| PCA                          |                      |   (x)                |  71  (x)       |    (x)   |
+| KNN                          |                       |  (x)                | 20 (x)         |   (x)   |
+| UMAP                         |                       |   (x)                 | 0.76 (x)        |  (x)  |
+| Louvain clustering           |                      |  (x)                 | 0.12 (x)        |  (x)  |
+| Leiden clustering            |                     |  (x)                | 0.08 (x)       |  (x) |
+| t-SNE                        |                      |   (x)                 | 1.5  (x)       |   (x) |
+| Differential Peak Analysis   |                      |    (x)                 | 21 (x)        |   (x) |
+| End-to-end notebook run      |                     |                         | 134              |           |
 | Price ($/hr)                 | 1.073                   | 1.110                      | 2.953             | 4.00        |
-| Total cost ($)               | 0.465                   | 0.063                      | 0.106             | 0.096       |
+| Total cost ($)               |                    |                       |              |        |
+
+
+## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
+
+<img align="left" width="240" height="200" src="https://github.com/avantikalal/rapids-single-cell-examples/blob/rilango/mem-fix/images/atacworks_notebook_img.png?raw=true">
+
+We analyze single-cell ATAC-seq data from 5000 PBMC cells as in example 4. Additionally, we use cuDF to calculate and visualize cluster-specific chromatin accessibility in selected marker regions. Finally, we use a deep learning model trained with [AtacWorks](https://github.com/clara-parabricks/AtacWorks), to improve the accuracy of the chromatin accessibility track and call peaks in individual clusters.
+
+### Example Data
+
+The dataset was made publicly available by 10X Genomics. Use the following command to download the peak x cell count matrix and the fragment file for this dataset, and store both in the `data` folder:
+
+```bash
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X.sparse.h5ad
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz
+wget -P <path to this repository>/data https://rapids-single-cell-examples.s3.us-east-2.amazonaws.com/5k_pbmcs_10X_fragments.tsv.gz.tbi
+```
+
+### Example Model
+
+We use a pre-trained deep learning model to denoise the chromatin accessibility track and call peaks. This model can be downloaded into the `models` folder:
+```bash
+wget -P <path to this repository>/models https://api.ngc.nvidia.com/v2/models/nvidia/atac_bulk_lowcov_5m_50m/versions/0.3/files/models/model.pth.tar
+```
+
+### Example Code
+Follow this [Jupyter notebook](notebooks/5k_pbmc_coverage_gpu.ipynb) for GPU analysis of this dataset. In order for the notebook to run, the files [utils.py](notebooks/utils.py), and [coverage.py](notebooks/coverage.py) need to be in the same folder as the notebook.
+
 
 
 ## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
