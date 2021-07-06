@@ -625,4 +625,6 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
 
     print("Filtering highly variable genes.")
     sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
-    return sparse_gpu_array, genes_filtered[variable_genes], marker_genes_raw
+    genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
+    
+    return sparse_gpu_array, genes_filtered, marker_genes_raw
