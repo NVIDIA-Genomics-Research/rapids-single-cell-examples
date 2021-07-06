@@ -461,11 +461,11 @@ def leiden(adata, resolution=1.0):
     return clusters
 
 
-def _cellranger_hvg(mean, mean_sq, genes, n_top_genes):
+def _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes):
 
     mean[mean == 0] = 1e-12
     variance = mean_sq - mean ** 2
-    variance *= sparse_gpu_array.shape[1] / (n_cells - 1)
+    variance *= len(genes) / (n_cells - 1)
     dispersion = variance / mean
 
     df = pd.DataFrame()
@@ -521,7 +521,7 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
     n_cells = sparse_gpu_array.shape[0]
     mean = sparse_gpu_array.sum(axis=0).flatten() / n_cells
     mean_sq = sparse_gpu_array.multiply(sparse_gpu_array).sum(axis=0).flatten() / n_cells
-    variable_genes = _cellranger_hvg(mean, mean_sq, genes, n_top_genes)
+    variable_genes = _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes)
     
     return variable_genes
 
@@ -535,7 +535,7 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     _genes = '/var/_index'
 
     cell_batch_size = 100000
-    gene_batch_size = 3000
+    gene_batch_size = 2000
     
     batches = []
     mean = []
@@ -547,20 +547,21 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
         indptrs = h5f[_indptr]
         indices = cp.array(h5f[_index])
         genes = cudf.Series(h5f[_genes], dtype=cp.dtype('object'))
-        total_cells = indptrs.shape[0] - 1
+        n_cells = indptrs.shape[0] - 1
 
     # Get indices of genes to filter
     print("Identifying genes to filter.")
-    gene_query = cp.bincount(indices) >= min_cells_per_gene
-    genes = genes[gene_query].reset_index(drop=True)
+    gene_query = (cp.bincount(indices) >= min_cells_per_gene)
+    genes_filtered = genes[gene_query].reset_index(drop=True)
 
     print("Filtering and normalizing data")
     # Batch by cells and filter, normalize and log transform each batch
-    for batch_start in range(0, total_cells, cell_batch_size):
+    n_cells_filtered = 0
+    for batch_start in range(0, n_cells, cell_batch_size):
         # Get batch indices
         with h5py.File(input_file, 'r') as h5f:
             indptrs = h5f[_indptr]
-            actual_batch_size = min(cell_batch_size, total_cells - batch_start)
+            actual_batch_size = min(cell_batch_size, n_cells - batch_start)
             batch_end = batch_start + actual_batch_size
             start_ptr = indptrs[batch_start]
             end_ptr = indptrs[batch_end]
@@ -581,6 +582,7 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
         # Filter cells in the batch
         degrees = cp.diff(partial_sparse_array.indptr)
         query = ((min_genes_per_cell <= degrees) & (degrees <= max_genes_per_cell))
+        n_cells_filtered += sum(query)
         partial_sparse_array = partial_sparse_array[query]
     
         # Filter genes
@@ -594,9 +596,9 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
 
     print("Calculating highly variable genes.")
     # Batch across genes to calculate gene-wise dispersions
-    for batch_start in range(0, len(genes), gene_batch_size):
+    for batch_start in range(0, len(genes_filtered), gene_batch_size):
         # Get batch indices
-        actual_batch_size = min(gene_batch_size, len(genes) - batch_start)
+        actual_batch_size = min(gene_batch_size, len(genes_filtered) - batch_start)
         batch_end = batch_start + actual_batch_size
     
         partial_sparse_array = cp.sparse.vstack([x[:, batch_start:batch_end] for x in batches])
@@ -607,20 +609,20 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
 
         # Calculate sq sum per gene - can batch across genes
         partial_sparse_array = partial_sparse_array.multiply(partial_sparse_array)
-        partial_sq_mean = partial_sparse_array.sum(axis=0) / partial_sparse_array.shape[0]
-        sq_mean.append(partial_sq_mean)
+        partial_mean_sq = partial_sparse_array.sum(axis=0) / partial_sparse_array.shape[0]
+        mean_sq.append(partial_mean_sq)
     
     mean = cp.hstack(mean).ravel()
-    mean_sq = cp.hstack(sq_means).ravel()
+    mean_sq = cp.hstack(mean_sq).ravel()
 
-    variable_genes = _cellranger_hvg(mean, mean_sq, genes, n_top_genes)
+    variable_genes = _cellranger_hvg(mean, mean_sq, genes_filtered, n_cells_filtered, n_top_genes)
 
-    print("Saving raw marker gene expression.")
+    print("Storing raw marker gene expression.")
     marker_genes_raw = {
-        ("%s_raw" % marker): cp.sparse.vstack([x[:, genes == marker] for x in batches]).todense().ravel()
+        ("%s_raw" % marker): cp.sparse.vstack([x[:, genes_filtered == marker] for x in batches]).todense().ravel()
         for marker in markers
     }
 
     print("Filtering highly variable genes.")
     sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
-    return sparse_gpu_array, genes, marker_genes_raw
+    return sparse_gpu_array, genes_filtered, marker_genes_raw
