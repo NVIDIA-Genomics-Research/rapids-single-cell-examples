@@ -6,9 +6,8 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
     zlib1g-dev rsync vim cmake tabix
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.8.0 wget pytabix dash-daq \
+    scanpy==1.8.0 wget pytabix dash-daq atacworks==0.3.4 \
     dash-html-components dash-bootstrap-components dash-core-components
-    # atacworks==0.3.3
 
 WORKDIR /workspace
 ENV HOME /workspace
