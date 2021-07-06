@@ -9,6 +9,8 @@ RUN /opt/conda/envs/rapids/bin/pip install \
     scanpy==1.7.2 wget pytabix dash-daq atacworks==0.3.4 \
     dash-html-components dash-bootstrap-components dash-core-components
 
+RUN /opt/conda/envs/rapids/bin/pip install --ignore-installed numba==0.52.0
+
 WORKDIR /workspace
 ENV HOME /workspace
 RUN git clone \
