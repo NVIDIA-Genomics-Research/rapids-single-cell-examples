@@ -95,11 +95,13 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 
 
-## Example 2: Single-cell RNA-seq of 1 Million Mouse Brain Cells
+## Example 2: Single-cell RNA-seq of 1.3 Million Mouse Brain Cells
 
 <img align="left" width="240" height="200" src="https://github.com/clara-parabricks/rapids-single-cell-examples/blob/master/images/1M_brain.png?raw=true">
 
-We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
+We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-seq data from 1.3 million cells. This example includes preprocessing, dimension reduction, clustering and visualization.
+
+Compared to the previous example, here we make several adjustments to handle the larger dataset. We perform most of the preprocessing operations (e.g. filtering, normalization) while reading the dataset in batches. Further, we perform a batched PCA by training on a fraction of cells and transforming the data in batches.
 
 This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available. Oversubscribing a GPU by more than a factor of 2x can cause thrashing in UVM, which can ultimately lead to the notebook freezing.
 
@@ -121,20 +123,20 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 We report the runtime of these notebooks on various GCP instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on Dec 16, 2020.
 
-| Step                         | CPU <br> n1-highmem-32 <br> 32 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
+| Step                         | CPU <br> n1-highmem-64 <br> 64 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|----------------------------|-------------------|--------------|
-| Preprocessing                |                       |   (x)                |   (x)         |   (x)    |
-| PCA                          |                       |    (x)               |    (x)       |  (x)  |
-| t-SNE                        |                       |   (x)                 |    (x)       |    (x)  |
-| k-means (single iteration)   |                        |  (x)                  |   (x)        |   (x)   |
-| KNN                          |                        |   (x)                |    (x)       |    (x)    |
-| UMAP                         |                       |    (x)                 |  (x)        |  (x)   |
-| Louvain clustering           |                        |   (x)                |   (x)       |   (x)  |
-| Leiden clustering            |                       |   (x)                |   (x)      |   (x) |
-| Re-analysis of subgroup      |                        |  (x)                 |    (x)        |   (x)   |
-| End-to-end notebook run      |                      |                        |                |           |
-| Price ($/hr)                 | 1.893                     | 1.296                      | 5.906             | 4.00         |
-| Total cost ($)               |                      |                       |              |         |
+| Data load + Preprocessing    |    1120                  |   (x)                |   (x)         |   (x)    |
+| PCA                          |      44.3                 |    (x)               |    (x)       |  (x)  |
+| t-SNE                        |    6509                   |   (x)                 |    (x)       |    (x)  |
+| k-means (single iteration)   |     148                  |  (x)                  |   (x)        |   (x)   |
+| KNN                          |     154               |   (x)                |    (x)       |    (x)    |
+| UMAP                         |    2571           |    (x)                 |  (x)        |  (x)   |
+| Louvain clustering           |    1153                    |   (x)                |   (x)       |   (x)  |
+| Leiden clustering            |    6345                   |   (x)                |   (x)      |   (x) |
+| Re-analysis of subgroup      |     255                   |  (x)                 |    (x)        |   (x)   |
+| End-to-end notebook run      |   18338                   |                        |                |           |
+| Price ($/hr)                 |   3.786                     | 1.296                      | 5.906             | 4.00         |
+| Total cost ($)               |    19.285                  |                       |              |         |
 
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 Human Lung Cells (beta version)
