@@ -24,6 +24,9 @@ import scipy
 import math
 import warnings
 
+import h5py
+from statsmodels import robust
+
 from cuml.linear_model import LinearRegression
 
 
@@ -448,30 +451,11 @@ def leiden(adata, resolution=1.0):
     return clusters
 
 
-def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
-    """
-    Identifies highly variable genes using the 'cellranger' method.
-    
-    Parameters
-    ----------
-    
-    sparse_gpu_array : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
-    
-    genes : cudf series containing genes
-    
-    n_top_genes : number of variable genes
-    """
+def _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes):
 
-    if n_top_genes is None:
-        n_top_genes = genes.shape[0] // 10
-
-    n_cells = sparse_gpu_array.shape[0]
-    mean = sparse_gpu_array.sum(axis=0).flatten() / n_cells
     mean[mean == 0] = 1e-12
-
-    mean_sq = sparse_gpu_array.multiply(sparse_gpu_array).sum(axis=0).flatten() / n_cells
     variance = mean_sq - mean ** 2
-    variance *= sparse_gpu_array.shape[1] / (n_cells - 1)
+    variance *= len(genes) / (n_cells - 1)
     dispersion = variance / mean
 
     df = pd.DataFrame()
@@ -487,7 +471,6 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
     disp_grouped = df.groupby('mean_bin')['dispersions']
     disp_median_bin = disp_grouped.median()
     
-    from statsmodels import robust
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         disp_mad_bin = disp_grouped.apply(robust.mad)
@@ -499,10 +482,139 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
     dispersion_norm = dispersion_norm[~np.isnan(dispersion_norm)]
     dispersion_norm[::-1].sort()
 
+    if n_top_genes is None:
+        n_top_genes = genes.shape[0] // 10
+
     if n_top_genes > df.shape[0]:
         n_top_genes = df.shape[0]
 
     disp_cut_off = dispersion_norm[n_top_genes - 1]
     variable_genes = np.nan_to_num(df['dispersions_norm'].values) >= disp_cut_off
-
     return variable_genes
+
+
+
+def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
+    """
+    Identifies highly variable genes using the 'cellranger' method.
+    
+    Parameters
+    ----------
+    
+    sparse_gpu_array : scipy.sparse.csr_matrix of shape (n_cells, n_genes)
+    
+    genes : cudf series containing genes
+    
+    n_top_genes : number of variable genes
+    """
+
+    n_cells = sparse_gpu_array.shape[0]
+    mean = sparse_gpu_array.sum(axis=0).flatten() / n_cells
+    mean_sq = sparse_gpu_array.multiply(sparse_gpu_array).sum(axis=0).flatten() / n_cells
+    variable_genes = _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes)
+    
+    return variable_genes
+
+
+def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes_per_cell=6000, 
+                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000):
+
+    _data = '/X/data'
+    _index = '/X/indices'
+    _indptr = '/X/indptr'
+    _genes = '/var/_index'
+
+    cell_batch_size = 100000
+    gene_batch_size = 2000
+    
+    batches = []
+    mean = []
+    mean_sq = []
+    
+    # Get data from h5 file
+    print("Calculating data size.")
+    with h5py.File(input_file, 'r') as h5f:
+        indptrs = h5f[_indptr]
+        indices = cp.array(h5f[_index])
+        genes = cudf.Series(h5f[_genes], dtype=cp.dtype('object'))
+        n_cells = indptrs.shape[0] - 1
+
+    # Get indices of genes to filter
+    print("Identifying genes to filter.")
+    gene_query = (cp.bincount(indices) >= min_cells_per_gene)
+    genes_filtered = genes[gene_query].reset_index(drop=True)
+
+    print("Filtering and normalizing data")
+    # Batch by cells and filter, normalize and log transform each batch
+    n_cells_filtered = 0
+    for batch_start in range(0, n_cells, cell_batch_size):
+        # Get batch indices
+        with h5py.File(input_file, 'r') as h5f:
+            indptrs = h5f[_indptr]
+            actual_batch_size = min(cell_batch_size, n_cells - batch_start)
+            batch_end = batch_start + actual_batch_size
+            start_ptr = indptrs[batch_start]
+            end_ptr = indptrs[batch_end]
+
+            # Read data and index of batch from hdf5
+            sub_data = cp.array(h5f[_data][start_ptr:end_ptr])
+            sub_indices = cp.array(h5f[_index][start_ptr:end_ptr])
+
+            # recompute the row pointer for the partial dataset
+            sub_indptrs  = cp.array(indptrs[batch_start:(batch_end + 1)])
+            sub_indptrs = sub_indptrs - sub_indptrs[0]
+
+        # Reconstruct partial sparse array
+        partial_sparse_array = cp.sparse.csr_matrix(
+            (sub_data, sub_indices, sub_indptrs),
+            shape=(batch_end - batch_start, len(genes)))
+
+        # Filter cells in the batch
+        degrees = cp.diff(partial_sparse_array.indptr)
+        query = ((min_genes_per_cell <= degrees) & (degrees <= max_genes_per_cell))
+        n_cells_filtered += sum(query)
+        partial_sparse_array = partial_sparse_array[query]
+    
+        # Filter genes
+        partial_sparse_array = partial_sparse_array[:, gene_query]
+    
+        # Normalize
+        partial_sparse_array = normalize_total(partial_sparse_array, target_sum=target_sum)
+
+        # Log transform
+        batches.append(partial_sparse_array.log1p())
+
+    print("Calculating highly variable genes.")
+    # Batch across genes to calculate gene-wise dispersions
+    for batch_start in range(0, len(genes_filtered), gene_batch_size):
+        # Get batch indices
+        actual_batch_size = min(gene_batch_size, len(genes_filtered) - batch_start)
+        batch_end = batch_start + actual_batch_size
+    
+        partial_sparse_array = cp.sparse.vstack([x[:, batch_start:batch_end] for x in batches])
+
+        # Calculate sum per gene
+        partial_mean = partial_sparse_array.sum(axis=0) / partial_sparse_array.shape[0]
+        mean.append(partial_mean)
+
+        # Calculate sq sum per gene - can batch across genes
+        partial_sparse_array = partial_sparse_array.multiply(partial_sparse_array)
+        partial_mean_sq = partial_sparse_array.sum(axis=0) / partial_sparse_array.shape[0]
+        mean_sq.append(partial_mean_sq)
+    
+    mean = cp.hstack(mean).ravel()
+    mean_sq = cp.hstack(mean_sq).ravel()
+
+    variable_genes = _cellranger_hvg(mean, mean_sq, genes_filtered, n_cells_filtered, n_top_genes)
+
+    print("Storing raw marker gene expression.")
+    marker_genes_raw = {
+        ("%s_raw" % marker): cp.sparse.vstack([x[:, genes_filtered == marker] for x in batches]).todense().ravel()
+        for marker in markers
+    }
+
+    print("Filtering highly variable genes.")
+    sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
+    genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
+    
+    return sparse_gpu_array, genes_filtered, marker_genes_raw
