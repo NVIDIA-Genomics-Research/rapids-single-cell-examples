@@ -32,7 +32,7 @@ from cuml.linear_model import LinearRegression
 
 def _regress_out_chunk(X, y):
     """
-    Performs a data_cunk.shape[1] number of local linear regressions,
+    Performs a data_chunk.shape[1] number of local linear regressions,
     replacing the data in the original chunk w/ the regressed result.
 
     Parameters
@@ -41,8 +41,8 @@ def _regress_out_chunk(X, y):
     X : cupy.ndarray of shape (n_cells, 3)
         Matrix of regressors
 
-    y : cupy.sparse.spmatrix of shape (n_cells,)
-        Sparse matrix containing a single column of the cellxgene matrix
+    y : cupy.ndarray or cupy.sparse.spmatrix of shape (n_cells,)
+        containing a single column of the cellxgene matrix
 
     Returns
     -------
@@ -50,11 +50,12 @@ def _regress_out_chunk(X, y):
     dense_mat : cupy.ndarray of shape (n_cells,)
         Adjusted column
     """
-    y_d = y.todense()
+    if cp.sparse.issparse(y):
+        y = y.todense()
     
     lr = LinearRegression(fit_intercept=False, output_type="cupy")
-    lr.fit(X, y_d, convert_dtype=True)
-    return y_d.reshape(y_d.shape[0],) - lr.predict(X).reshape(y_d.shape[0])
+    lr.fit(X, y, convert_dtype=True)
+    return y.reshape(y.shape[0],) - lr.predict(X).reshape(y.shape[0])
     
 
 def normalize_total(csr_arr, target_sum):
@@ -145,6 +146,9 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     regressors[:, 2] = percent_mito
     
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
+    
+    if n_counts.shape[0] < 1000000:
+        normalized = normalized.todense()
     
     for i in range(normalized.shape[1]):
         if verbose and i % 500 == 0:
