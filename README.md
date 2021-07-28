@@ -90,7 +90,7 @@ We report the runtime of these notebooks on various GCP instances below. All run
 | Differential Gene Expression |        158               |       (x)            | 7.6  (x)    |   (x)   |
 | Re-analysis of subgroup      |         30              |       (x)             | 3.8  (x)     |   (x)    |
 | End-to-end notebook run      |        626                |                        |  141          |           |
-| Price ($/hr)                 |       0.760                  | 1.110                     | 2.953         | 4.00         |
+| Price ($/hr)                 |       0.760                  | 1.110                     | 2.953         | 3.673         |
 | Total cost ($)               |       0.132               |                      |          |         |
 
 
@@ -135,7 +135,7 @@ We report the runtime of these notebooks on various GCP instances below. All run
 | Leiden clustering            |    6345                   |   (x)                |   (x)      |   (x) |
 | Re-analysis of subgroup      |     255                   |  (x)                 |    (x)        |   (x)   |
 | End-to-end notebook run      |   18338                   |                        |                |           |
-| Price ($/hr)                 |   3.786                     | 1.296                      | 5.906             | 4.00         |
+| Price ($/hr)                 |   3.786                     | 1.296                      | 5.906             | 3.673         |
 | Total cost ($)               |    19.285                  |                       |              |         |
 
 
@@ -194,16 +194,16 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> n1-standard-16 <br> 16 vCPUs | GPU <br> n1-standard-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-8 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|-------------------------|----------------------------|-------------------|-------------|
-| PCA                          | 149                     |   (x)                |  71  (x)       |    (x)   |
-| KNN                          | 19.7                      |  (x)                | 20 (x)         |   (x)   |
-| UMAP                         | 69                      |   (x)                 | 0.76 (x)        |  (x)  |
-| Louvain clustering           | 13.1                     |  (x)                 | 0.12 (x)        |  (x)  |
-| Leiden clustering            | 15.7                    |  (x)                | 0.08 (x)       |  (x) |
-| t-SNE                        | 258                     |   (x)                 | 1.5  (x)       |   (x) |
-| Differential Peak Analysis   | 135                     |    (x)                 | 21 (x)        |   (x) |
-| End-to-end notebook run      | 682                    |                         | 134              |           |
-| Price ($/hr)                 | 0.760                   | 1.110                      | 2.953             | 4.00        |
-| Total cost ($)               | 0.144                   |                       | 0.110             |        |
+| PCA                          | 149                     |   (x)                 |  71  (x)       |  54  (2.8x) |
+| KNN                          | 19.7                      |  (x)                | 20 (x)         |  5.3 (3.7x) |
+| UMAP                         | 69                      |   (x)                 | 0.76 (x)       | 0.69 (100x) |
+| Louvain clustering           | 13.1                     |  (x)                 | 0.12 (x)       | 0.11 (119x) |
+| Leiden clustering            | 15.7                    |  (x)                  | 0.08 (x)       | 0.06 (262x) |
+| t-SNE                        | 258                     |   (x)                 | 1.5  (x)       |  2.2 (117x) |
+| Differential Peak Analysis   | 135                     |    (x)                | 21 (x)         | 10.4  (13x) |
+| End-to-end notebook run      | 682                    |                        | 134            |   92        |
+| Price ($/hr)                 | 0.760                   | 1.110                 | 2.953          | 3.673       |
+| Total cost ($)               | 0.144                   |                       | 0.110          |    0.094    |
 
 
 ## Example 5: Visualizing Chromatin Accessibility in 5,000 PBMCs with RAPIDS and AtacWorks (Beta version)
