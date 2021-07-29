@@ -12,7 +12,7 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.7.0rc1
+      - scanpy==1.8.1
       - python-igraph
       - louvain
       - leidenalg
