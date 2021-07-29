@@ -24,6 +24,7 @@ import scipy
 import math
 
 from cuml.linear_model import LinearRegression
+from cuml.preprocessing import StandardScaler
 
 
 def scale(normalized, max_value=10):
@@ -47,15 +48,9 @@ def scale(normalized, max_value=10):
         Dense normalized matrix
     """
 
-    normalized = cp.asarray(normalized)
-    mean = normalized.mean(axis=0)
-    normalized -= mean
-    del mean
-    stddev = cp.sqrt(normalized.var(axis=0))
-    normalized /= stddev
-    del stddev
+    scaled = StandardScaler().fit_transform(normalized)
     
-    return normalized.clip(a_max=max_value)
+    return scaled.clip(a_max=max_value)
 
 
 def _regress_out_chunk(X, y):
@@ -408,7 +403,8 @@ def rank_genes_groups(
     reference = groups_order[0]
     if len(groups) == 1:
         raise Exception('Cannot perform logistic regression on a single cluster.')
-    grouping_mask = labels.astype('int').isin(cudf.Series(groups_order))
+        
+    grouping_mask = labels.astype('int').isin(cudf.Series(groups_order).astype('int'))
     grouping = labels.loc[grouping_mask]
     
     X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault
