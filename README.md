@@ -125,18 +125,18 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> n1-highmem-64 <br> 64 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|----------------------------|-------------------|--------------|
-| Data load + Preprocessing    |    1120                   |  1121 (1x)                 |  967 (x)         |  475 (2.4x)    |
-| PCA                          |      44                   |   44 (1x)                  |   43 (x)        |   17.8 (2.5x)  |
-| t-SNE                        |    6509                   |  189 (34x)                 |   50 (x)        |   37  (176x)  |
-| k-means (single iteration)   |     148                   |  12.7 (12x)                |  2.6 (x)         |    2 (74x)   |
-| KNN                          |     154                   |   (x)                 |   92 (x)        |   62 (2.5x)    |
-| UMAP                         |    2571                   |    (x)                |  32 (x)          |   21 (122x)   |
-| Louvain clustering           |    1153                   |   (x)                 |  3.9 (x)         |    2.4 (480x)  |
-| Leiden clustering            |    6345                   |   (x)                 |  2.7 (x)         |    1.7 (3732x) |
-| Re-analysis of subgroup      |     255                   |  (x)                  |   15 (x)        |   17.9 (14.2x)   |
-| End-to-end notebook run      |   18338                   |                       |    1265           |   686       |
-| Price ($/hr)                 |   3.786                   | 1.296                 | 5.906         | 3.673         |
-| Total cost ($)               |    19.285                 |                       |               |   0.700      |
+| Data load + Preprocessing    |    1120                   |  1121 (1x)                 |  967 (1.2x)       |  475 (2.4x)    |
+| PCA                          |      44                   |   45 (1x)                  |   43 (1x)         |   17.8 (2.5x)  |
+| t-SNE                        |    6509                   |  196 (33x)                 |   50 (130x)       |   37  (176x)  |
+| k-means (single iteration)   |     148                   |  12.7 (12x)                |  2.6 (57x)        |    2 (74x)   |
+| KNN                          |     154                   |   141 (1.1x)               |   92 (1.7x)       |   62 (2.5x)    |
+| UMAP                         |    2571                   |   146 (18x)                |  32 (80x)         |   21 (122x)   |
+| Louvain clustering           |    1153                   |  6.1 (189x)                |  3.9 (296x)       |    2.4 (480x)  |
+| Leiden clustering            |    6345                   |   5.1 (1244x)              |  2.7 (2350x)      |    1.7 (3732x) |
+| Re-analysis of subgroup      |     255                   |  19.2 (13x)                |   15 (17x)        |   17.9 (14.2x)   |
+| End-to-end notebook run      |   18338                   |    1759                    |    1265           |   686       |
+| Price ($/hr)                 |   3.786                   | 1.296                      | 5.906             | 3.673         |
+| Total cost ($)               |    19.285                 |  0.633                     |    2.075           |   0.700      |
 
 
 ## Example 3: GPU-based Interactive Visualization of 70,000 Human Lung Cells (beta version)
