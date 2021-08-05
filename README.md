@@ -103,7 +103,7 @@ We demonstrate the use of RAPIDS to accelerate the analysis of single-cell RNA-s
 
 Compared to the previous example, here we make several adjustments to handle the larger dataset. We perform most of the preprocessing operations (e.g. filtering, normalization) while reading the dataset in batches. Further, we perform a batched PCA by training on a fraction of cells and transforming the data in batches.
 
-This example relies heavily on UVM and a few of the operations oversubscribed a 32GB V100 GPU on a DGX1. While this example should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available. Oversubscribing a GPU by more than a factor of 2x can cause thrashing in UVM, which can ultimately lead to the notebook freezing.
+This example relies heavily on UVM. While it should work on any GPU built on the Pascal architecture or newer, you will want to make sure there is enough main memory available. Oversubscribing a GPU by more than a factor of 2x can cause thrashing in UVM, which can ultimately lead to the notebook freezing.
 
 ### Example Dataset
 
@@ -125,7 +125,7 @@ We report the runtime of these notebooks on various GCP instances below. All run
 
 | Step                         | CPU <br> n1-highmem-64 <br> 64 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|----------------------------|-------------------|--------------|
-| Data load + Preprocessing    |    1120                   |  1121 (1x)                 |  967 (1.2x)       |  475 (2.4x)    |
+| Data load + Preprocessing    |    1120                   |  1125 (1x)                 |  967 (1.2x)       |  475 (2.4x)    |
 | PCA                          |      44                   |   45 (1x)                  |   43 (1x)         |   17.8 (2.5x)  |
 | t-SNE                        |    6509                   |  196 (33x)                 |   50 (130x)       |   37  (176x)  |
 | k-means (single iteration)   |     148                   |  12.7 (12x)                |  2.6 (57x)        |    2 (74x)   |
