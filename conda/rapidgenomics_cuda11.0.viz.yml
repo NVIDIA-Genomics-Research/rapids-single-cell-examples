@@ -6,10 +6,10 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - rapids=21.06*
+  - rapids=21.08*
   - cudatoolkit=11.0
   - python-wget
-  - cupy=8*
+  - cupy=9*
   - cmake
   - jupyterlab
   - wget

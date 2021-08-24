@@ -35,11 +35,11 @@ DATASETS = {
 # Key: String: Example name
 # Value: (String, String): conda env. name, relative path the conda yml file.
 CONDA_ENV_MAPPING = {
-    'hlca_lung': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    'hlca_lung_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda10.2.viz.yml'),
-    'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    '5k_pbmc_coverage': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
+    'hlca_lung': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    'hlca_lung_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda11.0.viz.yml'),
+    'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    '5k_pbmc_coverage': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
 }
 
 NOTEBOOKS = {
@@ -138,7 +138,7 @@ To execute 'hlca_lung' example in container, please execute following command:
             run(create_cmd, shell=True)
 
         run(['bash', '-c',
-            'source activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name)],
+            'conda activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name)],
             check=True)
 
         return env_name
