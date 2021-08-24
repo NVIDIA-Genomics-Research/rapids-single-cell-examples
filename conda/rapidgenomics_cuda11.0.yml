@@ -21,5 +21,4 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - atacworks
       - atacworks==0.3.4
