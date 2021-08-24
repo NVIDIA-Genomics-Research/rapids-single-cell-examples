@@ -15,6 +15,7 @@ dependencies:
   - pytabix
   - cmake
   - jupyterlab
+  - ipykernel
   - wget
   - scanpy==1.8.1
   - pyBigWig
@@ -25,3 +26,4 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
+      - atacworks==0.3.4
