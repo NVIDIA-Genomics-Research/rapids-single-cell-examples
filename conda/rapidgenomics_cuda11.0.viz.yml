@@ -8,11 +8,11 @@ channels:
 dependencies:
   - python=3.7
   - rapids=21.08*
-  - cudatoolkit=11.2
-  - python-wget
-  - cupy=8*
   - tabix
   - pytabix
+  - cudatoolkit=11.0
+  - python-wget
+  - cupy=9*
   - cmake
   - jupyterlab
   - ipykernel
@@ -23,6 +23,7 @@ dependencies:
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
+  - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy

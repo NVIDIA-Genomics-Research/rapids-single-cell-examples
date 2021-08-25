@@ -8,9 +8,9 @@ channels:
 dependencies:
   - python=3.7
   - rapids=21.08*
-  - cudatoolkit=11.2
+  - cudatoolkit=11.0
   - python-wget
-  - cupy=8*
+  - cupy=9*
   - tabix
   - pytabix
   - cmake
@@ -19,6 +19,7 @@ dependencies:
   - wget
   - scanpy==1.8.1
   - pyBigWig
+  - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy
