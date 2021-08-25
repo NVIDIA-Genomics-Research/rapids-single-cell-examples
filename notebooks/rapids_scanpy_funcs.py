@@ -24,10 +24,36 @@ import scipy
 import math
 import warnings
 
+from cuml.linear_model import LinearRegression
+from cuml.preprocessing import StandardScaler
+
+
+def scale(normalized, max_value=10):
+    """
+    Scales matrix to unit variance and clips values
+
+    Parameters
+    ----------
+
+    normalized : cupy.ndarray or numpy.ndarray of shape (n_cells, n_genes)
+                 Matrix to scale
+    max_value : int
+                After scaling matrix to unit variance,
+                values will be clipped to this number
+                of std deviations.
+
+    Return
+    ------
+
+    normalized : cupy.ndarray of shape (n_cells, n_genes)
+        Dense normalized matrix
+    """
+
+    scaled = StandardScaler().fit_transform(normalized)
+    
+    return scaled.clip(a_max=max_value)
 import h5py
 from statsmodels import robust
-
-from cuml.linear_model import LinearRegression
 
 
 def _regress_out_chunk(X, y):
@@ -380,7 +406,8 @@ def rank_genes_groups(
     reference = groups_order[0]
     if len(groups) == 1:
         raise Exception('Cannot perform logistic regression on a single cluster.')
-    grouping_mask = labels.isin(cudf.Series(groups_order))
+        
+    grouping_mask = labels.astype('int').isin(cudf.Series(groups_order).astype('int'))
     grouping = labels.loc[grouping_mask]
     
     X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault

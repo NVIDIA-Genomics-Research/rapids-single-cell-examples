@@ -1,5 +1,6 @@
 channels:
   - rapidsai
+  - rapidsai-nightly
   - nvidia
   - conda-forge
   - bioconda
@@ -14,11 +15,12 @@ dependencies:
   - pytabix
   - cmake
   - jupyterlab
+  - ipykernel
   - wget
+  - scanpy==1.8.1
   - pyBigWig
   - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.7.2
       - atacworks==0.3.4

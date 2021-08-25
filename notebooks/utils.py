@@ -7,22 +7,16 @@ def pca(adata, n_components=50, train_ratio=0.35, n_batches=50, gpu=False):
     """
     Performs a batched PCA by training on the first `train_ratio` samples
     and transforming in `n_batches` number of batches.
-
     Parameters
     ----------
-
     adata : anndata.AnnData of shape (n_cells, n_genes)
         Annotated data object for which to perform PCA
-
     n_components : int
         Number of principal components to keep
-
     train_ratio : float
         Percentage of cells to use for training
-
     n_batches : int
         Number of batches to use for transform
-
     gpu : bool
         Uses Scikit-Learn for CPU (gpu=False) and RAPIDS cuML for GPU
         (gpu=True)

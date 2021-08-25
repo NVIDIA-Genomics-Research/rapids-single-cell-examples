@@ -15,7 +15,8 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.7.2
+      - scanpy==1.8.1
+      - python-igraph
       - louvain
       - MulticoreTSNE
       - pynndescent

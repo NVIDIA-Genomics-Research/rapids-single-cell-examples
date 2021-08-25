@@ -5,11 +5,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     git python3-setuptools python3-pip build-essential libcurl4-gnutls-dev \
     zlib1g-dev rsync vim cmake tabix
 
+RUN git clone \
+    https://github.com/cjnolet/AtacWorks.git atacworks
+
+
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.7.2 wget pytabix dash-daq atacworks==0.3.4 \
+    scanpy==1.8.1 wget pytabix dash-daq \
     dash-html-components dash-bootstrap-components dash-core-components
 
-RUN /opt/conda/envs/rapids/bin/pip install --ignore-installed numba==0.52.0
+RUN cd atacworks && /opt/conda/envs/rapids/bin/pip install .
 
 WORKDIR /workspace
 ENV HOME /workspace
