@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=rapidsai/rapidsai:21.08-cuda11.0-runtime-ubuntu18.04-py3.7
 
 FROM ${BASE_IMAGE}
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git python3-setuptools python3-pip build-essential libcurl4-gnutls-dev \
     zlib1g-dev rsync vim cmake tabix
 

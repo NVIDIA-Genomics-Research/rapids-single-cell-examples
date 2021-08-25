@@ -138,7 +138,7 @@ To execute 'hlca_lung' example in container, please execute following command:
             run(create_cmd, shell=True)
 
         run(['bash', '-c',
-            'conda activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name)],
+            'source activate %s && python3 -m ipykernel install --user --name=%s' % (env_name, env_name)],
             check=True)
 
         return env_name

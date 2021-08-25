@@ -16,6 +16,7 @@ dependencies:
   - jupyterlab
   - wget
   - pyBigWig
+  - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy

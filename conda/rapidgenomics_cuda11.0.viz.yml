@@ -17,6 +17,7 @@ dependencies:
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
+  - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy
