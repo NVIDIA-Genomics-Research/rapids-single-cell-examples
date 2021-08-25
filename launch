@@ -35,11 +35,11 @@ DATASETS = {
 # Key: String: Example name
 # Value: (String, String): conda env. name, relative path the conda yml file.
 CONDA_ENV_MAPPING = {
-    'hlca_lung': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    'hlca_lung_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda10.2.viz.yml'),
-    'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
-    '5k_pbmc_coverage': ('rapidgenomics', 'conda/rapidgenomics_cuda10.2.yml'),
+    'hlca_lung': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    'hlca_lung_viz': ('rapidgenomics_viz', 'conda/rapidgenomics_cuda11.0.viz.yml'),
+    'dsci_bmmc_60k': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    '1M_brain': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
+    '5k_pbmc_coverage': ('rapidgenomics', 'conda/rapidgenomics_cuda11.0.yml'),
 }
 
 NOTEBOOKS = {
