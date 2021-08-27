@@ -825,4 +825,4 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
     
     return sparse_gpu_array, genes_filtered, marker_genes_raw
->>>>>>> master
+
