@@ -88,7 +88,7 @@ def _regress_out_chunk(X, y):
     dense_mat : cupy.ndarray of shape (n_cells,)
         Adjusted column
     """
-    y_d = y.todense()
+    y_d = y
     
     lr = LinearRegression(fit_intercept=False, output_type="cupy")
     lr.fit(X, y_d, convert_dtype=True)
