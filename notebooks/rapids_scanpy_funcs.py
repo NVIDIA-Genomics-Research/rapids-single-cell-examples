@@ -657,7 +657,36 @@ def highly_variable_genes_filter(client,
     dispersion = variance / mean
 
     df = pd.DataFrame()
+    df['genes'] = genes.to_array()
+    df['means'] = mean.tolist()
+    df['dispersions'] = dispersion.tolist()
+    df['mean_bin'] = pd.cut(
+        df['means'],
+        np.r_[-np.inf, np.percentile(df['means'], np.arange(10, 105, 5)), np.inf],
+    )
 
+    disp_grouped = df.groupby('mean_bin')['dispersions']
+    disp_median_bin = disp_grouped.median()
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        disp_mad_bin = disp_grouped.apply(robust.mad)
+        df['dispersions_norm'] = (
+            df['dispersions'].values - disp_median_bin[df['mean_bin'].values].values
+        ) / disp_mad_bin[df['mean_bin'].values].values
+
+    dispersion_norm = df['dispersions_norm'].values
+
+    dispersion_norm = dispersion_norm[~np.isnan(dispersion_norm)]
+    dispersion_norm[::-1].sort()
+
+    if n_top_genes > df.shape[0]:
+        n_top_genes = df.shape[0]
+
+    disp_cut_off = dispersion_norm[n_top_genes - 1]
+    vaiable_genes = np.nan_to_num(df['dispersions_norm'].values) >= disp_cut_off
+
+    return vaiable_genes
 def _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes):
 
     mean[mean == 0] = 1e-12
