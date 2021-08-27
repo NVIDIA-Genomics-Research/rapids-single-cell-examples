@@ -1,23 +1,30 @@
 channels:
   - rapidsai
+  - rapidsai-nightly
   - nvidia
   - conda-forge
   - bioconda
   - defaults
 dependencies:
   - python=3.7
-  - rapids=0.17*
-  - cudatoolkit=10.2
+  - rapids=21.08*
+  - tabix
+  - pytabix
+  - cudatoolkit=11.0
   - python-wget
-  - cupy=8*
+  - cupy=9*
   - cmake
   - jupyterlab
+  - ipykernel
   - wget
+  - scanpy==1.8.1
+  - pyBigWig
   - dash-daq
   - dash-html-components
   - dash-bootstrap-components
   - dash-core-components
+  - ipykernel
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.7.0rc1
+      - atacworks==0.3.4

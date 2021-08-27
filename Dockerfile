@@ -1,13 +1,19 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:0.17-cuda11.0-runtime-ubuntu18.04-py3.7
+ARG BASE_IMAGE=rapidsai/rapidsai:21.08-cuda11.0-runtime-ubuntu18.04-py3.7
 
 FROM ${BASE_IMAGE}
-RUN apt update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git python3-setuptools python3-pip build-essential libcurl4-gnutls-dev \
     zlib1g-dev rsync vim cmake tabix
 
+RUN git clone \
+    https://github.com/cjnolet/AtacWorks.git atacworks
+
+
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.7.0rc1 wget pytabix atacworks==0.3.3 dash-daq \
+    scanpy==1.8.1 wget pytabix dash-daq \
     dash-html-components dash-bootstrap-components dash-core-components
+
+RUN cd atacworks && /opt/conda/envs/rapids/bin/pip install .
 
 WORKDIR /workspace
 ENV HOME /workspace
