@@ -121,7 +121,7 @@ We provide a second notebook with the CPU version of this analysis [here](notebo
 
 ### Acceleration
 
-We report the runtime of these notebooks on various GCP instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on Dec 16, 2020.
+We report the runtime of these notebooks on various GCP instances below. All runtimes are given in seconds. Acceleration is given in parentheses. Benchmarking was performed on Dec 16, 2020. Note: this section is out of date and will be revised shortly.
 
 | Step                         | CPU <br> n1-highmem-64 <br> 64 vCPUs | GPU <br> n1-highmem-16 <br> T4 16 GB GPU <br> (Acceleration)  | GPU <br> n1-highmem-16 <br> Tesla V100 16 GB GPU <br> (Acceleration) | GPU <br> a2-highgpu-1g <br> Tesla A100 40GB GPU <br> (Acceleration) |
 |------------------------------|---------------------------|----------------------------|-------------------|--------------|
