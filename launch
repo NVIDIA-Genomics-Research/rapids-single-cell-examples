@@ -267,6 +267,7 @@ To execute 'hlca_lung' example in container, please execute following command:
         cmd = """docker run \
             %s --rm \
             --network host \
+            --shm-size=512m \
             -p %d:8888 \
             -v %s:/workspace/rapids-single-cell-examples/data \
             -e HOME=/workspace \
