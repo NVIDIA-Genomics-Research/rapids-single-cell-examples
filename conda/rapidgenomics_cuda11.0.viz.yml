@@ -7,10 +7,12 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - rapids=21.08*
+  - cuml=21.12*
+  - cudf=21.12*
+  - cugraph=21.12*
   - tabix
   - pytabix
-  - cudatoolkit=11.0
+  - cudatoolkit=11.2
   - python-wget
   - cupy=9*
   - cmake
