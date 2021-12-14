@@ -62,7 +62,8 @@ def scale(normalized, max_value=10):
 
     scaled = StandardScaler().fit_transform(normalized)
     
-    return scaled.clip(a_max=max_value)
+    return cp.clip(scaled, a_min= -max_value,a_max=max_value)
+
 import h5py
 from statsmodels import robust
 
@@ -184,7 +185,7 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
     
-    if n_counts.shape[0] < 100000:
+    if n_counts.shape[0] < 100000 and cp.sparse.issparse(normaliz):
         normalized = normalized.todense()
     
     for i in range(normalized.shape[1]):
