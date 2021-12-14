@@ -62,7 +62,8 @@ def scale(normalized, max_value=10):
 
     scaled = StandardScaler().fit_transform(normalized)
     
-    return scaled.clip(a_max=max_value)
+    return cp.clip(scaled, a_min= -max_value,a_max=max_value)
+
 import h5py
 from statsmodels import robust
 
@@ -184,7 +185,7 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
     
-    if n_counts.shape[0] < 100000:
+    if n_counts.shape[0] < 100000 and cp.sparse.issparse(normalized):
         normalized = normalized.todense()
     
     for i in range(normalized.shape[1]):
@@ -440,7 +441,7 @@ def rank_genes_groups(
         partial_indices = cp.argsort(scores[partition])[::-1]
         global_indices = reference_indices[partition][partial_indices]
         rankings_gene_scores.append(scores[global_indices].get())  ## Shouldn't need to take this off device
-        rankings_gene_names.append(var_names[global_indices].to_pandas())
+        rankings_gene_names.append(var_names.iloc[global_indices].to_pandas())
         if len(groups_order) <= 2:
             break
 
