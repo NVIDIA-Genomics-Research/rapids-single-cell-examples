@@ -441,7 +441,7 @@ def rank_genes_groups(
         partial_indices = cp.argsort(scores[partition])[::-1]
         global_indices = reference_indices[partition][partial_indices]
         rankings_gene_scores.append(scores[global_indices].get())  ## Shouldn't need to take this off device
-        rankings_gene_names.append(var_names[global_indices].to_pandas())
+        rankings_gene_names.append(var_names.iloc[global_indices].to_pandas())
         if len(groups_order) <= 2:
             break
 
