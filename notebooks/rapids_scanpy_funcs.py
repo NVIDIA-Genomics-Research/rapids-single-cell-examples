@@ -185,7 +185,7 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
     
-    if n_counts.shape[0] < 100000 and cp.sparse.issparse(normaliz):
+    if n_counts.shape[0] < 100000 and cp.sparse.issparse(normalized):
         normalized = normalized.todense()
     
     for i in range(normalized.shape[1]):
