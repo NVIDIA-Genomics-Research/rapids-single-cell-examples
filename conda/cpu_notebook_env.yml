@@ -12,6 +12,7 @@ dependencies:
   - wget
   - python-igraph
   - leidenalg
+  - cmake=3.13*
   - pip
   - pip:
       - jupyter-server-proxy
