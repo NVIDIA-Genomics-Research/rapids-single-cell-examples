@@ -422,8 +422,6 @@ def rank_genes_groups(
     grouping_mask = labels.astype('int').isin(cudf.Series(groups_order).astype('int'))
     grouping = labels.loc[grouping_mask]
     
-    print(str(grouping_mask.values))
-    
     X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault
     y = labels.loc[grouping]
     
