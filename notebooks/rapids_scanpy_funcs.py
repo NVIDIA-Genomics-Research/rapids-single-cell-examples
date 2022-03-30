@@ -18,6 +18,7 @@ import cupy as cp
 import cudf
 import cugraph
 
+import time
 import dask
 from cuml.dask.common.part_utils import _extract_partitions
 from cuml.common.memory_utils import with_cupy_rmm
@@ -582,6 +583,7 @@ def read_with_filter(client,
             # recompute the row pointer for the partial dataset
             sub_indptrs  = cp.array(indptrs[batch_start:(batch_end + 1)])
             sub_indptrs = sub_indptrs - sub_indptrs[0]
+        start = time.time()
 
         # Reconstruct partial sparse array
         partial_sparse_array = cp.sparse.csr_matrix(
@@ -595,6 +597,8 @@ def read_with_filter(client,
 
         if post_processor is not None:
             partial_sparse_array = post_processor(partial_sparse_array)
+            
+        print("Preprocessing and filtering took: %ss" % (time.time() - start))
 
         return partial_sparse_array
 
@@ -754,15 +758,15 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
 
 
 def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes_per_cell=6000, 
-                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000):
+                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000, max_cells=50000):
 
     _data = '/X/data'
     _index = '/X/indices'
     _indptr = '/X/indptr'
     _genes = '/var/_index'
 
-    cell_batch_size = 100000
-    gene_batch_size = 2000
+    cell_batch_size = min(100000, max_cells)
+    gene_batch_size = 4000
     
     batches = []
     mean = []
@@ -774,8 +778,9 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
         indptrs = h5f[_indptr]
         indices = cp.array(h5f[_index])
         genes = cudf.Series(h5f[_genes], dtype=cp.dtype('object'))
-        n_cells = indptrs.shape[0] - 1
+        n_cells = min(max_cells, indptrs.shape[0] - 1)
 
+    start = time.time()
     # Get indices of genes to filter
     print("Identifying genes to filter.")
     gene_query = (cp.bincount(indices) >= min_cells_per_gene)
@@ -853,6 +858,8 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     print("Filtering highly variable genes.")
     sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
     genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
+    
+    print("Preprocessing and filtering took %ss" % (time.time() - start))
     
     return sparse_gpu_array, genes_filtered, marker_genes_raw
 
