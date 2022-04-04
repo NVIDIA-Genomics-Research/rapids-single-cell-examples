@@ -754,15 +754,15 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
 
 
 def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes_per_cell=6000, 
-                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000):
+                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000, max_cells=50000):
 
     _data = '/X/data'
     _index = '/X/indices'
     _indptr = '/X/indptr'
     _genes = '/var/_index'
 
-    cell_batch_size = 100000
-    gene_batch_size = 2000
+    cell_batch_size = min(100000, max_cells)
+    gene_batch_size = 4000
     
     batches = []
     mean = []
@@ -772,18 +772,16 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     print("Calculating data size.")
     with h5py.File(input_file, 'r') as h5f:
         indptrs = h5f[_indptr]
-        indices = cp.array(h5f[_index])
         genes = cudf.Series(h5f[_genes], dtype=cp.dtype('object'))
-        n_cells = indptrs.shape[0] - 1
+        n_cells = min(max_cells, indptrs.shape[0] - 1)
 
-    # Get indices of genes to filter
-    print("Identifying genes to filter.")
-    gene_query = (cp.bincount(indices) >= min_cells_per_gene)
-    genes_filtered = genes[gene_query].reset_index(drop=True)
+    start = time.time()
 
-    print("Filtering and normalizing data")
-    # Batch by cells and filter, normalize and log transform each batch
+    print("Filtering cells")
+    # Batch by cells and filter
     n_cells_filtered = 0
+    gene_counts = cp.zeros(shape=(len(genes),), dtype=cp.dtype('int32'))
+    
     for batch_start in range(0, n_cells, cell_batch_size):
         # Get batch indices
         with h5py.File(input_file, 'r') as h5f:
@@ -811,7 +809,17 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
         query = ((min_genes_per_cell <= degrees) & (degrees <= max_genes_per_cell))
         n_cells_filtered += sum(query)
         partial_sparse_array = partial_sparse_array[query]
+        batches.append(partial_sparse_array)
     
+        # Update gene count
+        gene_counts += cp.bincount(partial_sparse_array.indices)
+    
+    print("Identifying genes to filter")
+    gene_query = (gene_counts >= min_cells_per_gene)
+    genes_filtered = genes[gene_query].reset_index(drop=True)
+    
+    print("Filtering genes and normalizing data")
+    for i, partial_sparse_array in enumerate(batches):
         # Filter genes
         partial_sparse_array = partial_sparse_array[:, gene_query]
     
@@ -819,7 +827,7 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
         partial_sparse_array = normalize_total(partial_sparse_array, target_sum=target_sum)
 
         # Log transform
-        batches.append(partial_sparse_array.log1p())
+        batches[i] = partial_sparse_array.log1p()
 
     print("Calculating highly variable genes.")
     # Batch across genes to calculate gene-wise dispersions
@@ -854,5 +862,6 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
     genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
     
+    print("Preprocessing and filtering took %ss" % (time.time() - start))
+    
     return sparse_gpu_array, genes_filtered, marker_genes_raw
-
