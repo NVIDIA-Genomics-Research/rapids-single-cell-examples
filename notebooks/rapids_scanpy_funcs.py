@@ -548,7 +548,7 @@ def read_with_filter(client,
                      sample_file,
                      min_genes_per_cell=200,
                      max_genes_per_cell=6000,
-                     min_cells = 0,
+                     min_cells = 1,
                      num_cells=None,
                      batch_size=50000,
                      partial_post_processor=None):
