@@ -778,7 +778,10 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     with h5py.File(input_file, 'r') as h5f:
         indptrs = h5f[_indptr]
         genes = cudf.Series(h5f[_genes], dtype=cp.dtype('object'))
-        n_cells = min(max_cells, indptrs.shape[0] - 1)
+        if max_cells is not None:
+            n_cells = min(max_cells, indptrs.shape[0] - 1)
+        else:
+            n_cells = indptrs.shape[0] - 1
 
     start = time.time()
 
