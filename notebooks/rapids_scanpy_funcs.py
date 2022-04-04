@@ -754,16 +754,21 @@ def highly_variable_genes(sparse_gpu_array, genes, n_top_genes=None):
 
 
 def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes_per_cell=6000, 
-                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000, max_cells=50000):
+                          min_cells_per_gene=1, target_sum=1e4, n_top_genes=5000, max_cells=None):
 
     _data = '/X/data'
     _index = '/X/indices'
     _indptr = '/X/indptr'
     _genes = '/var/_index'
 
-    cell_batch_size = min(100000, max_cells)
+    # Set batch size
+    if max_cells is not None:
+        cell_batch_size = min(100000, max_cells)
+    else:
+        cell_batch_size = 100000
     gene_batch_size = 4000
     
+    # Empty lists
     batches = []
     mean = []
     mean_sq = []
