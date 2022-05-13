@@ -19,7 +19,7 @@ dependencies:
   - jupyterlab
   - ipykernel
   - wget
-  - scanpy==1.8.1
+  - scanpy==1.9.1
   - pyBigWig
   - ipykernel
   - pip

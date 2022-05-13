@@ -5,10 +5,10 @@ channels:
 dependencies:
   - python=3.7
   - python-wget
-  - scikit-learn
   - umap-learn
   - cmake
   - jupyterlab
+  - scanpy=1.9.1
   - wget
   - python-igraph
   - leidenalg
@@ -16,7 +16,6 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
-      - scanpy==1.8.1
       - python-igraph
       - louvain
       - MulticoreTSNE
