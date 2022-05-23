@@ -598,8 +598,6 @@ def read_with_filter(client,
         if post_processor is not None:
             partial_sparse_array = post_processor(partial_sparse_array)
             
-        print("Preprocessing and filtering took: %ss" % (time.time() - start))
-
         return partial_sparse_array
 
 
@@ -873,7 +871,5 @@ def preprocess_in_batches(input_file, markers, min_genes_per_cell=200, max_genes
     print("Filtering highly variable genes.")
     sparse_gpu_array =  cp.sparse.vstack([partial_sparse_array[:, variable_genes] for partial_sparse_array in batches])
     genes_filtered = genes_filtered[variable_genes].reset_index(drop=True)
-    
-    print("Preprocessing and filtering took %ss" % (time.time() - start))
     
     return sparse_gpu_array, genes_filtered, marker_genes_raw
