@@ -6,11 +6,11 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3.7
-  - cuml=21.12*
-  - cudf=21.12*
-  - cugraph=21.12*
-  - cudatoolkit=11.2
+  - python=3.8
+  - cuml=22.02*
+  - cudf=22.02*
+  - cugraph=22.02*
+  - cudatoolkit=11.5
   - python-wget
   - cupy=9*
   - tabix
@@ -19,7 +19,7 @@ dependencies:
   - jupyterlab
   - ipykernel
   - wget
-  - scanpy==1.8.1
+  - scanpy==1.9.1
   - pyBigWig
   - ipykernel
   - pip

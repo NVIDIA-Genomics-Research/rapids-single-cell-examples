@@ -46,7 +46,7 @@ main_fig_height = 700
 
 class Visualization:
 
-    def __init__(self, adata, markers,
+    def __init__(self, adata, markers=[],
                  re_cluster_callback=None,
                  n_components=50,
                  n_neighbors=50,
@@ -154,7 +154,7 @@ class Visualization:
         violins = self.update_violin_plot(self.tdf)
 
         col_classes = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight'}
-        col_class = col_classes[12 / len(violins)]
+        col_class = col_classes[12 / len(violins)] if len(violins) > 0 else None
         divs_violin = []
         for i in range(0, len(violins)):
             divs_violin.append(
@@ -362,7 +362,7 @@ class Visualization:
         self.reset()
 
         return self.app.run_server(
-            debug=True, use_reloader=False, host=host, port=port)
+            debug=False, use_reloader=False, host=host, port=port)
 
     def reset_dialog(self, n_clicks):
         if not dash.callback_context.triggered:
