@@ -49,8 +49,9 @@ RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in
 
 ## Citation
 
-If you use this code, please cite: <a href="https://zenodo.org/badge/latestdoi/265649968"><img src="https://zenodo.org/badge/265649968.svg" alt="DOI"></a>
+If you use this code, please cite our preprint:
 
+Nolet C., Lal A., et al., (2022). [Accelerating single-cell genomic analysis with GPUs](https://www.biorxiv.org/content/10.1101/2022.05.26.493607v1). bioRxiv.
 
 
 ## Example 1: Single-cell RNA-seq of 70,000 Human Lung Cells
