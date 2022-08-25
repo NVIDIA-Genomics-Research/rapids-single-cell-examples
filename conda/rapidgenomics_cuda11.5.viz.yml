@@ -7,20 +7,24 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - cuml=22.02*
-  - cudf=22.02*
-  - cugraph=22.02*
-  - cudatoolkit=11.5
-  - python-wget
-  - cupy=9*
+  - cuml=22.08*
+  - cudf=22.08*
+  - cugraph=22.08*
   - tabix
   - pytabix
+  - cudatoolkit=11.5
+  - cupy=9*
+  - python-wget
   - cmake
   - jupyterlab
   - ipykernel
   - wget
   - scanpy==1.9.1
   - pyBigWig
+  - dash-daq
+  - dash-html-components
+  - dash-bootstrap-components
+  - dash-core-components
   - ipykernel
   - pip
   - pip:

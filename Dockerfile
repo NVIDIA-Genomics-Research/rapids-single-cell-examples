@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=rapidsai/rapidsai:22.02-cuda11.2-runtime-ubuntu18.04-py3.8
+ARG BASE_IMAGE=rapidsai/rapidsai:22.08-cuda11.5-runtime-ubuntu18.04-py3.8
 
 FROM ${BASE_IMAGE}
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -10,7 +10,7 @@ RUN git clone \
 
 
 RUN /opt/conda/envs/rapids/bin/pip install \
-    scanpy==1.8.1 wget pytabix dash-daq \
+    scanpy==1.9.1 wget pytabix dash-daq \
     dash-html-components dash-bootstrap-components dash-core-components
 
 RUN cd atacworks && /opt/conda/envs/rapids/bin/pip install .
@@ -18,7 +18,7 @@ RUN cd atacworks && /opt/conda/envs/rapids/bin/pip install .
 WORKDIR /workspace
 ENV HOME /workspace
 RUN git clone \
-    https://github.com/clara-parabricks/rapids-single-cell-examples.git \
+    https://github.com/NVIDIA-Genomics-Research/rapids-single-cell-examples.git \
     rapids-single-cell-examples
 
 ARG GIT_BRANCH=master
@@ -34,5 +34,5 @@ CMD jupyter-lab \
 		--NotebookApp.token="" \
 		--NotebookApp.password_required=False
 
-# ENV LD_LIBRARY_PATH /usr/local/cuda-10.2/compat
+# ENV LD_LIBRARY_PATH /usr/local/cuda-11.5/compat
 # RUN echo "export PATH=$PATH:/workspace/data" >> ~/.bashrc
