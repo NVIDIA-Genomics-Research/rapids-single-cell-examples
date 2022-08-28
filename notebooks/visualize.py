@@ -261,10 +261,10 @@ class Visualization:
             gdf = df.query(query)
             fig.add_trace(
                 go.Scattergl({
-                'x': gdf['x'].to_array(),
-                'y': gdf['y'].to_array(),
-                'text': gdf['labels'].to_array(),
-                'customdata': gdf['point_index'].to_array(),
+                'x': gdf['x'].to_numpy(),
+                'y': gdf['y'].to_numpy(),
+                'text': gdf['labels'].to_numpy(),
+                'customdata': gdf['point_index'].to_numpy(),
                 'name': 'Cluster ' + si,
                 'mode': 'markers',
                 'marker': {'size': 3, 'color': colors[i % len(colors)]}
@@ -286,10 +286,10 @@ class Visualization:
             gdf = df.query(query)
             fig = {
                 'type':'scattergl',
-                'x': gdf['x'].to_array(),
-                'y': gdf['y'].to_array(),
-                'text': gdf['labels'].to_array(),
-                'customdata': gdf['point_index'].to_array(),
+                'x': gdf['x'].to_numpy(),
+                'y': gdf['y'].to_numpy(),
+                'text': gdf['labels'].to_numpy(),
+                'customdata': gdf['point_index'].to_numpy(),
                 'name': 'Cluster ' + si,
                 'mode': 'markers',
                 'marker': {'size': 3, 'color': colors[i % len(colors)]}        }
@@ -341,7 +341,7 @@ class Visualization:
             query = 'labels == ' + si
             gdf = df.query(query)
 
-            y = gdf[marker_val].to_array()
+            y = gdf[marker_val].to_numpy()
             x = [i] * len(y)
             fig.add_trace(
                 go.Violin({

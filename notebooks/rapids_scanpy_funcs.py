@@ -308,7 +308,7 @@ def select_groups(labels, groups_order_subset='all'):
         groups_ids = []
         for name in groups_order_subset:
             groups_ids.append(
-                cp.where(cp.array(labels.cat.categories.to_array().astype("int32")) == int(name))[0][0]
+                cp.where(cp.array(labels.cat.categories.to_numpy().astype("int32")) == int(name))[0][0]
             )
         if len(groups_ids) == 0:
             # fallback to index retrieval
@@ -321,9 +321,9 @@ def select_groups(labels, groups_order_subset='all'):
             
         groups_ids = [groups_id.item() for groups_id in groups_ids]
         groups_masks = groups_masks[groups_ids]
-        groups_order_subset = labels.cat.categories[groups_ids].to_array().astype(int)
+        groups_order_subset = labels.cat.categories[groups_ids].to_numpy().astype(int)
     else:
-        groups_order_subset = groups_order.to_array()
+        groups_order_subset = groups_order.to_numpy()
     return groups_order_subset, groups_masks
 
 
@@ -427,7 +427,7 @@ def rank_genes_groups(
     y = labels.loc[grouping]
     
     clf = LogisticRegression(**kwds)
-    clf.fit(X.get(), grouping.to_array().astype('float32'))
+    clf.fit(X.get(), grouping.astype('float32').to_numpy())
     scores_all = cp.array(clf.coef_).T
     
     for igroup, group in enumerate(groups_order):
@@ -660,7 +660,7 @@ def highly_variable_genes_filter(client,
     dispersion = variance / mean
 
     df = pd.DataFrame()
-    df['genes'] = genes.to_array()
+    df['genes'] = genes.to_numpy()
     df['means'] = mean.tolist()
     df['dispersions'] = dispersion.tolist()
     df['mean_bin'] = pd.cut(
@@ -699,7 +699,7 @@ def _cellranger_hvg(mean, mean_sq, genes, n_cells, n_top_genes):
 
     df = pd.DataFrame()
     # Note - can be replaced with cudf once 'cut' is added in 21.08
-    df['genes'] = genes.to_array()
+    df['genes'] = genes.to_numpy()
     df['means'] = mean.tolist()
     df['dispersions'] = dispersion.tolist()
     df['mean_bin'] = pd.cut(
