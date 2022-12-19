@@ -291,12 +291,11 @@ def filter_genes(sparse_gpu_array, genes_idx, min_cells=0):
 
 
 def select_groups(labels, groups_order_subset='all'):
-    adata_obs_key = labels
     groups_order = labels.cat.categories
-    groups_masks = cp.zeros(
+    groups_masks = np.zeros(
         (len(labels.cat.categories), len(labels.cat.codes)), dtype=bool
     )
-    for iname, name in enumerate(labels.cat.categories.to_pandas()):
+    for iname, name in enumerate(labels.cat.categories):
         # if the name is not found, fallback to index retrieval
         if labels.cat.categories[iname] in labels.cat.codes:
             mask = labels.cat.categories[iname] == labels.cat.codes
@@ -308,32 +307,32 @@ def select_groups(labels, groups_order_subset='all'):
         groups_ids = []
         for name in groups_order_subset:
             groups_ids.append(
-                cp.where(cp.array(labels.cat.categories.to_numpy().astype("int32")) == int(name))[0][0]
+                np.where(name == labels.cat.categories)[0]
             )
         if len(groups_ids) == 0:
             # fallback to index retrieval
-            groups_ids = cp.where(
-                cp.in1d(
-                    cp.arange(len(labels.cat.categories)).astype(str),
-                    cp.array(groups_order_subset),
+            groups_ids = np.where(
+                np.in1d(
+                    np.arange(len(labels.cat.categories)).astype(str),
+                    np.array(groups_order_subset),
                 )
             )[0]
-            
         groups_ids = [groups_id.item() for groups_id in groups_ids]
+        if len(groups_ids) >2:    
+            groups_ids = np.sort(groups_ids)
         groups_masks = groups_masks[groups_ids]
-        groups_order_subset = labels.cat.categories[groups_ids].to_numpy().astype(int)
+        groups_order_subset = labels.cat.categories[groups_ids].to_numpy()
     else:
         groups_order_subset = groups_order.to_numpy()
     return groups_order_subset, groups_masks
 
 
 def rank_genes_groups(
-    X,
-    labels,  # louvain results
-    var_names,
-    groups=None,
+    adata,
+    groupby,  
+    groups="all",
     reference='rest',
-    n_genes=100,
+    n_genes = None,
     **kwds,
 ):
 
@@ -343,8 +342,7 @@ def rank_genes_groups(
     Parameters
     ----------
 
-    X : cupy.ndarray of shape (n_cells, n_genes)
-        The cellxgene matrix to rank genes
+    adata : adata object
 
     labels : cudf.Series of size (n_cells,)
         Observations groupings to consider
@@ -367,7 +365,7 @@ def rank_genes_groups(
     #### Wherever we see "adata.obs[groupby], we should just replace w/ the groups"
         
     # for clarity, rename variable
-    if groups == 'all':
+    if groups == 'all' or groups == None:
         groups_order = 'all'
     elif isinstance(groups, (str, int)):
         raise ValueError('Specify a sequence of groups')
@@ -377,6 +375,7 @@ def rank_genes_groups(
             groups_order = [str(n) for n in groups_order]
         if reference != 'rest' and reference not in set(groups_order):
             groups_order += [reference]
+    labels = pd.Series(adata.obs[groupby]).reset_index(drop="True")
     if (
         reference != 'rest'
         and reference not in set(labels.cat.categories)
@@ -390,23 +389,25 @@ def rank_genes_groups(
     
     original_reference = reference
     
-    n_vars = len(var_names)
 
+    X = adata.X
+    var_names = adata.var_names
+    
     # for clarity, rename variable
     n_genes_user = n_genes
     # make sure indices are not OoB in case there are less genes than n_genes
-    if n_genes_user > X.shape[1]:
+    if n_genes == None or n_genes_user > X.shape[1]:
         n_genes_user = X.shape[1]
     # in the following, n_genes is simply another name for the total number of genes
-    n_genes = X.shape[1]
+
 
     n_groups = groups_masks.shape[0]
-    ns = cp.zeros(n_groups, dtype=int)
+    ns = np.zeros(n_groups, dtype=int)
     for imask, mask in enumerate(groups_masks):
-        ns[imask] = cp.where(mask)[0].size
+        ns[imask] = np.where(mask)[0].size
     if reference != 'rest':
-        ireference = cp.where(groups_order == reference)[0][0]
-    reference_indices = cp.arange(n_vars, dtype=int)
+        reference = np.where(groups_order == reference)[0][0]
+    reference_indices = cp.arange(X.shape[1], dtype=int)
 
     rankings_gene_scores = []
     rankings_gene_names = []
@@ -415,19 +416,26 @@ def rank_genes_groups(
         
     # if reference is not set, then the groups listed will be compared to the rest
     # if reference is set, then the groups listed will be compared only to the other groups listed
+    refname = reference
     from cuml.linear_model import LogisticRegression
     reference = groups_order[0]
     if len(groups) == 1:
         raise Exception('Cannot perform logistic regression on a single cluster.')
         
-    grouping_mask = labels.astype('int').isin(cudf.Series(groups_order).astype('int'))
+    grouping_mask = labels.isin(pd.Series(groups_order))
     grouping = labels.loc[grouping_mask]
     
-    X = X[grouping_mask.values, :]  # Indexing with a series causes issues, possibly segfault
-    y = labels.loc[grouping]
+    X = X[grouping_mask.values, :]
+    # Indexing with a series causes issues, possibly segfault
+        
+    grouping_logreg = grouping.cat.codes.to_numpy().astype('float32')
+    uniques = np.unique(grouping_logreg)
+    for idx, cat in enumerate(uniques):
+        grouping_logreg[np.where(grouping_logreg == cat)] = idx
+
     
     clf = LogisticRegression(**kwds)
-    clf.fit(X.get(), grouping.astype('float32').to_numpy())
+    clf.fit(X, grouping_logreg)
     scores_all = cp.array(clf.coef_).T
     
     for igroup, group in enumerate(groups_order):
@@ -435,19 +443,20 @@ def rank_genes_groups(
             scores = scores_all[0]
         else:
             scores = scores_all[igroup]
-
+        
         partition = cp.argpartition(scores, -n_genes_user)[-n_genes_user:]
         partial_indices = cp.argsort(scores[partition])[::-1]
         global_indices = reference_indices[partition][partial_indices]
-        rankings_gene_scores.append(scores[global_indices].get())  ## Shouldn't need to take this off device
-        rankings_gene_names.append(var_names.iloc[global_indices].to_pandas())
+        rankings_gene_scores.append(scores[global_indices].get())  
+        rankings_gene_names.append(var_names[global_indices.get()])
         if len(groups_order) <= 2:
             break
 
     groups_order_save = [str(g) for g in groups_order]
     if (len(groups) == 2):
-        groups_order_save = [g for g in groups_order if g != reference]
-            
+        groups_order_save = [groups_order_save[0]]
+
+    
     scores = np.rec.fromarrays(
         [n for n in rankings_gene_scores],
         dtype=[(rn, 'float32') for rn in groups_order_save],
@@ -457,9 +466,8 @@ def rank_genes_groups(
         [n for n in rankings_gene_names],
         dtype=[(rn, 'U50') for rn in groups_order_save],
     )
-        
-    return scores, names, original_reference
 
+    return scores, names, original_reference
 
 def leiden(adata, resolution=1.0):
     """
