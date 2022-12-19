@@ -150,7 +150,7 @@ def normalize_total(csr_arr, target_sum):
     return csr_arr
 
 
-def regress_out(normalized, n_counts, percent_mito, verbose=False):
+def regress_out(normalized, n_counts, percent_mito, batchsize = 100, verbose=False):
 
     """
     Use linear regression to adjust for the effects of unwanted noise
@@ -169,6 +169,12 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     percent_mito : cupy.ndarray of shape (n_cells,)
         Percentage of genes that each cell needs to adjust for
 
+    batchsize: Union[int,Literal["all"],None] (default: 100)
+        Number of genes that should be processed together. 
+        If `'all'` all genes will be processed together if `normalized.shape[0]` <100000. 
+        If `None` each gene will be analysed seperatly.
+        Will be ignored if cuML version < 22.12
+
     verbose : bool
         Print debugging information
 
@@ -186,37 +192,52 @@ def regress_out(normalized, n_counts, percent_mito, verbose=False):
     
     outputs = cp.empty(normalized.shape, dtype=normalized.dtype, order="F")
     
-    if n_counts.shape[0] < 100000 and cp.sparse.issparse(normalized):
-        normalized = normalized.todense()
 
     # cuML gained support for multi-target regression in version 22.12. This
     # removes the need for a Python for loop and speeds up the code
-    # significantly. When 'normalized' has not been converted to dense, the
-    # multi-target regression is not used to prevent running out of memory.
+    # significantly.     
     cuml_supports_multi_target = LinearRegression._get_tags()['multioutput']
-    is_dense = not cp.sparse.issparse(normalized)
 
-    if cuml_supports_multi_target and is_dense:
-        X = regressors
-        y = normalized
-
-        # Use SVD algorithm as this is the only algorithm supported in the
-        # multi-target regression. In addition, it is more numerically stable
-        # than the default 'eig' algorithm.
-        lr = LinearRegression(fit_intercept=False, output_type="cupy", algorithm='svd')
-        lr.fit(X, y, convert_dtype=True)
-        # Instead of "return y - lr.predict(X), we write to outputs to maintain
-        # "F" ordering like in the else branch.
-        outputs[:] = y - lr.predict(X)
+    if cuml_supports_multi_target and batchsize:
+        if batchsize == "all" and normalized.shape[0] < 100000:
+            if cp.sparse.issparse(normalized): 
+                normalized = normalized.todense()
+            X = regressors
+            # Use SVD algorithm as this is the only algorithm supported in the
+            # multi-target regression. In addition, it is more numerically stable
+            # than the default 'eig' algorithm.
+            lr = LinearRegression(fit_intercept=False, output_type="cupy", algorithm='svd')
+            lr.fit(X, normalized, convert_dtype=True)
+            outputs[:] = normalized - lr.predict(X)
+        else:
+            if batchsize == "all":
+                batchsize = 100
+            n_batches = math.ceil(normalized.shape[1] / batchsize)
+            for batch in range(n_batches):
+                start_idx = batch * batchsize
+                stop_idx = min(batch * batchsize + batchsize,normalized.shape[1])
+                if cp.sparse.issparse(normalized):
+                    arr_batch = normalized[:,start_idx:stop_idx].todense()
+                else:
+                    arr_batch = normalized[:,start_idx:stop_idx].copy()
+                X = regressors
+                lr = LinearRegression(fit_intercept=False, output_type="cupy", algorithm='svd')
+                lr.fit(X, arr_batch, convert_dtype=True)
+                # Instead of "return y - lr.predict(X), we write to outputs to maintain
+                # "F" ordering like in the else branch.
+                outputs[:,start_idx:stop_idx] =arr_batch - lr.predict(X)
     else:
+        if normalized.shape[0] < 100000 and cp.sparse.issparse(normalized):
+            normalized = normalized.todense()
         for i in range(normalized.shape[1]):
             if verbose and i % 500 == 0:
                 print("Regressed %s out of %s" %(i, normalized.shape[1]))
             X = regressors
             y = normalized[:,i]
             outputs[:, i] = _regress_out_chunk(X, y)
-    
+            
     return outputs
+
 
 
 def filter_cells(sparse_gpu_array, min_genes, max_genes, rows_per_batch=10000, barcodes=None):
