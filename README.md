@@ -49,6 +49,9 @@ RAPIDS provides a [GPU Dashboard](https://medium.com/rapids-ai/gpu-dashboards-in
 
 ## Citation
 
+[![DOI](https://zenodo.org/badge/265649968.svg)](https://zenodo.org/badge/latestdoi/265649968)
+
+
 If you use this code, please cite our preprint:
 
 Nolet C., Lal A., et al., (2022). [Accelerating single-cell genomic analysis with GPUs](https://www.biorxiv.org/content/10.1101/2022.05.26.493607v1). bioRxiv.
