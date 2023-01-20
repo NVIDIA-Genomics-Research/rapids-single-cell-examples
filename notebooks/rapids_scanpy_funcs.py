@@ -436,8 +436,9 @@ def rank_genes_groups(
     
     clf = LogisticRegression(**kwds)
     clf.fit(X, grouping_logreg)
-    scores_all = cp.array(clf.coef_).T
-    
+    scores_all = cp.array(clf.coef_)
+    if len(groups_order)== scores_all.shape[1]:
+        scores_all= scores_all.T
     for igroup, group in enumerate(groups_order):
         if len(groups_order) <= 2:  # binary logistic regression
             scores = scores_all[0]
