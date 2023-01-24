@@ -25,12 +25,12 @@ docker run --gpus all --rm -v /mnt/data:/data claraparabricks/single-cell-exampl
 All dependencies for these examples can be installed with conda.
 
 ```bash
-conda env create --name rapidgenomics -f conda/rapidgenomics_cuda11.0.yml
+conda env create --name rapidgenomics -f conda/rapidgenomics_cuda11.5.yml
 conda activate rapidgenomics
 python -m ipykernel install --user --display-name "Python (rapidgenomics)"
 ```
 
-After installing the necessary dependencies, you can just run `jupyter lab`.
+After installing the necessary dependencies, you can just run `jupyter lab`. There are are a few different conda environment files which correspond to different notebooks. In addition to the one listed above, there is one for the CPU notebooks, one for the real-time visualization notebook, and one for the AtacSeq notebook.
 
 
 ## Configuration
