@@ -7,9 +7,9 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - cuml=22.12*
-  - cudf=22.12*
-  - cugraph=22.12*
+  - cuml=22.08*
+  - cudf=22.08*
+  - cugraph=22.08*
   - cudatoolkit=11.5
   - python-wget
   - cupy=9*
@@ -25,3 +25,4 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
+      - atacworks==0.3.4
