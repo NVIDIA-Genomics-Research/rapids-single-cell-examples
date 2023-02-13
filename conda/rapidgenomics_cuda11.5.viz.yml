@@ -26,7 +26,7 @@ dependencies:
   - dash-bootstrap-components
   - dash-core-components
   - ipykernel
-  - pip
   - pip:
       - jupyter-server-proxy
-      - atacworks==0.3.4
+      - git+https://github.com/cjnolet/AtacWorks.git
+

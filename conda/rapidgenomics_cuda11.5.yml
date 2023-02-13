@@ -25,3 +25,4 @@ dependencies:
   - pip
   - pip:
       - jupyter-server-proxy
+      - git+https://github.com/cjnolet/AtacWorks.git
