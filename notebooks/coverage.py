@@ -235,7 +235,7 @@ def get_coverages(start, end, fragments):
     coverage_df = expanded_fragments.groupby(['chrom', 'start', 'end', 'cluster'], as_index=False).count()
 
     # List all clusters
-    clusters = sorted(np.unique(fragments_copy['cluster'].to_array()))
+    clusters = sorted(np.unique(fragments_copy['cluster'].astype(int).to_numpy()))
     num_clusters = len(clusters)
 
     # Create empty array
