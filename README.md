@@ -1,3 +1,19 @@
+# Deprecation Notice
+
+[![status: deprecated](https://img.shields.io/badge/status-deprecated-red.svg)](#)
+
+This repository is deprecated in favor of scverse/rapids_singlecell, an scverse core package for RAPIDS-accelerated single-cell analysis.
+
+For installation, usage, and migration guidance, see the documentation: https://rapids-singlecell.readthedocs.io/en/latest/
+
+Active development, issue tracking, and releases are maintained at: https://github.com/scverse/rapids_singlecell
+
+This repository is retained for reference only and will not receive further updates or fixes.
+If you rely on this code, please update your workflows to use rapids_singlecell and file any new issues or feature requests in the scverse repository.
+
+
+
+
 # GPU-Accelerated Single-Cell Genomics Analysis with RAPIDS
 
 This repository contains example notebooks demonstrating how to use [RAPIDS](https://rapids.ai) for GPU-accelerated analysis of single-cell sequencing data.
