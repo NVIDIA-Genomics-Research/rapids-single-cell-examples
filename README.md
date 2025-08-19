@@ -4,11 +4,14 @@
 
 This repository is deprecated in favor of scverse/rapids_singlecell, an scverse core package for RAPIDS-accelerated single-cell analysis.
 
-For installation, usage, and migration guidance, see the documentation: https://rapids-singlecell.readthedocs.io/en/latest/
+* For installation, usage, and migration guidance, see the documentation: https://rapids-singlecell.readthedocs.io/en/latest/
 
-Active development, issue tracking, and releases are maintained at: https://github.com/scverse/rapids_singlecell
+* Active development, issue tracking, and releases are maintained at: https://github.com/scverse/rapids_singlecell
 
-This repository is retained for reference only and will not receive further updates or fixes.
+* NVIDIA blueprint to try RAPIDS-singlecell and get hands-on: https://build.nvidia.com/nvidia/single-cell-analysis
+
+* This repository is retained for reference only and will not receive further updates or fixes.
+
 If you rely on this code, please update your workflows to use rapids_singlecell and file any new issues or feature requests in the scverse repository.
 
 
